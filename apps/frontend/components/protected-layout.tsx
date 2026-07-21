@@ -9,35 +9,65 @@ type NavigationItem = {
   href: string;
   label: string;
   permissions?: string[];
+  icon: string;
 };
 
 const navigationItems: NavigationItem[] = [
-  { href: '/dashboard', label: 'Главная' },
+  { href: '/dashboard', label: 'Главная', icon: '🏠' },
   {
     href: '/search',
     label: 'Поиск запчастей',
     permissions: ['INVENTORY_VIEW'],
+    icon: '🔍',
   },
-  { href: '/inventory', label: 'Товары', permissions: ['INVENTORY_VIEW'] },
-  { href: '/sales', label: 'Продажи', permissions: ['SALES_VIEW', 'SALES_CREATE'] },
+  {
+    href: '/inventory',
+    label: 'Товары',
+    permissions: ['INVENTORY_VIEW'],
+    icon: '📦',
+  },
+  {
+    href: '/sales',
+    label: 'Продажи',
+    permissions: ['SALES_VIEW', 'SALES_CREATE'],
+    icon: '💰',
+  },
   {
     href: '/purchases',
     label: 'Закупки',
     permissions: ['PURCHASES_VIEW', 'PURCHASES_CREATE'],
+    icon: '🚚',
   },
   {
     href: '/dashboard/inventory/import',
     label: 'Импорт Excel',
     permissions: ['INVENTORY_IMPORT'],
+    icon: '📥',
   },
   {
     href: '/employees',
     label: 'Сотрудники',
     permissions: ['EMPLOYEES_VIEW'],
+    icon: '👥',
   },
-  { href: '/shops', label: 'Магазины', permissions: ['SHOPS_VIEW'] },
-  { href: '/part-categories', label: 'Категории запчастей', permissions: ['CATALOG_MANAGE'] },
-  { href: '/part-catalog', label: 'Центральный каталог', permissions: ['CATALOG_MANAGE'] },
+  {
+    href: '/shops',
+    label: 'Магазины',
+    permissions: ['SHOPS_VIEW'],
+    icon: '🏪',
+  },
+  {
+    href: '/part-categories',
+    label: 'Категории',
+    permissions: ['CATALOG_MANAGE'],
+    icon: '🗂',
+  },
+  {
+    href: '/part-catalog',
+    label: 'Каталог',
+    permissions: ['CATALOG_MANAGE'],
+    icon: '📚',
+  },
 ];
 
 const roleLabels = {
@@ -48,10 +78,21 @@ const roleLabels = {
   VIEWER: 'Наблюдатель',
 };
 
-export function ProtectedLayout({ children }: { children: ReactNode }) {
+export function ProtectedLayout({
+  children,
+}: {
+  children: ReactNode;
+}) {
   const pathname = usePathname();
   const router = useRouter();
-  const { hasAnyPermission, isAuthenticated, isLoading, logout, user } = useAuth();
+
+  const {
+    hasAnyPermission,
+    isAuthenticated,
+    isLoading,
+    logout,
+    user,
+  } = useAuth();
 
   useEffect(() => {
     if (!isLoading && (!isAuthenticated || !user)) {
@@ -61,8 +102,8 @@ export function ProtectedLayout({ children }: { children: ReactNode }) {
 
   if (isLoading) {
     return (
-      <main className="grid min-h-screen place-items-center bg-slate-100 text-slate-600">
-        Загрузка профиля…
+      <main className="grid min-h-screen place-items-center bg-slate-100">
+        Загрузка...
       </main>
     );
   }
@@ -71,9 +112,14 @@ export function ProtectedLayout({ children }: { children: ReactNode }) {
     return null;
   }
 
-  const fullName = [user.firstName, user.lastName].filter(Boolean).join(' ');
+  const fullName = [user.firstName, user.lastName]
+    .filter(Boolean)
+    .join(' ');
+
   const visibleItems = navigationItems.filter(
-    (item) => !item.permissions || hasAnyPermission(...item.permissions),
+    (item) =>
+      !item.permissions ||
+      hasAnyPermission(...item.permissions),
   );
 
   function handleLogout() {
@@ -82,43 +128,88 @@ export function ProtectedLayout({ children }: { children: ReactNode }) {
   }
 
   return (
-    <div className="min-h-screen bg-slate-100 text-slate-900 md:flex">
-      <aside className="border-b border-slate-200 bg-white p-4 md:min-h-screen md:w-64 md:border-r md:border-b-0">
-        <Link href="/dashboard" className="text-xl font-bold text-blue-700">
-          AutoStock
-        </Link>
+    <div className="min-h-screen bg-slate-100 md:flex">
 
-        <div className="mt-5 rounded-lg bg-slate-50 p-3 text-sm">
-          <p className="font-medium text-slate-900">{fullName || user.phone}</p>
-          <p className="mt-1 text-slate-500">{roleLabels[user.role]}</p>
-          {user.shop && <p className="mt-1 text-slate-500">{user.shop.name}</p>}
+      <aside className="w-72 bg-slate-950 text-white shadow-2xl">
+
+        <div className="p-6">
+
+          <Link href="/dashboard" className="block">
+            <h1 className="text-3xl font-bold">
+              AutoStock
+            </h1>
+
+            <p className="mt-1 text-sm text-slate-400">
+              Система управления автозапчастями
+            </p>
+          </Link>
+
+          <div className="mt-6 rounded-xl border border-slate-800 bg-slate-900 p-4">
+
+            <p className="text-xs uppercase tracking-widest text-slate-500">
+              Пользователь
+            </p>
+
+            <p className="mt-3 text-lg font-semibold">
+              {fullName || user.phone}
+            </p>
+
+            <p className="mt-1 text-sm text-slate-400">
+              {roleLabels[user.role]}
+            </p>
+
+            {user.shop && (
+              <div className="mt-3 rounded-lg bg-slate-800 px-3 py-2 text-sm">
+                🏪 {user.shop.name}
+              </div>
+            )}
+          </div>
+
+          <div className="my-6 border-t border-slate-800"></div>
+
+          <nav className="space-y-2">
+
+            {visibleItems.map((item) => {
+
+              const isActive =
+                pathname === item.href ||
+                pathname.startsWith(`${item.href}/`);
+
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={`flex items-center gap-3 rounded-xl px-4 py-3 transition-all ${
+                    isActive
+                      ? 'bg-blue-600 text-white shadow-lg'
+                      : 'text-slate-400 hover:bg-slate-900 hover:text-white'
+                  }`}
+                >
+                  <span>{item.icon}</span>
+
+                  <span>{item.label}</span>
+
+                </Link>
+              );
+            })}
+
+          </nav>
+
+          <button
+            onClick={handleLogout}
+            className="mt-8 w-full rounded-xl bg-red-600 px-4 py-3 font-medium text-white transition hover:bg-red-700"
+          >
+            Выйти
+          </button>
+
         </div>
 
-        <nav className="mt-6 flex gap-2 overflow-x-auto md:block">
-          {visibleItems.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={`block whitespace-nowrap rounded px-3 py-2 text-sm ${
-                pathname === item.href
-                  ? 'bg-blue-50 font-medium text-blue-700'
-                  : 'text-slate-600 hover:bg-slate-100'
-              }`}
-            >
-              {item.label}
-            </Link>
-          ))}
-        </nav>
-
-        <button
-          onClick={handleLogout}
-          className="mt-6 rounded border border-slate-300 px-3 py-2 text-sm"
-        >
-          Выйти
-        </button>
       </aside>
 
-      <section className="flex-1 p-4 md:p-8">{children}</section>
+      <main className="flex-1 p-8">
+        {children}
+      </main>
+
     </div>
   );
 }
