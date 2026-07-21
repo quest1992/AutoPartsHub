@@ -1,0 +1,4 @@
+'use client';
+import { Suspense } from 'react'; import { useRouter,useSearchParams } from 'next/navigation'; import { ProtectedLayout } from '../../../components/protected-layout'; import { useAuth } from '../../../components/auth-provider'; import { PartCategoryForm } from '../../../components/part-category-form';
+function Content(){const r=useRouter(),q=useSearchParams();const{hasPermission,isLoading}=useAuth();const ok=hasPermission('CATALOG_MANAGE');return <ProtectedLayout>{!isLoading&&!ok?<p className="rounded bg-white p-5">Недостаточно прав для управления категориями.</p>:<><h1 className="text-2xl font-bold">Добавить категорию</h1><PartCategoryForm parentId={q.get('parentId')??undefined} onSuccess={()=>r.push('/part-categories')}/></>}</ProtectedLayout>}
+export default function NewPartCategoryPage(){return <Suspense fallback={<main className="grid min-h-screen place-items-center">Загрузка…</main>}><Content/></Suspense>}

@@ -1,0 +1,3 @@
+'use client';
+import { useRouter } from 'next/navigation'; import { ProtectedLayout } from '../../../components/protected-layout'; import { useAuth } from '../../../components/auth-provider'; import { PartCatalogForm } from '../../../components/part-catalog-form';
+export default function NewPartCatalogPage(){const r=useRouter();const{hasPermission,isLoading}=useAuth();const ok=hasPermission('CATALOG_MANAGE');return <ProtectedLayout>{!isLoading&&!ok?<p className="rounded bg-white p-5">Недостаточно прав для управления каталогом.</p>:<><h1 className="text-2xl font-bold">Добавить позицию каталога</h1><PartCatalogForm onSuccess={()=>r.push('/part-catalog?created=1')}/></>}</ProtectedLayout>}

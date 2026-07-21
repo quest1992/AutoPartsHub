@@ -1,0 +1,1 @@
+import Link from 'next/link'; export default function Forbidden(){return <main className="min-h-screen p-8 text-center"><h1 className="text-2xl font-bold">Недостаточно прав</h1><p className="mt-2">У вас нет доступа к этому разделу.</p><Link className="mt-5 inline-block rounded bg-blue-600 px-4 py-2 text-white" href="/dashboard">Вернуться на Dashboard</Link></main>}

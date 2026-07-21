@@ -1,0 +1,15 @@
+# AutoStock Database
+
+## Tables
+
+- users
+- shops
+- employees
+- manufacturers
+- vehicle_models
+- categories
+- parts_catalog
+- part_oem_numbers
+- inventory
+- price_history
+- excel_imports
