@@ -2,9 +2,17 @@ import * as XLSX from 'xlsx';
 import { normalizePartName } from '../../common/utils/part-name-normalizer';
 import { normalizePartNumber } from '../../common/utils/part-number-normalizer';
 
-export type ImportField = 'partNumber' | 'name' | 'price' | 'quantity';
+export type ImportField =
+  | 'category'
+  | 'subcategory'
+  | 'partNumber'
+  | 'name'
+  | 'price'
+  | 'quantity';
 
 export interface ColumnMappingInput {
+  categoryColumn?: string | null;
+  subcategoryColumn?: string | null;
   partNumberColumn?: string | null;
   nameColumn?: string | null;
   priceColumn?: string | null;
@@ -12,6 +20,8 @@ export interface ColumnMappingInput {
 }
 
 export interface ResolvedColumnMapping {
+  categoryColumn: string;
+  subcategoryColumn: string | null;
   partNumberColumn: string | null;
   nameColumn: string;
   priceColumn: string;
@@ -26,10 +36,18 @@ export interface ParsedWorksheet {
 }
 
 export interface NormalizedImportRow {
+  categoryName: string | null;
+  normalizedCategoryName: string | null;
+
+  subcategoryName: string | null;
+  normalizedSubcategoryName: string | null;
+
   partNumber: string | null;
   rawPartNumber: string | null;
+
   name: string | null;
   rawName: string | null;
+
   price: number | null;
   quantity: number;
 }
@@ -37,6 +55,20 @@ export interface NormalizedImportRow {
 export type PreviewRowStatus = 'valid' | 'invalid' | 'requires_review';
 
 const COLUMN_ALIASES: Record<ImportField, string[]> = {
+  category: [
+    'категория',
+    'категориятовара',
+    'категориядетали',
+    'category',
+    'partcategory',
+  ],
+
+  subcategory: [
+    'подкатегория',
+    'подкатегориятовара',
+    'подкатегориядетали',
+    'subcategory',
+  ],
   partNumber: [
     'oem',
     'артикул',
@@ -74,7 +106,6 @@ const COLUMN_ALIASES: Record<ImportField, string[]> = {
     'количество',
     'колво',
     'наличие',
-    'склад',
     'quantity',
     'qty',
     'stock',
@@ -97,7 +128,8 @@ export function normalizeHeader(value: unknown): string {
   return cellText(value)
     .trim()
     .toLowerCase()
-    .replace(/[\s_-]+/g, '')
+    .replace(/[＊*]/g, '')
+    .replace(/[\s_./\\-]+/g, '')
     .replace(/ё/g, 'е');
 }
 
@@ -107,12 +139,14 @@ export function suggestColumnMapping(
   const mapping: Partial<Record<ImportField, string>> = {};
   const used = new Set<string>();
 
-  for (const field of [
-    'partNumber',
-    'name',
-    'price',
-    'quantity',
-  ] as ImportField[]) {
+for (const field of [
+  'category',
+  'subcategory',
+  'partNumber',
+  'name',
+  'price',
+  'quantity',
+] as ImportField[]) {
     for (const column of columns) {
       if (used.has(column)) continue;
       const key = normalizeHeader(column);
@@ -228,20 +262,43 @@ export function resolveColumnMapping(
   input?: ColumnMappingInput,
 ): { mapping: ResolvedColumnMapping; errors: string[] } {
   const suggested = suggestColumnMapping(columns);
-  const mapping: ResolvedColumnMapping = {
-    partNumberColumn:
-      input?.partNumberColumn?.trim() ||
-      suggested.partNumber ||
-      null,
-    nameColumn:
-      input?.nameColumn?.trim() || suggested.name || '',
-    priceColumn:
-      input?.priceColumn?.trim() || suggested.price || '',
-    quantityColumn:
-      input?.quantityColumn?.trim() || suggested.quantity || '',
-  };
+ const mapping: ResolvedColumnMapping = {
+  categoryColumn:
+    input?.categoryColumn?.trim() ||
+    suggested.category ||
+    '',
+
+  subcategoryColumn:
+    input?.subcategoryColumn?.trim() ||
+    suggested.subcategory ||
+    null,
+
+  partNumberColumn:
+    input?.partNumberColumn?.trim() ||
+    suggested.partNumber ||
+    null,
+
+  nameColumn:
+    input?.nameColumn?.trim() ||
+    suggested.name ||
+    '',
+
+  priceColumn:
+    input?.priceColumn?.trim() ||
+    suggested.price ||
+    '',
+
+  quantityColumn:
+    input?.quantityColumn?.trim() ||
+    suggested.quantity ||
+    '',
+};
 
   const errors: string[] = [];
+
+  if (!mapping.categoryColumn) {
+  errors.push('Не выбрана колонка с категорией');
+}
   if (!mapping.nameColumn) {
     errors.push('Не выбрана колонка с наименованием');
   }
@@ -328,40 +385,76 @@ export function normalizeImportRow(
   source: Record<string, string>,
   mapping: ResolvedColumnMapping,
 ): { normalized: NormalizedImportRow; errors: string[] } {
+  const categoryName = mapping.categoryColumn
+    ? source[mapping.categoryColumn]?.trim() || null
+    : null;
+
+  const subcategoryName = mapping.subcategoryColumn
+    ? source[mapping.subcategoryColumn]?.trim() || null
+    : null;
+
   const rawPartNumber = mapping.partNumberColumn
     ? source[mapping.partNumberColumn]?.trim() || null
     : null;
+
   const rawName = mapping.nameColumn
     ? source[mapping.nameColumn]?.trim() || null
     : null;
+
   const rawPrice = mapping.priceColumn
     ? source[mapping.priceColumn]
     : undefined;
+
   const rawQuantity = mapping.quantityColumn
     ? source[mapping.quantityColumn]
     : undefined;
 
   const errors: string[] = [];
+
+  if (!categoryName) {
+    errors.push('Не указана категория');
+  }
+
+  if (!rawName) {
+    errors.push('Не указано наименование');
+  }
+
   const partNumber = rawPartNumber
     ? normalizePartNumber(rawPartNumber) || null
     : null;
-  const name = rawName ? normalizePartName(rawName) || null : null;
+
+  const name = rawName
+    ? normalizePartName(rawName) || null
+    : null;
 
   if (!partNumber && !name) {
     errors.push('Укажите артикул или наименование');
   }
-  if (!rawName?.trim()) {
-    errors.push('Не указано наименование');
-  }
 
   const priceResult = normalizePriceValue(rawPrice);
-  if (priceResult.error) errors.push(priceResult.error);
+  if (priceResult.error) {
+    errors.push(priceResult.error);
+  }
 
   const quantityResult = normalizeQuantityValue(rawQuantity);
-  if (quantityResult.error) errors.push(quantityResult.error);
+  if (quantityResult.error) {
+    errors.push(quantityResult.error);
+  }
 
   return {
     normalized: {
+      categoryName,
+
+      normalizedCategoryName: categoryName
+        ? normalizePartName(categoryName) || null
+        : null,
+
+      subcategoryName,
+
+      normalizedSubcategoryName: subcategoryName
+        ? normalizePartName(subcategoryName) || null
+        : null,
+
       partNumber,
       rawPartNumber,
       name,
@@ -369,6 +462,7 @@ export function normalizeImportRow(
       price: priceResult.price,
       quantity: quantityResult.quantity,
     },
+
     errors,
   };
 }

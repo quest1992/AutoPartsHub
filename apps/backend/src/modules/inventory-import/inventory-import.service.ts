@@ -6,7 +6,6 @@ import {
 } from '@nestjs/common';
 import {
   getPartNameSearchTokens,
-  getPartNameTokens,
   normalizePartName,
 } from '../../common/utils/part-name-normalizer';
 
@@ -71,6 +70,8 @@ constructor(
     const { mapping, errors: mappingErrors } = resolveColumnMapping(
       parsed.columns,
       mappingInput ?? {
+        categoryColumn: suggestedMapping.category,
+        subcategoryColumn: suggestedMapping.subcategory,
         partNumberColumn: suggestedMapping.partNumber,
         nameColumn: suggestedMapping.name,
         priceColumn: suggestedMapping.price,
@@ -88,12 +89,16 @@ constructor(
       totalRows: evaluated.length,
       columns: parsed.columns,
       suggestedMapping: {
+        category: suggestedMapping.category ?? null,
+        subcategory: suggestedMapping.subcategory ?? null,
         partNumber: suggestedMapping.partNumber ?? null,
         name: suggestedMapping.name ?? null,
         price: suggestedMapping.price ?? null,
         quantity: suggestedMapping.quantity ?? null,
       },
       appliedMapping: {
+        categoryColumn: mapping.categoryColumn,
+        subcategoryColumn: mapping.subcategoryColumn,
         partNumberColumn: mapping.partNumberColumn,
         nameColumn: mapping.nameColumn,
         priceColumn: mapping.priceColumn,
@@ -104,6 +109,8 @@ constructor(
         rowNumber: row.rowNumber,
         source: row.source,
         normalized: {
+          category: row.normalized.categoryName,
+          subcategory: row.normalized.subcategoryName,
           partNumber: row.normalized.partNumber,
           name: row.normalized.displayName,
           price: row.normalized.displayPrice,
@@ -321,14 +328,7 @@ constructor(
  let partCatalogItemId = match.partCatalogItemId;
 
 if (!match.matched || !partCatalogItemId) {
-  const category = await tx.partCategory.findFirst({
-  where: { slug: 'unassigned' },
-  select: { id: true },
-});
-
-  if (!category) {
-    throw new NotFoundException('Категория "Не распределено" не найдена');
-  }
+  const category = await this.resolveImportedCategory(tx, normalized);
 
   const sequence = await tx.appSequence.upsert({
     where: { key: 'PART_CATALOG' },
@@ -376,6 +376,64 @@ await this.createInventoryItem(
         error: this.publicErrorMessage(error),
       };
     }
+  }
+
+  private async resolveImportedCategory(
+    tx: Prisma.TransactionClient,
+    normalized: NormalizedImportRow,
+  ): Promise<{ id: string }> {
+    const categoryName = normalized.categoryName?.trim();
+
+    if (!categoryName) {
+      throw new BadRequestException('Не указана категория товара');
+    }
+
+    const parentCategory = await tx.partCategory.findFirst({
+      where: {
+        parentId: null,
+        isActive: true,
+        name: {
+          equals: categoryName,
+          mode: 'insensitive',
+        },
+      },
+      select: {
+        id: true,
+        name: true,
+      },
+    });
+
+    if (!parentCategory) {
+      throw new NotFoundException(
+        `Категория «${categoryName}» не найдена`,
+      );
+    }
+
+    const subcategoryName = normalized.subcategoryName?.trim();
+
+    if (!subcategoryName) {
+      return { id: parentCategory.id };
+    }
+
+    const subcategory = await tx.partCategory.findFirst({
+      where: {
+        parentId: parentCategory.id,
+        isActive: true,
+        name: {
+          equals: subcategoryName,
+          mode: 'insensitive',
+        },
+      },
+      select: { id: true },
+    });
+
+    if (!subcategory) {
+      throw new NotFoundException(
+        `Подкатегория «${subcategoryName}» не найдена в категории «${categoryName}»`,
+      );
+    }
+
+    return subcategory;
   }
 
   private async createInventoryItem(
