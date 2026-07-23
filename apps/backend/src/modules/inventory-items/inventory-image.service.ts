@@ -1,10 +1,6 @@
-import {
-  BadRequestException,
-  Injectable,
-  ServiceUnavailableException,
-} from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { randomUUID } from 'node:crypto';
-import { v2 as cloudinary, UploadApiResponse } from 'cloudinary';
+import { CloudinaryService } from '../../cloudinary/cloudinary.service';
 
 export const INVENTORY_IMAGE_MAX_BYTES = 5 * 1024 * 1024;
 export const INVENTORY_IMAGE_MIME_TYPES = [
@@ -21,6 +17,8 @@ export interface InventoryImageFile {
 
 @Injectable()
 export class InventoryImageService {
+  constructor(private readonly cloudinary: CloudinaryService) {}
+
   validate(file?: InventoryImageFile) {
     if (!file) throw new BadRequestException('Выберите файл изображения');
     if (
@@ -30,56 +28,28 @@ export class InventoryImageService {
     )
       throw new BadRequestException('Допустимы только JPEG, PNG и WebP');
     if (file.size > INVENTORY_IMAGE_MAX_BYTES)
-      throw new BadRequestException('Размер изображения не должен превышать 5 МБ');
+      throw new BadRequestException(
+        'Размер изображения не должен превышать 5 МБ',
+      );
   }
 
   async upload(file: InventoryImageFile) {
     this.validate(file);
-    this.configure();
-    const result = await new Promise<UploadApiResponse>((resolve, reject) => {
-      const stream = cloudinary.uploader.upload_stream(
-        {
-          folder: 'autostock/inventory',
-          public_id: `inventory-${randomUUID()}`,
-          overwrite: false,
-          resource_type: 'image',
-          transformation: [
-            {
-              width: 1600,
-              height: 1600,
-              crop: 'limit',
-              quality: 'auto:good',
-              fetch_format: 'auto',
-            },
-          ],
-        },
-        (error, uploaded) => {
-          if (error || !uploaded)
-            reject(error ?? new Error('Cloudinary upload returned no result'));
-          else resolve(uploaded);
-        },
-      );
-      stream.end(file.buffer);
+    const uploaded = await this.cloudinary.uploadImage(file, {
+      folder: 'autostock/inventory',
+      publicId: `inventory-${randomUUID()}`,
+      transformation: {
+        width: 1600,
+        height: 1600,
+        crop: 'limit',
+        quality: 'auto:good',
+        fetch_format: 'auto',
+      },
     });
-    return { imageUrl: result.secure_url, imagePublicId: result.public_id };
+    return { imageUrl: uploaded.url, imagePublicId: uploaded.publicId };
   }
 
   async remove(publicId: string) {
-    this.configure();
-    await cloudinary.uploader.destroy(publicId, {
-      resource_type: 'image',
-      invalidate: true,
-    });
-  }
-
-  private configure() {
-    const cloud_name = process.env.CLOUDINARY_CLOUD_NAME;
-    const api_key = process.env.CLOUDINARY_API_KEY;
-    const api_secret = process.env.CLOUDINARY_API_SECRET;
-    if (!cloud_name || !api_key || !api_secret)
-      throw new ServiceUnavailableException(
-        'Хранилище изображений не настроено',
-      );
-    cloudinary.config({ cloud_name, api_key, api_secret, secure: true });
+    await this.cloudinary.deleteImage(publicId);
   }
 }

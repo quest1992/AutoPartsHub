@@ -23,16 +23,40 @@ const includedItem = (overrides: Record<string, unknown> = {}) => ({
 });
 
 describe('InventoryImageService validation', () => {
-  const service = new InventoryImageService();
+  const cloudinary = {
+    uploadImage: jest.fn(),
+    deleteImage: jest.fn(),
+  };
+  const service = new InventoryImageService(cloudinary as never);
   it('rejects unsupported files', () => {
-    expect(() =>
-      service.validate({ ...file, mimetype: 'image/gif' }),
-    ).toThrow(BadRequestException);
+    expect(() => service.validate({ ...file, mimetype: 'image/gif' })).toThrow(
+      BadRequestException,
+    );
   });
   it('rejects files larger than 5 MB', () => {
     expect(() =>
       service.validate({ ...file, size: INVENTORY_IMAGE_MAX_BYTES + 1 }),
     ).toThrow(BadRequestException);
+  });
+
+  it('delegates upload and deletion to the shared Cloudinary service', async () => {
+    cloudinary.uploadImage.mockResolvedValueOnce({
+      url: 'https://res.cloudinary.com/demo/image/upload/item.webp',
+      publicId: 'autostock/inventory/item',
+    });
+    await expect(service.upload(file)).resolves.toEqual({
+      imageUrl: 'https://res.cloudinary.com/demo/image/upload/item.webp',
+      imagePublicId: 'autostock/inventory/item',
+    });
+    expect(cloudinary.uploadImage).toHaveBeenCalledWith(
+      file,
+      expect.objectContaining({ folder: 'autostock/inventory' }),
+    );
+
+    await service.remove('autostock/inventory/item');
+    expect(cloudinary.deleteImage).toHaveBeenCalledWith(
+      'autostock/inventory/item',
+    );
   });
 });
 
@@ -41,9 +65,11 @@ describe('InventoryItemsService image ownership and persistence', () => {
     const prisma = {
       shopInventoryItem: {
         findUnique: jest.fn().mockResolvedValue(existing),
-        update: jest.fn().mockImplementation(({ data }) =>
-          Promise.resolve(includedItem({ ...existing, ...data })),
-        ),
+        update: jest
+          .fn()
+          .mockImplementation(({ data }) =>
+            Promise.resolve(includedItem({ ...existing, ...data })),
+          ),
       },
     };
     const images = {

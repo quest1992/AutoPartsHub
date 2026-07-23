@@ -18,6 +18,8 @@ import { InventoryImportModule } from './modules/inventory-import/inventory-impo
 import { DashboardModule } from './modules/dashboard/dashboard.module';
 import { PermissionsModule } from './common/permissions/permissions.module';
 import { EmployeesModule } from './modules/employees/employees.module';
+import { CloudinaryModule } from './cloudinary/cloudinary.module';
+
 
 @Module({
   imports: [
@@ -40,6 +42,7 @@ import { EmployeesModule } from './modules/employees/employees.module';
     InventorySearchModule,
     InventoryImportModule,
     DashboardModule,
+    CloudinaryModule,
   ],
 })
 export class AppModule {}
