@@ -124,6 +124,11 @@ function cellText(value: unknown): string {
   return '';
 }
 
+export function normalizeText(value: unknown): string | null {
+  const text = cellText(value).trim();
+  return text || null;
+}
+
 export function normalizeHeader(value: unknown): string {
   return cellText(value)
     .trim()
@@ -192,7 +197,6 @@ export function parseExcelFile(file: {
       type: 'buffer',
       cellFormula: false,
       cellDates: true,
-      codepage: 65001,
     });
   } catch {
     throw new Error('FILE_READ_FAILED');
@@ -233,7 +237,7 @@ export function parseExcelFile(file: {
 
     const source: Record<string, string> = {};
     columns.forEach((column, columnIndex) => {
-      source[column] = cellText(rawRow[columnIndex]).trim();
+      source[column] = normalizeText(rawRow[columnIndex]) ?? '';
     });
     rows.push({ rowNumber: index + 1, source });
   }
@@ -338,7 +342,7 @@ export function normalizePriceValue(value: unknown): {
   }
 
   let text = cellText(value).toLowerCase();
-  text = text.replace(/\s*(сом|tjs|руб|rub)\b/gi, '').trim();
+  text = text.replace(/\s*(сом|tjs|руб|rub)\s*$/gi, '').trim();
   text = text.replace(/\s+/g, '');
   if (text.includes(',') && text.includes('.')) {
     text = text.replace(/\./g, '').replace(',', '.');
@@ -386,19 +390,19 @@ export function normalizeImportRow(
   mapping: ResolvedColumnMapping,
 ): { normalized: NormalizedImportRow; errors: string[] } {
   const categoryName = mapping.categoryColumn
-    ? source[mapping.categoryColumn]?.trim() || null
+    ? normalizeText(source[mapping.categoryColumn])
     : null;
 
   const subcategoryName = mapping.subcategoryColumn
-    ? source[mapping.subcategoryColumn]?.trim() || null
+    ? normalizeText(source[mapping.subcategoryColumn])
     : null;
 
   const rawPartNumber = mapping.partNumberColumn
-    ? source[mapping.partNumberColumn]?.trim() || null
+    ? normalizeText(source[mapping.partNumberColumn])
     : null;
 
   const rawName = mapping.nameColumn
-    ? source[mapping.nameColumn]?.trim() || null
+    ? normalizeText(source[mapping.nameColumn])
     : null;
 
   const rawPrice = mapping.priceColumn

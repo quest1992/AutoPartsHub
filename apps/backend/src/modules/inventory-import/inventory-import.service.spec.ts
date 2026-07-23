@@ -163,6 +163,7 @@ describe('InventoryImportService', () => {
       actor,
       'shop-1',
       {
+        categoryColumn: '\u041d\u0430\u0438\u043c\u0435\u043d\u043e\u0432\u0430\u043d\u0438\u0435',
         nameColumn: 'Наименование',
         priceColumn: 'Цена',
         quantityColumn: 'Остаток',
@@ -188,6 +189,7 @@ describe('InventoryImportService', () => {
       actor,
       'shop-1',
       {
+        categoryColumn: '\u041d\u0430\u0438\u043c\u0435\u043d\u043e\u0432\u0430\u043d\u0438\u0435',
         nameColumn: 'Наименование',
         priceColumn: 'Цена',
         quantityColumn: 'Остаток',

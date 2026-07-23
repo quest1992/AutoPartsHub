@@ -20,18 +20,21 @@ export default function PartCatalogPage() {
 
   const [query, setQuery] = useState('');
   const [data, setData] = useState<PartCatalogResponse | null>(null);
-  const [categories, setCategories] = useState<PartCategoryOption[]>([]);
   const [selectedCategories, setSelectedCategories] = useState<
     Record<string, string>
   >({});
-
   const [categorySearch, setCategorySearch] = useState<
-  Record<string, string>
->({});
-
-const [openedSearch, setOpenedSearch] = useState<string | null>(null);
-
-const [activeCategoryIndex, setActiveCategoryIndex] = useState(0);
+    Record<string, string>
+  >({});
+  const [categoryResults, setCategoryResults] = useState<
+    Record<string, PartCategoryOption[]>
+  >({});
+  const [categoryLoading, setCategoryLoading] = useState<
+    Record<string, boolean>
+  >({});
+  const [activeCategoryRowId, setActiveCategoryRowId] = useState<string | null>(
+    null,
+  );
   const [onlyUnassigned, setOnlyUnassigned] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
@@ -41,40 +44,12 @@ const [activeCategoryIndex, setActiveCategoryIndex] = useState(0);
   const canManage = hasPermission('CATALOG_MANAGE');
 
   const getCategoryLabel = useCallback(
-  (category: PartCategoryOption) =>
-    category.parent
-      ? `${category.parent.name} → ${category.name}`
-      : category.name,
-  [],
-);
-
-const getFilteredCategories = useCallback(
-  (itemId: string) => {
-    const search = (categorySearch[itemId] ?? '')
-      .trim()
-      .toLocaleLowerCase('ru');
-
-    return [...categories]
-      .filter((category) => {
-        if (!search) {
-          return true;
-        }
-
-        return getCategoryLabel(category)
-          .toLocaleLowerCase('ru')
-          .includes(search);
-      })
-      .sort((a, b) =>
-        getCategoryLabel(a).localeCompare(
-          getCategoryLabel(b),
-          'ru',
-          { sensitivity: 'base' },
-        ),
-      )
-      .slice(0, 12);
-  },
-  [categories, categorySearch, getCategoryLabel],
-);
+    (category: PartCategoryOption) =>
+      category.parent
+        ? `${category.parent.name} → ${category.name}`
+        : category.name,
+    [],
+  );
 
   const load = useCallback(
     async (page = 1) => {
@@ -86,18 +61,13 @@ const getFilteredCategories = useCallback(
       setError('');
 
       try {
-        const [catalogResponse, categoriesResponse] = await Promise.all([
-          getPartCatalog({
-            search: query.trim() || undefined,
-            page,
-            limit: 20,
-            isActive: true,
-          }),
-          getPartCategories(),
-        ]);
-
+        const catalogResponse = await getPartCatalog({
+          search: query.trim() || undefined,
+          page,
+          limit: 20,
+          isActive: true,
+        });
         setData(catalogResponse);
-        setCategories(categoriesResponse.data);
       } catch (e) {
         setError(
           e instanceof ApiError && e.status === 403
@@ -121,16 +91,91 @@ const getFilteredCategories = useCallback(
     return () => window.clearTimeout(timer);
   }, [load]);
 
-  const availableCategories = useMemo(
-    () =>
-      categories.filter(
-        (category) =>
-          category.isActive &&
-          category.name !== UNASSIGNED_CATEGORY_NAME &&
-          category.slug !== 'unassigned',
-      ),
-    [categories],
-  );
+  useEffect(() => {
+    if (!activeCategoryRowId) {
+      return;
+    }
+
+    const itemId = activeCategoryRowId;
+    const search = (categorySearch[itemId] ?? '').trim();
+
+    if (search.length < 1) {
+      return;
+    }
+
+    let cancelled = false;
+    const timer = window.setTimeout(() => {
+      const requestParams = {
+        search,
+        isActive: true,
+        limit: 20,
+        page: 1,
+      };
+
+      console.log('[Catalog table][REQUEST]', {
+        itemId,
+        search,
+        requestParams,
+      });
+
+      setCategoryLoading((previous) => ({
+        ...previous,
+        [itemId]: true,
+      }));
+
+      void getPartCategories(requestParams)
+        .then((result) => {
+          console.log('[Catalog table][RESPONSE]', {
+            itemId,
+            search,
+            result: result.data.map((category) => ({
+              id: category.id,
+              name: category.name,
+              childrenCount: category._count?.children,
+            })),
+          });
+
+          if (cancelled) {
+            return;
+          }
+
+          setCategoryResults((previous) => ({
+            ...previous,
+            [itemId]: result.data,
+          }));
+        })
+        .catch((reason) => {
+          if (cancelled) {
+            return;
+          }
+
+          setCategoryResults((previous) => ({
+            ...previous,
+            [itemId]: [],
+          }));
+          setError(
+            reason instanceof Error
+              ? reason.message
+              : 'Не удалось найти категории.',
+          );
+        })
+        .finally(() => {
+          if (cancelled) {
+            return;
+          }
+
+          setCategoryLoading((previous) => ({
+            ...previous,
+            [itemId]: false,
+          }));
+        });
+    }, 300);
+
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timer);
+    };
+  }, [activeCategoryRowId, categorySearch]);
 
   const visibleItems = useMemo(() => {
     const items = data?.data ?? [];
@@ -144,11 +189,19 @@ const getFilteredCategories = useCallback(
     );
   }, [data, onlyUnassigned]);
 
-  function selectCategory(itemId: string, categoryId: string) {
+  function handleCategorySelect(
+    itemId: string,
+    category: PartCategoryOption,
+  ) {
     setSelectedCategories((current) => ({
       ...current,
-      [itemId]: categoryId,
+      [itemId]: category.id,
     }));
+    setCategorySearch((current) => ({
+      ...current,
+      [itemId]: getCategoryLabel(category),
+    }));
+    setActiveCategoryRowId(null);
   }
 
   async function saveCategory(itemId: string) {
@@ -306,6 +359,16 @@ const getFilteredCategories = useCallback(
                   {visibleItems.map((item) => {
                     const isUnassigned =
                       item.category.name === UNASSIGNED_CATEGORY_NAME;
+                    const rowSearch = categorySearch[item.id] ?? '';
+                    const rowResults = categoryResults[item.id] ?? [];
+                    const rowLoading = categoryLoading[item.id] ?? false;
+
+                    console.log('[Catalog table][RENDER]', {
+                      itemId: item.id,
+                      search: rowSearch,
+                      results: rowResults,
+                      open: activeCategoryRowId === item.id,
+                    });
 
                     return (
                       <tr key={item.id} className="border-t align-middle">
@@ -317,92 +380,85 @@ const getFilteredCategories = useCallback(
                           {isUnassigned ? (
                             <div className="flex min-w-[280px] gap-2">
                               <div className="relative w-full">
-  <input
-    type="text"
-    value={categorySearch[item.id] ?? ''}
-    onFocus={() => setOpenedSearch(item.id)}
-    onBlur={() => {
-  setTimeout(() => {
-    setOpenedSearch(null);
-  }, 150);
-}}
-    onChange={(event) => {
-      setCategorySearch((current) => ({
-        ...current,
-        [item.id]: event.target.value,
-      }));
+                                <input
+                                  type="text"
+                                  value={rowSearch}
+                                  onFocus={() =>
+                                    setActiveCategoryRowId(item.id)
+                                  }
+                                  onBlur={() => {
+                                    window.setTimeout(() => {
+                                      setActiveCategoryRowId((current) =>
+                                        current === item.id ? null : current,
+                                      );
+                                    }, 150);
+                                  }}
+                                  onChange={(event) => {
+                                    const value = event.target.value;
 
-      setOpenedSearch(item.id);
+                                    console.log('[Catalog table][INPUT]', {
+                                      itemId: item.id,
+                                      value,
+                                    });
 
-      setSelectedCategories((current) => ({
-        ...current,
-        [item.id]: '',
-      }));
-    }}
-    placeholder="Начните вводить категорию..."
-    autoComplete="off"
-    className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
-  />
+                                    setCategorySearch((previous) => ({
+                                      ...previous,
+                                      [item.id]: value,
+                                    }));
+                                    setActiveCategoryRowId(item.id);
+                                    setSelectedCategories((previous) => ({
+                                      ...previous,
+                                      [item.id]: '',
+                                    }));
 
-  {openedSearch === item.id && (
-    <div className="absolute left-0 right-0 top-full z-50 mt-1 max-h-64 overflow-y-auto rounded-lg border border-slate-200 bg-white shadow-xl">
-      {getFilteredCategories(item.id).length > 0 ? (
-        getFilteredCategories(item.id).map((category) => (
-          <button
-            key={category.id}
-            type="button"
-            onMouseDown={(event) => {
-              event.preventDefault();
+                                    if (value.trim().length < 1) {
+                                      setCategoryResults((previous) => ({
+                                        ...previous,
+                                        [item.id]: [],
+                                      }));
+                                      setCategoryLoading((previous) => ({
+                                        ...previous,
+                                        [item.id]: false,
+                                      }));
+                                    }
+                                  }}
+                                  placeholder="Начните вводить категорию..."
+                                  autoComplete="off"
+                                  className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                                />
 
-              selectCategory(item.id, category.id);
-
-              setCategorySearch((current) => ({
-                ...current,
-                [item.id]: getCategoryLabel(category),
-              }));
-
-              setOpenedSearch(null);
-            }}
-            className="block w-full border-b border-slate-100 px-3 py-2.5 text-left text-sm text-slate-700 last:border-b-0 hover:bg-blue-50 hover:text-blue-700"
-          >
-           {(() => {
-  const label = getCategoryLabel(category);
-  const search = (categorySearch[item.id] ?? '').trim();
-
-  if (!search) {
-    return label;
-  }
-
-  const index = label
-    .toLocaleLowerCase('ru')
-    .indexOf(search.toLocaleLowerCase('ru'));
-
-  if (index === -1) {
-    return label;
-  }
-
-  return (
-    <>
-      {label.slice(0, index)}
-
-      <span className="rounded bg-yellow-100 px-0.5 font-semibold text-slate-900">
-        {label.slice(index, index + search.length)}
-      </span>
-
-      {label.slice(index + search.length)}
-    </>
-  );
-})()}
-          </button>
-        ))
-      ) : (
-        <p className="px-3 py-3 text-sm text-slate-500">
-          Категория не найдена
-        </p>
-      )}
-    </div>
-  )}
-</div>
+                                {activeCategoryRowId === item.id &&
+                                  rowSearch.trim() && (
+                                    <div className="absolute left-0 right-0 top-full z-50 mt-1 max-h-64 overflow-y-auto rounded-lg border border-slate-200 bg-white shadow-xl">
+                                      {rowLoading ? (
+                                        <p className="px-3 py-3 text-sm text-slate-500">
+                                          Поиск категорий…
+                                        </p>
+                                      ) : rowResults.length > 0 ? (
+                                        rowResults.map((category) => (
+                                          <button
+                                            key={category.id}
+                                            type="button"
+                                            onMouseDown={(event) => {
+                                              event.preventDefault();
+                                              handleCategorySelect(
+                                                item.id,
+                                                category,
+                                              );
+                                            }}
+                                            className="block w-full border-b border-slate-100 px-3 py-2.5 text-left text-sm text-slate-700 last:border-b-0 hover:bg-blue-50 hover:text-blue-700"
+                                          >
+                                            {category.name}
+                                          </button>
+                                        ))
+                                      ) : (
+                                        <p className="px-3 py-3 text-sm text-slate-500">
+                                          Категория не найдена
+                                        </p>
+                                      )}
+                                    </div>
+                                  )}
+                              </div>
 
                               <button
                                 onClick={() => void saveCategory(item.id)}

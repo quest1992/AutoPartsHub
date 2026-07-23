@@ -30,7 +30,26 @@ export const updatePartCatalogItem=(id:string,data:Partial<PartCatalogPayload>)=
 export type PartCategoryOption={id:string;name:string;slug:string;description?:string|null;parentId?:string|null;sortOrder?:number;isActive:boolean;parent:{id:string;name:string}|null;_count:{children:number}};
 export type PartCategoryTreeNode={id:string;name:string;slug:string;description:string|null;parentId:string|null;sortOrder:number;isActive:boolean;children:PartCategoryTreeNode[]};
 export type PartCategoryPayload={name:string;slug:string;description?:string;parentId?:string|null;sortOrder?:number;isActive?:boolean};
-export const getPartCategories=()=>request<{data:PartCategoryOption[];meta:Pagination}>('/part-categories?isActive=true&limit=100');
+export type PartCategoriesQuery = {
+  search?: string;
+  limit?: number;
+  page?: number;
+  isActive?: boolean;
+  leafOnly?: boolean;
+};
+
+export const getPartCategories = (
+  params: PartCategoriesQuery = {},
+) =>
+  request<{ data: PartCategoryOption[]; meta: Pagination }>(
+    `/part-categories?${documentQuery({
+      search: params.search,
+      isActive: params.isActive ?? true,
+      leafOnly: params.leafOnly,
+      limit: params.limit ?? 20,
+      page: params.page ?? 1,
+    })}`,
+  );
 export const getPartCategoryTree=(includeInactive=false)=>request<PartCategoryTreeNode[]>(`/part-categories/tree?isActive=${includeInactive?'false':'true'}`);
 export const getPartCategory=(id:string)=>request<PartCategoryOption & {children:PartCategoryOption[]}>(`/part-categories/${id}`);
 export const createPartCategory=(data:PartCategoryPayload)=>request<PartCategoryOption>('/part-categories',{method:'POST',body:JSON.stringify(data)});

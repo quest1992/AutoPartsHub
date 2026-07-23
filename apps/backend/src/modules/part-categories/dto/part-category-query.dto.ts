@@ -31,6 +31,12 @@ export class PartCategoryQueryDto {
   @IsOptional()
   @Transform(toBoolean)
   @IsBoolean()
+  leafOnly?: boolean;
+
+  @ApiPropertyOptional({ example: true })
+  @IsOptional()
+  @Transform(toBoolean)
+  @IsBoolean()
   isActive?: boolean;
 
   @ApiPropertyOptional({ example: 'тормоз' })

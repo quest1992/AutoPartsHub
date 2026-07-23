@@ -45,18 +45,29 @@ export class PartCategoriesService {
       search,
       parentId,
       rootOnly,
+      leafOnly,
       isActive,
     } = query;
+    const normalizedSearch = search?.trim();
+
     const where: Prisma.PartCategoryWhereInput = {
       ...(isActive !== undefined && { isActive }),
       ...(rootOnly ? { parentId: null } : parentId ? { parentId } : {}),
-      ...(search?.trim() && {
+      ...(leafOnly === true && { children: { none: {} } }),
+
+      ...(normalizedSearch && {
         OR: [
-          { name: { contains: search.trim(), mode: 'insensitive' } },
-          { slug: { contains: search.trim(), mode: 'insensitive' } },
+          { name: { contains: normalizedSearch, mode: 'insensitive' } },
+          { slug: { contains: normalizedSearch, mode: 'insensitive' } },
         ],
       }),
     };
+
+    console.log('[Category search][Service] query.search:', search);
+    console.log(
+      '[Category search][Service] Prisma where:',
+      JSON.stringify(where),
+    );
 
     const [data, total] = await this.prisma.$transaction([
       this.prisma.partCategory.findMany({
@@ -72,10 +83,23 @@ export class PartCategoriesService {
       this.prisma.partCategory.count({ where }),
     ]);
 
-    return {
+    console.log('[Category search][Service] found:', total);
+    console.log(
+      '[Category search][Service] first 20 names:',
+      data.slice(0, 20).map((category) => category.name),
+    );
+
+    const result = {
       data,
       meta: { total, page, limit, totalPages: Math.ceil(total / limit) },
     };
+
+    console.log(
+      '[Category search][Service] result JSON:',
+      JSON.stringify(result),
+    );
+
+    return result;
   }
 
   async findTree(isActive = true) {

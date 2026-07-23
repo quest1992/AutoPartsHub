@@ -4,6 +4,7 @@ import {
   normalizeImportRow,
   normalizePriceValue,
   normalizeQuantityValue,
+  normalizeText,
   parseExcelFile,
   resolveColumnMapping,
   suggestColumnMapping,
@@ -23,12 +24,16 @@ function buildWorkbook(
 describe('inventory import parser', () => {
   it('detects Russian headers', () => {
     const mapping = suggestColumnMapping([
+      'Категория',
+      'Подкатегория',
       'Артикул',
       'Наименование',
       'Цена',
       'Остаток',
     ]);
     expect(mapping).toEqual({
+      category: 'Категория',
+      subcategory: 'Подкатегория',
       partNumber: 'Артикул',
       name: 'Наименование',
       price: 'Цена',
@@ -78,11 +83,12 @@ describe('inventory import parser', () => {
 
   it('normalizes part number and name in row', () => {
     const { mapping } = resolveColumnMapping(
-      ['Артикул', 'Наименование', 'Цена', 'Остаток'],
+      ['Категория', 'Артикул', 'Наименование', 'Цена', 'Остаток'],
       {},
     );
     const { normalized, errors } = normalizeImportRow(
       {
+        Категория: 'Фильтры',
         Артикул: '04465-YZZR7',
         Наименование: 'Колодки тормозные Toyota',
         Цена: '420',
@@ -100,5 +106,33 @@ describe('inventory import parser', () => {
   it('normalizes header aliases', () => {
     expect(normalizeHeader(' Part-Number ')).toBe('partnumber');
     expect(normalizeHeader('Розничная цена')).toBe('розничнаяцена');
+  });
+
+  it('trims text cells without changing Unicode or case', () => {
+    expect(normalizeText('  Фильтры  ')).toBe('Фильтры');
+    expect(normalizeText('')).toBeNull();
+    expect(normalizeText(null)).toBeNull();
+  });
+
+  it('preserves Russian cell values while parsing XLSX', () => {
+    const buffer = buildWorkbook(
+      ['Категория', 'Наименование', 'Цена', 'Количество'],
+      [['  Фильтры  ', '  Масляный фильтр  ', '100', '2']],
+    );
+
+    const parsed = parseExcelFile({ buffer, originalname: 'товары.xlsx' });
+
+    expect(parsed.columns).toEqual([
+      'Категория',
+      'Наименование',
+      'Цена',
+      'Количество',
+    ]);
+    expect(parsed.rows[0]?.source).toEqual({
+      Категория: 'Фильтры',
+      Наименование: 'Масляный фильтр',
+      Цена: '100',
+      Количество: '2',
+    });
   });
 });

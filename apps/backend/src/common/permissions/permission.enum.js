@@ -1,0 +1,27 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.Permission = void 0;
+var Permission;
+(function (Permission) {
+    Permission["DASHBOARD_VIEW"] = "DASHBOARD_VIEW";
+    Permission["INVENTORY_VIEW"] = "INVENTORY_VIEW";
+    Permission["INVENTORY_CREATE"] = "INVENTORY_CREATE";
+    Permission["INVENTORY_UPDATE"] = "INVENTORY_UPDATE";
+    Permission["INVENTORY_DELETE"] = "INVENTORY_DELETE";
+    Permission["INVENTORY_IMPORT"] = "INVENTORY_IMPORT";
+    Permission["INVENTORY_QUANTITY_UPDATE"] = "INVENTORY_QUANTITY_UPDATE";
+    Permission["SALES_VIEW"] = "SALES_VIEW";
+    Permission["SALES_CREATE"] = "SALES_CREATE";
+    Permission["SALES_CANCEL"] = "SALES_CANCEL";
+    Permission["PURCHASES_VIEW"] = "PURCHASES_VIEW";
+    Permission["PURCHASES_CREATE"] = "PURCHASES_CREATE";
+    Permission["PURCHASES_CANCEL"] = "PURCHASES_CANCEL";
+    Permission["EMPLOYEES_VIEW"] = "EMPLOYEES_VIEW";
+    Permission["EMPLOYEES_CREATE"] = "EMPLOYEES_CREATE";
+    Permission["EMPLOYEES_UPDATE"] = "EMPLOYEES_UPDATE";
+    Permission["EMPLOYEES_RESET_PASSWORD"] = "EMPLOYEES_RESET_PASSWORD";
+    Permission["SHOPS_VIEW"] = "SHOPS_VIEW";
+    Permission["SHOPS_MANAGE"] = "SHOPS_MANAGE";
+    Permission["CATALOG_VIEW"] = "CATALOG_VIEW";
+    Permission["CATALOG_MANAGE"] = "CATALOG_MANAGE";
+})(Permission || (exports.Permission = Permission = {}));

@@ -63,8 +63,14 @@ export class PartCategoriesController {
   @Get()
   @RequirePermissions(Permission.CATALOG_VIEW)
   @ApiOperation({ summary: 'Получить список категорий деталей' })
-  findAll(@Query() query: PartCategoryQueryDto) {
-    return this.partCategoriesService.findAll(query);
+  async findAll(@Query() query: PartCategoryQueryDto) {
+    console.log('[Category search][Controller] query.search:', query.search);
+    const result = await this.partCategoriesService.findAll(query);
+    console.log(
+      '[Category search][Controller] response JSON:',
+      JSON.stringify(result),
+    );
+    return result;
   }
 
   @Get('tree')
