@@ -4,6 +4,7 @@ import {
   ForbiddenException,
   Injectable,
   NotFoundException,
+  Logger,
 } from '@nestjs/common';
 import {
   InventoryMovementType,
@@ -16,6 +17,10 @@ import { ChangeQuantityDto } from './dto/change-quantity.dto';
 import { CreateShopInventoryItemDto } from './dto/create-shop-inventory-item.dto';
 import { ShopInventoryItemQueryDto } from './dto/shop-inventory-item-query.dto';
 import { UpdateShopInventoryItemDto } from './dto/update-shop-inventory-item.dto';
+import {
+  InventoryImageFile,
+  InventoryImageService,
+} from './inventory-image.service';
 
 export interface InventoryActor {
   id: string;
@@ -40,7 +45,12 @@ const include = {
 
 @Injectable()
 export class InventoryItemsService {
-  constructor(private readonly prisma: PrismaService) {}
+  private readonly logger = new Logger(InventoryItemsService.name);
+
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly images: InventoryImageService,
+  ) {}
 
   async create(dto: CreateShopInventoryItemDto, actor: InventoryActor) {
     const shopId = this.resolveShopForCreate(dto.shopId, actor);
@@ -204,6 +214,42 @@ export class InventoryItemsService {
       }),
     );
   }
+  async uploadImage(
+    id: string,
+    file: InventoryImageFile,
+    actor: InventoryActor,
+  ) {
+    const existing = await this.scopedItem(id, actor);
+    const uploaded = await this.images.upload(file);
+    let updated;
+    try {
+      updated = await this.prisma.shopInventoryItem.update({
+        where: { id },
+        data: uploaded,
+        include,
+      });
+    } catch (error) {
+      await this.images.remove(uploaded.imagePublicId).catch(() => undefined);
+      throw error;
+    }
+    if (existing.imagePublicId)
+      await this.images.remove(existing.imagePublicId).catch(() => {
+        this.logger.warn('Не удалось удалить заменённое изображение товара');
+      });
+    return this.withStatus(updated);
+  }
+
+  async deleteImage(id: string, actor: InventoryActor) {
+    const existing = await this.scopedItem(id, actor);
+    if (existing.imagePublicId) await this.images.remove(existing.imagePublicId);
+    return this.withStatus(
+      await this.prisma.shopInventoryItem.update({
+        where: { id },
+        data: { imageUrl: null, imagePublicId: null },
+        include,
+      }),
+    );
+  }
   async changeQuantity(
     id: string,
     dto: ChangeQuantityDto,
@@ -354,6 +400,9 @@ export class InventoryItemsService {
       }),
       ...(dto.location !== undefined && { location: empty(dto.location) }),
       ...(dto.notes !== undefined && { notes: empty(dto.notes) }),
+      ...(dto.compatibility !== undefined && {
+        compatibility: empty(dto.compatibility),
+      }),
     };
   }
   private async ensureActiveShop(id: string) {

@@ -359,6 +359,9 @@ model ShopInventoryItem {
   minQuantity        Int                        @default(0)
   location           String?
   notes              String?
+  compatibility      String?
+  imageUrl           String?
+  imagePublicId      String?
   isActive           Boolean                    @default(true)
   movements          InventoryMovement[]
   saleItems          SaleItem[]

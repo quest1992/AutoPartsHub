@@ -10,6 +10,7 @@ import {
   IsString,
   IsUUID,
   Length,
+  MaxLength,
   Min,
 } from 'class-validator';
 
@@ -66,5 +67,14 @@ export class CreateShopInventoryItemDto {
   @IsString()
   @Length(1, 1000)
   notes?: string;
+  @ApiPropertyOptional({
+    description: 'Свободное описание совместимости с автомобилями',
+    example: 'Toyota Camry XV50 2012–2017, двигатель 2.5',
+    maxLength: 500,
+  })
+  @IsOptional()
+  @IsString()
+  @MaxLength(500)
+  compatibility?: string;
   @ApiPropertyOptional() @IsOptional() @IsBoolean() isActive?: boolean;
 }

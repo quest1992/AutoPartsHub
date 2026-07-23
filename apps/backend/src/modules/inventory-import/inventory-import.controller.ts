@@ -24,7 +24,10 @@ import { PermissionsGuard } from '../../common/permissions/permissions.guard';
 import { RolesGuard } from '../../common/guards/roles.guard';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { InventoryActor } from '../inventory-items/inventory-items.service';
-import { ConfirmInventoryImportDto, PreviewInventoryImportDto } from './dto/confirm-inventory-import.dto';
+import {
+  ConfirmInventoryImportDto,
+  PreviewInventoryImportDto,
+} from './dto/confirm-inventory-import.dto';
 import { InventoryImportService } from './inventory-import.service';
 
 @ApiTags('Inventory Import')
@@ -59,6 +62,8 @@ export class InventoryImportController {
         },
         partNumberColumn: { type: 'string' },
         nameColumn: { type: 'string' },
+        compatibilityColumn: { type: 'string' },
+        storageLocationColumn: { type: 'string' },
         priceColumn: { type: 'string' },
         quantityColumn: { type: 'string' },
       },
@@ -76,6 +81,8 @@ export class InventoryImportController {
     return this.service.preview(file, req.user, dto.shopId, {
       partNumberColumn: dto.partNumberColumn,
       nameColumn: dto.nameColumn,
+      compatibilityColumn: dto.compatibilityColumn,
+      storageLocationColumn: dto.storageLocationColumn,
       priceColumn: dto.priceColumn,
       quantityColumn: dto.quantityColumn,
     });
@@ -83,7 +90,9 @@ export class InventoryImportController {
 
   @Post('confirm')
   @RequirePermissions(Permission.INVENTORY_IMPORT)
-  @ApiOperation({ summary: 'Подтвердить импорт Excel с выбранным сопоставлением колонок' })
+  @ApiOperation({
+    summary: 'Подтвердить импорт Excel с выбранным сопоставлением колонок',
+  })
   @ApiConsumes('multipart/form-data')
   @ApiBody({
     schema: {
@@ -94,6 +103,8 @@ export class InventoryImportController {
         shopId: { type: 'string', format: 'uuid' },
         partNumberColumn: { type: 'string' },
         nameColumn: { type: 'string' },
+        compatibilityColumn: { type: 'string' },
+        storageLocationColumn: { type: 'string' },
         priceColumn: { type: 'string' },
         quantityColumn: { type: 'string' },
       },
@@ -111,6 +122,8 @@ export class InventoryImportController {
     return this.service.confirm(file, req.user, dto.shopId, {
       partNumberColumn: dto.partNumberColumn,
       nameColumn: dto.nameColumn,
+      compatibilityColumn: dto.compatibilityColumn,
+      storageLocationColumn: dto.storageLocationColumn,
       priceColumn: dto.priceColumn,
       quantityColumn: dto.quantityColumn,
     });

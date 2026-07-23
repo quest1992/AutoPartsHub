@@ -73,6 +73,8 @@ export class InventoryImportService {
         subcategoryColumn: suggestedMapping.subcategory,
         partNumberColumn: suggestedMapping.partNumber,
         nameColumn: suggestedMapping.name,
+        compatibilityColumn: suggestedMapping.compatibility,
+        storageLocationColumn: suggestedMapping.storageLocation,
         priceColumn: suggestedMapping.price,
         quantityColumn: suggestedMapping.quantity,
       },
@@ -80,9 +82,7 @@ export class InventoryImportService {
 
     const evaluated = await this.evaluateRows(parsed.rows, mapping);
 
-    const validRows = evaluated.filter(
-      (row) => row.status === 'valid',
-    ).length;
+    const validRows = evaluated.filter((row) => row.status === 'valid').length;
 
     const invalidRows = evaluated.filter(
       (row) => row.status === 'invalid',
@@ -99,6 +99,8 @@ export class InventoryImportService {
         subcategory: suggestedMapping.subcategory ?? null,
         partNumber: suggestedMapping.partNumber ?? null,
         name: suggestedMapping.name ?? null,
+        compatibility: suggestedMapping.compatibility ?? null,
+        storageLocation: suggestedMapping.storageLocation ?? null,
         price: suggestedMapping.price ?? null,
         quantity: suggestedMapping.quantity ?? null,
       },
@@ -108,6 +110,8 @@ export class InventoryImportService {
         subcategoryColumn: mapping.subcategoryColumn,
         partNumberColumn: mapping.partNumberColumn,
         nameColumn: mapping.nameColumn,
+        compatibilityColumn: mapping.compatibilityColumn,
+        storageLocationColumn: mapping.storageLocationColumn,
         priceColumn: mapping.priceColumn,
         quantityColumn: mapping.quantityColumn,
       },
@@ -122,6 +126,8 @@ export class InventoryImportService {
           subcategory: row.normalized.subcategoryName,
           partNumber: row.normalized.partNumber,
           name: row.normalized.displayName,
+          compatibility: row.normalized.compatibility,
+          storageLocation: row.normalized.storageLocation,
           price: row.normalized.displayPrice,
           quantity: row.normalized.quantity,
         },
@@ -183,11 +189,7 @@ export class InventoryImportService {
     }> = [];
 
     try {
-      for (
-        let start = 0;
-        start < evaluated.length;
-        start += BATCH_SIZE
-      ) {
+      for (let start = 0; start < evaluated.length; start += BATCH_SIZE) {
         const batch = evaluated.slice(start, start + BATCH_SIZE);
 
         for (const row of batch) {
@@ -265,15 +267,11 @@ export class InventoryImportService {
     }
   }
 
-  private readWorksheet(file: {
-    buffer: Buffer;
-    originalname: string;
-  }) {
+  private readWorksheet(file: { buffer: Buffer; originalname: string }) {
     try {
       return parseExcelFile(file);
     } catch (error) {
-      const code =
-        error instanceof Error ? error.message : 'UNKNOWN';
+      const code = error instanceof Error ? error.message : 'UNKNOWN';
 
       switch (code) {
         case 'FILE_MISSING':
@@ -288,21 +286,15 @@ export class InventoryImportService {
           );
 
         case 'FILE_READ_FAILED':
-          throw new BadRequestException(
-            'Не удалось прочитать Excel-файл',
-          );
+          throw new BadRequestException('Не удалось прочитать Excel-файл');
 
         case 'WORKBOOK_EMPTY':
         case 'NO_DATA_ROWS':
         case 'NO_USABLE_ROWS':
-          throw new BadRequestException(
-            'В файле не найдены товары',
-          );
+          throw new BadRequestException('В файле не найдены товары');
 
         default:
-          throw new BadRequestException(
-            'Не удалось обработать Excel-файл',
-          );
+          throw new BadRequestException('Не удалось обработать Excel-файл');
       }
     }
   }
@@ -312,17 +304,12 @@ export class InventoryImportService {
       rowNumber: number;
       source: Record<string, string>;
     }>,
-    mapping: ReturnType<
-      typeof resolveColumnMapping
-    >['mapping'],
+    mapping: ReturnType<typeof resolveColumnMapping>['mapping'],
   ): Promise<ImportPreviewRow[]> {
     const result: ImportPreviewRow[] = [];
 
     for (const row of rows) {
-      const { normalized, errors } = normalizeImportRow(
-        row.source,
-        mapping,
-      );
+      const { normalized, errors } = normalizeImportRow(row.source, mapping);
 
       let status: PreviewRowStatus = 'valid';
       let catalogItemId: string | null = null;
@@ -355,9 +342,7 @@ export class InventoryImportService {
     return result;
   }
 
-  private async matchCatalog(
-    normalized: NormalizedImportRow,
-  ) {
+  private async matchCatalog(normalized: NormalizedImportRow) {
     return this.matchingService.match({
       partNumber: normalized.partNumber,
       name: normalized.name,
@@ -370,20 +355,13 @@ export class InventoryImportService {
     shopId: string,
     actor: InventoryActor,
   ): Promise<{
-    kind:
-      | 'imported'
-      | 'updated'
-      | 'skipped'
-      | 'requiresReview'
-      | 'failed';
+    kind: 'imported' | 'updated' | 'skipped' | 'requiresReview' | 'failed';
     error?: string;
   }> {
     if (row.status === 'invalid') {
       return {
         kind: 'skipped',
-        error:
-          row.errors.join('; ') ||
-          'Строка содержит ошибки',
+        error: row.errors.join('; ') || 'Строка содержит ошибки',
       };
     }
 
@@ -401,26 +379,17 @@ export class InventoryImportService {
       );
 
       if (existing) {
-        await this.updateInventoryItem(
-          tx,
-          existing,
-          normalized,
-          actor,
-        );
+        await this.updateInventoryItem(tx, existing, normalized, actor);
 
         return {
           kind: 'updated',
         };
       }
 
-      let partCatalogItemId =
-        match.partCatalogItemId ?? row.catalogItemId;
+      let partCatalogItemId = match.partCatalogItemId ?? row.catalogItemId;
 
       if (!match.matched || !partCatalogItemId) {
-        const category = await this.resolveImportedCategory(
-          tx,
-          normalized,
-        );
+        const category = await this.resolveImportedCategory(tx, normalized);
 
         const sequence = await tx.appSequence.upsert({
           where: {
@@ -444,9 +413,7 @@ export class InventoryImportService {
 
         const created = await tx.partCatalogItem.create({
           data: {
-            internalCode: `PRT-${String(
-              sequence.value,
-            ).padStart(6, '0')}`,
+            internalCode: `PRT-${String(sequence.value).padStart(6, '0')}`,
             name,
             normalizedName: normalizePartName(name),
             searchTokens: getPartNameSearchTokens(name),
@@ -464,10 +431,7 @@ export class InventoryImportService {
 
         partCatalogItemId = created.id;
 
-        if (
-          normalized.rawPartNumber &&
-          normalized.partNumber
-        ) {
+        if (normalized.rawPartNumber && normalized.partNumber) {
           await tx.partNumber.create({
             data: {
               partCatalogItemId: created.id,
@@ -506,39 +470,32 @@ export class InventoryImportService {
   ): Promise<{
     id: string;
   }> {
-    const categoryName =
-      normalized.categoryName?.trim();
+    const categoryName = normalized.categoryName?.trim();
 
     if (!categoryName) {
-      throw new BadRequestException(
-        'Не указана категория товара',
-      );
+      throw new BadRequestException('Не указана категория товара');
     }
 
-    const parentCategory =
-      await tx.partCategory.findFirst({
-        where: {
-          parentId: null,
-          isActive: true,
-          name: {
-            equals: categoryName,
-            mode: 'insensitive',
-          },
+    const parentCategory = await tx.partCategory.findFirst({
+      where: {
+        parentId: null,
+        isActive: true,
+        name: {
+          equals: categoryName,
+          mode: 'insensitive',
         },
-        select: {
-          id: true,
-          name: true,
-        },
-      });
+      },
+      select: {
+        id: true,
+        name: true,
+      },
+    });
 
     if (!parentCategory) {
-      throw new NotFoundException(
-        `Категория «${categoryName}» не найдена`,
-      );
+      throw new NotFoundException(`Категория «${categoryName}» не найдена`);
     }
 
-    const subcategoryName =
-      normalized.subcategoryName?.trim();
+    const subcategoryName = normalized.subcategoryName?.trim();
 
     if (!subcategoryName) {
       return {
@@ -546,20 +503,19 @@ export class InventoryImportService {
       };
     }
 
-    const subcategory =
-      await tx.partCategory.findFirst({
-        where: {
-          parentId: parentCategory.id,
-          isActive: true,
-          name: {
-            equals: subcategoryName,
-            mode: 'insensitive',
-          },
+    const subcategory = await tx.partCategory.findFirst({
+      where: {
+        parentId: parentCategory.id,
+        isActive: true,
+        name: {
+          equals: subcategoryName,
+          mode: 'insensitive',
         },
-        select: {
-          id: true,
-        },
-      });
+      },
+      select: {
+        id: true,
+      },
+    });
 
     if (!subcategory) {
       throw new NotFoundException(
@@ -593,9 +549,7 @@ export class InventoryImportService {
     });
 
     if (!part) {
-      throw new NotFoundException(
-        'Деталь каталога не найдена',
-      );
+      throw new NotFoundException('Деталь каталога не найдена');
     }
 
     if (!part.isActive) {
@@ -605,27 +559,26 @@ export class InventoryImportService {
     }
 
     if (!part.category.isActive) {
-      throw new BadRequestException(
-        'Категория детали отключена',
-      );
+      throw new BadRequestException('Категория детали отключена');
     }
 
     const item = await tx.shopInventoryItem.create({
-  data: {
-    shopId,
-    partCatalogItemId,
-    brand: null,
-    price: new Decimal(normalized.price ?? 0),
-    quantity: normalized.quantity,
-    minQuantity: 0,
-    oemNumber: normalized.rawPartNumber,
-    sku: normalized.rawPartNumber,
-    condition: PartCondition.NEW,
-    currency: 'TJS',
-    location: null,
-    notes: null,
-  },
-});
+      data: {
+        shopId,
+        partCatalogItemId,
+        brand: null,
+        price: new Decimal(normalized.price ?? 0),
+        quantity: normalized.quantity,
+        minQuantity: 0,
+        oemNumber: normalized.rawPartNumber,
+        sku: normalized.rawPartNumber,
+        condition: PartCondition.NEW,
+        currency: 'TJS',
+        location: normalized.storageLocation,
+        notes: null,
+        compatibility: normalized.compatibility,
+      },
+    });
 
     if (item.quantity > 0) {
       await tx.inventoryMovement.create({
@@ -637,8 +590,7 @@ export class InventoryImportService {
           change: item.quantity,
           quantityBefore: 0,
           quantityAfter: item.quantity,
-          notes:
-            'Начальный остаток (импорт Excel)',
+          notes: 'Начальный остаток (импорт Excel)',
         },
       });
     }
@@ -652,14 +604,13 @@ export class InventoryImportService {
     normalizedName: string | null,
   ) {
     if (catalogItemId) {
-      const byCatalog =
-        await tx.shopInventoryItem.findFirst({
-          where: {
-            shopId,
-            partCatalogItemId: catalogItemId,
-            isActive: true,
-          },
-        });
+      const byCatalog = await tx.shopInventoryItem.findFirst({
+        where: {
+          shopId,
+          partCatalogItemId: catalogItemId,
+          isActive: true,
+        },
+      });
 
       if (byCatalog) {
         return byCatalog;
@@ -667,40 +618,32 @@ export class InventoryImportService {
     }
 
     if (normalizedPartNumber) {
-      const byPartNumber =
-        await tx.shopInventoryItem.findMany({
-          where: {
-            shopId,
-            isActive: true,
-            OR: [
-              {
-                oemNumber: {
-                  not: null,
-                },
+      const byPartNumber = await tx.shopInventoryItem.findMany({
+        where: {
+          shopId,
+          isActive: true,
+          OR: [
+            {
+              oemNumber: {
+                not: null,
               },
-              {
-                sku: {
-                  not: null,
-                },
+            },
+            {
+              sku: {
+                not: null,
               },
-            ],
-          },
-          take: 500,
-        });
+            },
+          ],
+        },
+        take: 500,
+      });
 
       const matched = byPartNumber.find((item) => {
-        const oem = item.oemNumber
-          ?.replace(/[^A-Z0-9]/gi, '')
-          .toUpperCase();
+        const oem = item.oemNumber?.replace(/[^A-Z0-9]/gi, '').toUpperCase();
 
-        const sku = item.sku
-          ?.replace(/[^A-Z0-9]/gi, '')
-          .toUpperCase();
+        const sku = item.sku?.replace(/[^A-Z0-9]/gi, '').toUpperCase();
 
-        return (
-          oem === normalizedPartNumber ||
-          sku === normalizedPartNumber
-        );
+        return oem === normalizedPartNumber || sku === normalizedPartNumber;
       });
 
       if (matched) {
@@ -734,33 +677,31 @@ export class InventoryImportService {
     actor: InventoryActor,
   ) {
     const nextQuantity = normalized.quantity;
-    const nextPrice = new Decimal(
-      normalized.price ?? 0,
-    );
+    const nextPrice = new Decimal(normalized.price ?? 0);
 
-    const quantityChanged =
-      existing.quantity !== nextQuantity;
+    const quantityChanged = existing.quantity !== nextQuantity;
 
     await tx.shopInventoryItem.update({
       where: {
         id: existing.id,
       },
       data: {
-  price: nextPrice,
-  quantity: nextQuantity,
-  minQuantity: 0,
-  brand: null,
-  condition: PartCondition.NEW,
-  currency: 'TJS',
-  location: null,
-  notes: null,
-  ...(normalized.rawPartNumber
-    ? {
-        oemNumber: normalized.rawPartNumber,
-        sku: normalized.rawPartNumber,
-      }
-    : {}),
-},
+        price: nextPrice,
+        quantity: nextQuantity,
+        minQuantity: 0,
+        brand: null,
+        condition: PartCondition.NEW,
+        currency: 'TJS',
+        location: normalized.storageLocation,
+        notes: null,
+        compatibility: normalized.compatibility,
+        ...(normalized.rawPartNumber
+          ? {
+              oemNumber: normalized.rawPartNumber,
+              sku: normalized.rawPartNumber,
+            }
+          : {}),
+      },
     });
 
     if (quantityChanged) {
@@ -770,23 +711,17 @@ export class InventoryImportService {
           inventoryItemId: existing.id,
           userId: actor.id,
           type: InventoryMovementType.ADJUSTMENT,
-          change:
-            nextQuantity - existing.quantity,
+          change: nextQuantity - existing.quantity,
           quantityBefore: existing.quantity,
           quantityAfter: nextQuantity,
-          notes:
-            'Обновление при импорте Excel',
+          notes: 'Обновление при импорте Excel',
         },
       });
     }
   }
 
   private toPartCondition(
-    condition:
-      | 'NEW'
-      | 'USED'
-      | 'REFURBISHED'
-      | PartCondition,
+    condition: 'NEW' | 'USED' | 'REFURBISHED' | PartCondition,
   ): PartCondition {
     switch (condition) {
       case 'USED':
@@ -801,10 +736,7 @@ export class InventoryImportService {
     }
   }
 
-  private resolveShop(
-    actor: InventoryActor,
-    requestedShopId?: string,
-  ) {
+  private resolveShop(actor: InventoryActor, requestedShopId?: string) {
     if (actor.role === UserRole.SUPER_ADMIN) {
       if (!requestedShopId) {
         throw new BadRequestException(
@@ -816,26 +748,17 @@ export class InventoryImportService {
     }
 
     if (!actor.shopId) {
-      throw new ForbiddenException(
-        'Пользователь не привязан к магазину',
-      );
+      throw new ForbiddenException('Пользователь не привязан к магазину');
     }
 
-    if (
-      requestedShopId &&
-      requestedShopId !== actor.shopId
-    ) {
-      throw new ForbiddenException(
-        'Нельзя импортировать в чужой магазин',
-      );
+    if (requestedShopId && requestedShopId !== actor.shopId) {
+      throw new ForbiddenException('Нельзя импортировать в чужой магазин');
     }
 
     return actor.shopId;
   }
 
-  private publicErrorMessage(
-    error: unknown,
-  ) {
+  private publicErrorMessage(error: unknown) {
     if (
       error instanceof NotFoundException ||
       error instanceof BadRequestException
@@ -843,8 +766,7 @@ export class InventoryImportService {
       return error.message;
     }
 
-    return error instanceof Error &&
-      error.message
+    return error instanceof Error && error.message
       ? error.message
       : 'Не удалось обработать строку';
   }

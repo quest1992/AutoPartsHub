@@ -7,13 +7,16 @@ export const login = (phone:string,password:string) => request<LoginResponse>('/
 export type UserRole='SUPER_ADMIN'|'SHOP_ADMIN'|'MANAGER'|'SELLER'|'VIEWER'; export type CurrentUser={id:string;firstName:string;lastName:string|null;phone:string;role:UserRole;shopId:string|null;isActive:boolean;shop:{id:string;name:string;isActive:boolean}|null;permissions:string[]}; export const getCurrentUser=()=>request<{user:CurrentUser}>('/auth/me');
 export type SearchResponse={items:Array<{inventoryItemId:string;partCatalogItemId:string;internalCode:string;name:string;slug:string;oemNumber:string|null;category:{id:string;name:string};manufacturer:{id:string;name:string}|null;shop:{id:string;name:string};price:string;quantity:number;availableQuantity:number;isActive:boolean}>;pagination:{page:number;limit:number;total:number;totalPages:number}};
 export function searchInventory(params:Record<string,string|number|boolean|undefined>) { const query=new URLSearchParams(); Object.entries(params).forEach(([key,value])=>value!==undefined&&query.set(key,String(value))); return request<SearchResponse>(`/inventory-search?${query}`); }
-export type InventoryItem={id:string;partCatalogItemId:string;brand:string|null;sku:string|null;oemNumber:string|null;condition:string;price:string;currency:string;quantity:number;minQuantity:number;location:string|null;notes:string|null;isActive:boolean;shop:{id:string;name:string};partCatalogItem:{name:string;internalCode:string;category:{name:string};compatibilities:Array<{vehicleGeneration:{name:string;vehicleModel:{name:string;manufacturer:{name:string}}}}>}};
+export type InventoryItem={id:string;partCatalogItemId:string;brand:string|null;sku:string|null;oemNumber:string|null;compatibility:string|null;condition:string;price:string;currency:string;quantity:number;minQuantity:number;location:string|null;notes:string|null;imageUrl:string|null;imagePublicId:string|null;isActive:boolean;shop:{id:string;name:string};partCatalogItem:{name:string;internalCode:string;category:{name:string};compatibilities:Array<{vehicleGeneration:{name:string;vehicleModel:{name:string;manufacturer:{name:string}}}}>}};
 export type InventoryList={data:InventoryItem[];meta:{page:number;limit:number;total:number;totalPages:number}};
 export function inventoryList(params:Record<string,string|number|boolean|undefined>){const q=new URLSearchParams();Object.entries(params).forEach(([k,v])=>v!==undefined&&q.set(k,String(v)));return request<InventoryList>(`/inventory-items?${q}`)}
 export const inventoryOne=(id:string)=>request<InventoryItem>(`/inventory-items/${id}`);
-export const createInventory=(data:object)=>request<InventoryItem>('/inventory-items',{method:'POST',body:JSON.stringify(data)});
-export const updateInventory=(id:string,data:object)=>request<InventoryItem>(`/inventory-items/${id}`,{method:'PATCH',body:JSON.stringify(data)});
+export type InventoryPayload={partCatalogItemId?:string;brand?:string;sku?:string;oemNumber?:string;compatibility?:string|null;condition?:string;price?:number;currency?:string;quantity?:number;minQuantity?:number;location?:string|null;notes?:string;isActive?:boolean};
+export const createInventory=(data:InventoryPayload)=>request<InventoryItem>('/inventory-items',{method:'POST',body:JSON.stringify(data)});
+export const updateInventory=(id:string,data:InventoryPayload)=>request<InventoryItem>(`/inventory-items/${id}`,{method:'PATCH',body:JSON.stringify(data)});
 export const deleteInventory=(id:string)=>request<InventoryItem>(`/inventory-items/${id}`,{method:'DELETE'});
+export async function uploadInventoryImage(id:string,image:File){if(!baseUrl)throw new ApiError(0,'Не задан NEXT_PUBLIC_API_URL');const form=new FormData();form.append('image',image);const token=getToken();const response=await fetch(`${baseUrl}/inventory-items/${id}/image`,{method:'POST',headers:{...(token?{Authorization:`Bearer ${token}`}:{})},body:form});const body=await response.json().catch(()=>null);if(!response.ok)throw new ApiError(response.status,body?.message??'Не удалось загрузить фото');return body as InventoryItem}
+export const deleteInventoryImage=(id:string)=>request<InventoryItem>(`/inventory-items/${id}/image`,{method:'DELETE'});
 export type CatalogItem={id:string;name:string;internalCode:string;slug:string;category:{name:string};compatibilities:Array<{vehicleGeneration:{name:string;vehicleModel:{name:string;manufacturer:{name:string}}}}>};
 export type CatalogList={data:CatalogItem[];meta:{page:number;limit:number;total:number;totalPages:number}};
 export function catalogSearch(search:string){return request<CatalogList>(`/part-catalog?${new URLSearchParams({search,isActive:'true',limit:'10'})}`)}
@@ -66,6 +69,8 @@ export type InventoryImportPreviewRow = {
   normalized: {
     partNumber: string | null;
     name: string | null;
+    compatibility: string | null;
+    storageLocation: string | null;
     price: number | null;
     quantity: number;
   };
@@ -80,12 +85,16 @@ export type InventoryImportPreviewResponse = {
   suggestedMapping: {
     partNumber: string | null;
     name: string | null;
+    compatibility: string | null;
+    storageLocation: string | null;
     price: string | null;
     quantity: string | null;
   };
   appliedMapping: {
     partNumberColumn: string | null;
     nameColumn: string;
+    compatibilityColumn: string | null;
+    storageLocationColumn: string | null;
     priceColumn: string;
     quantityColumn: string;
   };
@@ -110,6 +119,8 @@ export type InventoryImportConfirmResponse = {
 export type InventoryImportMapping = {
   partNumberColumn?: string;
   nameColumn: string;
+  compatibilityColumn?: string;
+  storageLocationColumn?: string;
   priceColumn: string;
   quantityColumn: string;
 };
@@ -128,6 +139,8 @@ export async function importPreview(file: File, options: { shopId?: string; mapp
   if (options.shopId) form.append('shopId', options.shopId);
   if (options.mapping?.partNumberColumn) form.append('partNumberColumn', options.mapping.partNumberColumn);
   if (options.mapping?.nameColumn) form.append('nameColumn', options.mapping.nameColumn);
+  if (options.mapping?.compatibilityColumn) form.append('compatibilityColumn', options.mapping.compatibilityColumn);
+  if (options.mapping?.storageLocationColumn) form.append('storageLocationColumn', options.mapping.storageLocationColumn);
   if (options.mapping?.priceColumn) form.append('priceColumn', options.mapping.priceColumn);
   if (options.mapping?.quantityColumn) form.append('quantityColumn', options.mapping.quantityColumn);
   const response = await fetch(`${baseUrl}/inventory-import/preview`, {
@@ -149,6 +162,8 @@ export async function confirmInventoryImport(file: File, options: { shopId?: str
   if (options.shopId) form.append('shopId', options.shopId);
   if (options.mapping.partNumberColumn) form.append('partNumberColumn', options.mapping.partNumberColumn);
   form.append('nameColumn', options.mapping.nameColumn);
+  if (options.mapping.compatibilityColumn) form.append('compatibilityColumn', options.mapping.compatibilityColumn);
+  if (options.mapping.storageLocationColumn) form.append('storageLocationColumn', options.mapping.storageLocationColumn);
   form.append('priceColumn', options.mapping.priceColumn);
   form.append('quantityColumn', options.mapping.quantityColumn);
   const response = await fetch(`${baseUrl}/inventory-import/confirm`, {

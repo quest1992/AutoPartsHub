@@ -7,6 +7,8 @@ export type ImportField =
   | 'subcategory'
   | 'partNumber'
   | 'name'
+  | 'compatibility'
+  | 'storageLocation'
   | 'price'
   | 'quantity';
 
@@ -15,6 +17,8 @@ export interface ColumnMappingInput {
   subcategoryColumn?: string | null;
   partNumberColumn?: string | null;
   nameColumn?: string | null;
+  compatibilityColumn?: string | null;
+  storageLocationColumn?: string | null;
   priceColumn?: string | null;
   quantityColumn?: string | null;
 }
@@ -24,6 +28,8 @@ export interface ResolvedColumnMapping {
   subcategoryColumn: string | null;
   partNumberColumn: string | null;
   nameColumn: string;
+  compatibilityColumn: string | null;
+  storageLocationColumn: string | null;
   priceColumn: string;
   quantityColumn: string;
 }
@@ -47,6 +53,8 @@ export interface NormalizedImportRow {
 
   name: string | null;
   rawName: string | null;
+  compatibility: string | null;
+  storageLocation: string | null;
 
   price: number | null;
   quantity: number;
@@ -91,6 +99,30 @@ const COLUMN_ALIASES: Record<ImportField, string[]> = {
     'productname',
     'name',
     'item',
+  ],
+  compatibility: [
+    'совместимость',
+    'совместимостьсавто',
+    'совместимостьсавтомобилем',
+    'автомобиль',
+    'модельавтомобиля',
+    'compatibility',
+    'vehiclecompatibility',
+    'fitment',
+    'vehicle',
+    'carmodel',
+  ],
+  storageLocation: [
+    'местохранения',
+    'складскоеместо',
+    'местонаскладе',
+    'ячейка',
+    'стеллаж',
+    'storagelocation',
+    'warehouselocation',
+    'location',
+    'shelf',
+    'bin',
   ],
   price: [
     'цена',
@@ -144,14 +176,16 @@ export function suggestColumnMapping(
   const mapping: Partial<Record<ImportField, string>> = {};
   const used = new Set<string>();
 
-for (const field of [
-  'category',
-  'subcategory',
-  'partNumber',
-  'name',
-  'price',
-  'quantity',
-] as ImportField[]) {
+  for (const field of [
+    'category',
+    'subcategory',
+    'partNumber',
+    'name',
+    'compatibility',
+    'storageLocation',
+    'price',
+    'quantity',
+  ] as ImportField[]) {
     for (const column of columns) {
       if (used.has(column)) continue;
       const key = normalizeHeader(column);
@@ -266,43 +300,33 @@ export function resolveColumnMapping(
   input?: ColumnMappingInput,
 ): { mapping: ResolvedColumnMapping; errors: string[] } {
   const suggested = suggestColumnMapping(columns);
- const mapping: ResolvedColumnMapping = {
-  categoryColumn:
-    input?.categoryColumn?.trim() ||
-    suggested.category ||
-    '',
+  const mapping: ResolvedColumnMapping = {
+    categoryColumn: input?.categoryColumn?.trim() || suggested.category || '',
 
-  subcategoryColumn:
-    input?.subcategoryColumn?.trim() ||
-    suggested.subcategory ||
-    null,
+    subcategoryColumn:
+      input?.subcategoryColumn?.trim() || suggested.subcategory || null,
 
-  partNumberColumn:
-    input?.partNumberColumn?.trim() ||
-    suggested.partNumber ||
-    null,
+    partNumberColumn:
+      input?.partNumberColumn?.trim() || suggested.partNumber || null,
 
-  nameColumn:
-    input?.nameColumn?.trim() ||
-    suggested.name ||
-    '',
+    nameColumn: input?.nameColumn?.trim() || suggested.name || '',
 
-  priceColumn:
-    input?.priceColumn?.trim() ||
-    suggested.price ||
-    '',
+    compatibilityColumn:
+      input?.compatibilityColumn?.trim() || suggested.compatibility || null,
 
-  quantityColumn:
-    input?.quantityColumn?.trim() ||
-    suggested.quantity ||
-    '',
-};
+    storageLocationColumn:
+      input?.storageLocationColumn?.trim() || suggested.storageLocation || null,
+
+    priceColumn: input?.priceColumn?.trim() || suggested.price || '',
+
+    quantityColumn: input?.quantityColumn?.trim() || suggested.quantity || '',
+  };
 
   const errors: string[] = [];
 
   if (!mapping.categoryColumn) {
-  errors.push('Не выбрана колонка с категорией');
-}
+    errors.push('Не выбрана колонка с категорией');
+  }
   if (!mapping.nameColumn) {
     errors.push('Не выбрана колонка с наименованием');
   }
@@ -405,6 +429,14 @@ export function normalizeImportRow(
     ? normalizeText(source[mapping.nameColumn])
     : null;
 
+  const compatibility = mapping.compatibilityColumn
+    ? normalizeText(source[mapping.compatibilityColumn])
+    : null;
+
+  const storageLocation = mapping.storageLocationColumn
+    ? normalizeText(source[mapping.storageLocationColumn])
+    : null;
+
   const rawPrice = mapping.priceColumn
     ? source[mapping.priceColumn]
     : undefined;
@@ -414,6 +446,14 @@ export function normalizeImportRow(
     : undefined;
 
   const errors: string[] = [];
+
+  if (compatibility && compatibility.length > 500) {
+    errors.push('Совместимость не должна превышать 500 символов');
+  }
+
+  if (storageLocation && storageLocation.length > 200) {
+    errors.push('Место хранения не должно превышать 200 символов');
+  }
 
   if (!categoryName) {
     errors.push('Не указана категория');
@@ -427,9 +467,7 @@ export function normalizeImportRow(
     ? normalizePartNumber(rawPartNumber) || null
     : null;
 
-  const name = rawName
-    ? normalizePartName(rawName) || null
-    : null;
+  const name = rawName ? normalizePartName(rawName) || null : null;
 
   if (!partNumber && !name) {
     errors.push('Укажите артикул или наименование');
@@ -463,6 +501,8 @@ export function normalizeImportRow(
       rawPartNumber,
       name,
       rawName,
+      compatibility,
+      storageLocation,
       price: priceResult.price,
       quantity: quantityResult.quantity,
     },

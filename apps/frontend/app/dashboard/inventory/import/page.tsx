@@ -32,6 +32,8 @@ const statusLabels: Record<string, string> = {
 const emptyMapping = (): InventoryImportMapping => ({
   partNumberColumn: '',
   nameColumn: '',
+  compatibilityColumn: '',
+  storageLocationColumn: '',
   priceColumn: '',
   quantityColumn: '',
 });
@@ -116,6 +118,10 @@ export default function InventoryImportPage() {
       setMapping({
         partNumberColumn: response.appliedMapping.partNumberColumn ?? '',
         nameColumn: response.appliedMapping.nameColumn,
+        compatibilityColumn:
+          response.appliedMapping.compatibilityColumn ?? '',
+        storageLocationColumn:
+          response.appliedMapping.storageLocationColumn ?? '',
         priceColumn: response.appliedMapping.priceColumn,
         quantityColumn: response.appliedMapping.quantityColumn,
       });
@@ -254,6 +260,28 @@ export default function InventoryImportPage() {
                 }
               />
               <MappingSelect
+                label="Совместимость"
+                value={mapping.compatibilityColumn ?? ''}
+                columns={preview.columns}
+                onChange={(value) =>
+                  setMapping((current) => ({
+                    ...current,
+                    compatibilityColumn: value,
+                  }))
+                }
+              />
+              <MappingSelect
+                label="Место хранения"
+                value={mapping.storageLocationColumn ?? ''}
+                columns={preview.columns}
+                onChange={(value) =>
+                  setMapping((current) => ({
+                    ...current,
+                    storageLocationColumn: value,
+                  }))
+                }
+              />
+              <MappingSelect
                 label="Цена"
                 value={mapping.priceColumn}
                 columns={preview.columns}
@@ -302,6 +330,8 @@ export default function InventoryImportPage() {
                     <th className="py-2">№ строки</th>
                     <th>Артикул</th>
                     <th>Наименование</th>
+                    <th>Совместимость</th>
+                    <th>Место хранения</th>
                     <th>Цена</th>
                     <th>Количество</th>
                     <th>Статус</th>
@@ -314,6 +344,12 @@ export default function InventoryImportPage() {
                       <td className="py-3">{row.rowNumber}</td>
                       <td className="py-3">{row.normalized.partNumber ?? '—'}</td>
                       <td className="py-3">{row.normalized.name ?? '—'}</td>
+                      <td className="py-3">
+                        {row.normalized.compatibility ?? '—'}
+                      </td>
+                      <td className="py-3">
+                        {row.normalized.storageLocation ?? '—'}
+                      </td>
                       <td className="py-3">{row.normalized.price ?? '—'}</td>
                       <td className="py-3">{row.normalized.quantity}</td>
                       <td className="py-3">{statusLabels[row.status] ?? row.status}</td>

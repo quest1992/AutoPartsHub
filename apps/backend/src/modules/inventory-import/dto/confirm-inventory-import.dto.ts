@@ -28,6 +28,24 @@ export class PreviewInventoryImportDto {
   @Length(1, 200)
   nameColumn?: string;
 
+  @ApiPropertyOptional({
+    description: 'Колонка с совместимостью с автомобилями',
+    example: 'Совместимость',
+  })
+  @IsOptional()
+  @IsString()
+  @Length(1, 200)
+  compatibilityColumn?: string;
+
+  @ApiPropertyOptional({
+    description: 'Колонка с местом хранения товара',
+    example: 'Место хранения',
+  })
+  @IsOptional()
+  @IsString()
+  @Length(1, 200)
+  storageLocationColumn?: string;
+
   @ApiPropertyOptional({ description: 'Колонка с ценой', example: 'Цена' })
   @IsOptional()
   @IsString()
@@ -69,6 +87,24 @@ export class ConfirmInventoryImportDto {
   @IsString()
   @Length(1, 200)
   nameColumn!: string;
+
+  @ApiPropertyOptional({
+    description: 'Колонка с совместимостью с автомобилями',
+    example: 'Совместимость',
+  })
+  @IsOptional()
+  @IsString()
+  @Length(1, 200)
+  compatibilityColumn?: string;
+
+  @ApiPropertyOptional({
+    description: 'Колонка с местом хранения товара',
+    example: 'Место хранения',
+  })
+  @IsOptional()
+  @IsString()
+  @Length(1, 200)
+  storageLocationColumn?: string;
 
   @ApiProperty({ description: 'Колонка с ценой', example: 'Цена' })
   @IsString()
