@@ -76,26 +76,78 @@ export class PurchasesService {
   }
   async create(d: CreatePurchaseDto, a: InventoryActor) {
     const shopId = this.shop(a, d.shopId);
-    if (new Set(d.items.map((x) => x.inventoryItemId)).size !== d.items.length)
-      throw new BadRequestException('Складская позиция указана дважды');
+    for (const line of d.items) {
+      if (Boolean(line.inventoryItemId) === Boolean(line.catalogItemId))
+        throw new BadRequestException(
+          'Для каждой строки укажите либо inventoryItemId, либо catalogItemId',
+        );
+    }
     return this.serializable(async (tx) => {
       const shop = await tx.shop.findUnique({ where: { id: shopId } });
       if (!shop) throw new NotFoundException('Магазин не найден');
       if (!shop.isActive) throw new BadRequestException('Магазин отключён');
-      const items = await tx.shopInventoryItem.findMany({
-        where: { id: { in: d.items.map((x) => x.inventoryItemId) } },
-        include: { partCatalogItem: true },
-      });
-      if (items.length !== d.items.length)
-        throw new NotFoundException('Складская позиция не найдена');
-      if (items.some((i) => i.shopId !== shopId))
-        throw new ForbiddenException(
-          'Складская позиция принадлежит другому магазину',
-        );
-      if (items.some((i) => !i.isActive))
-        throw new BadRequestException(
-          'Нельзя принять неактивную складскую позицию',
-        );
+      const requestedCurrency = d.currency?.trim().toUpperCase() || 'TJS';
+      const resolved: Array<{
+        line: CreatePurchaseDto['items'][number];
+        item: Prisma.ShopInventoryItemGetPayload<{
+          include: { partCatalogItem: true };
+        }>;
+      }> = [];
+      for (const line of d.items) {
+        let item: Prisma.ShopInventoryItemGetPayload<{
+          include: { partCatalogItem: true };
+        }>;
+        if (line.inventoryItemId) {
+          const existingItem = await tx.shopInventoryItem.findUnique({
+            where: { id: line.inventoryItemId },
+            include: { partCatalogItem: true },
+          });
+          if (!existingItem)
+            throw new NotFoundException('Складская позиция не найдена');
+          item = existingItem;
+          if (item.shopId !== shopId)
+            throw new ForbiddenException(
+              'Складская позиция принадлежит другому магазину',
+            );
+          if (!item.isActive)
+            throw new BadRequestException(
+              'Нельзя принять неактивную складскую позицию',
+            );
+        } else {
+          const catalogItem = await tx.partCatalogItem.findUnique({
+            where: { id: line.catalogItemId! },
+          });
+          if (!catalogItem)
+            throw new NotFoundException('Товар каталога не найден');
+          if (!catalogItem.isActive)
+            throw new BadRequestException('Товар каталога отключён');
+          const salePrice = new Prisma.Decimal(
+            line.salePrice ?? line.purchasePrice,
+          );
+          item = await tx.shopInventoryItem.upsert({
+            where: {
+              shopId_partCatalogItemId: {
+                shopId,
+                partCatalogItemId: catalogItem.id,
+              },
+            },
+            create: {
+              shopId,
+              partCatalogItemId: catalogItem.id,
+              quantity: 0,
+              price: salePrice,
+              currency: requestedCurrency,
+              isActive: true,
+            },
+            update: { isActive: true },
+            include: { partCatalogItem: true },
+          });
+        }
+        resolved.push({ line, item });
+      }
+      if (new Set(resolved.map(({ item }) => item.id)).size !== resolved.length)
+        throw new BadRequestException('Складская позиция указана дважды');
+      const items = resolved.map(({ item }) => item);
       if (new Set(items.map((i) => i.currency)).size !== 1)
         throw new BadRequestException(
           'Все позиции закупки должны иметь одинаковую валюту',
@@ -132,8 +184,7 @@ export class PurchasesService {
           purchasedAt: d.purchasedAt ? new Date(d.purchasedAt) : new Date(),
         },
       });
-      for (const line of d.items) {
-        const i = items.find((x) => x.id === line.inventoryItemId)!;
+      for (const { line, item: i } of resolved) {
         const price = new Prisma.Decimal(line.purchasePrice);
         const salePrice =
           line.salePrice === undefined

@@ -25,7 +25,7 @@ export class PartCategoriesService {
     const data = this.normalize(dto);
     const parentId = data.parentId ?? null;
 
-    await this.ensureValidParent(parentId, undefined, 1);
+    await this.ensureValidParent(parentId);
     await this.ensureNoDuplicate(parentId, data.name, data.slug);
 
     try {
@@ -63,12 +63,6 @@ export class PartCategoriesService {
       }),
     };
 
-    console.log('[Category search][Service] query.search:', search);
-    console.log(
-      '[Category search][Service] Prisma where:',
-      JSON.stringify(where),
-    );
-
     const [data, total] = await this.prisma.$transaction([
       this.prisma.partCategory.findMany({
         where,
@@ -83,23 +77,10 @@ export class PartCategoriesService {
       this.prisma.partCategory.count({ where }),
     ]);
 
-    console.log('[Category search][Service] found:', total);
-    console.log(
-      '[Category search][Service] first 20 names:',
-      data.slice(0, 20).map((category) => category.name),
-    );
-
-    const result = {
+    return {
       data,
       meta: { total, page, limit, totalPages: Math.ceil(total / limit) },
     };
-
-    console.log(
-      '[Category search][Service] result JSON:',
-      JSON.stringify(result),
-    );
-
-    return result;
   }
 
   async findTree(isActive = true) {
@@ -157,11 +138,7 @@ export class PartCategoriesService {
     const finalSlug = data.slug ?? existing.slug;
 
     if (dto.parentId !== undefined || dto.isActive === true) {
-      await this.ensureValidParent(
-        finalParentId,
-        id,
-        await this.getSubtreeHeight(id),
-      );
+      await this.ensureValidParent(finalParentId, id);
     }
     await this.ensureNoDuplicate(finalParentId, finalName, finalSlug, id);
 
@@ -187,18 +164,46 @@ export class PartCategoriesService {
 
   async remove(id: string) {
     await this.findOne(id);
-    const activeChildren = await this.prisma.partCategory.count({
-      where: { parentId: id, isActive: true },
-    });
+    const [activeChildren, activeCatalogItems] = await this.prisma.$transaction(
+      [
+        this.prisma.partCategory.count({
+          where: { parentId: id, isActive: true },
+        }),
+        this.prisma.partCatalogItem.count({
+          where: { categoryId: id, isActive: true },
+        }),
+      ],
+    );
     if (activeChildren > 0) {
       throw new BadRequestException(
         'Нельзя отключить категорию с активными дочерними категориями',
+      );
+    }
+    if (activeCatalogItems > 0) {
+      throw new BadRequestException(
+        'Нельзя отключить категорию с активными деталями каталога',
       );
     }
     return this.prisma.partCategory.update({
       where: { id },
       data: { isActive: false },
     });
+  }
+
+  async deletePermanently(id: string) {
+    await this.findOne(id);
+    const [children, catalogItems] = await this.prisma.$transaction([
+      this.prisma.partCategory.count({ where: { parentId: id } }),
+      this.prisma.partCatalogItem.count({ where: { categoryId: id } }),
+    ]);
+
+    if (children > 0 || catalogItems > 0) {
+      throw new ConflictException(
+        'Нельзя удалить категорию, пока в ней есть дочерние категории или детали каталога',
+      );
+    }
+
+    return this.prisma.partCategory.delete({ where: { id } });
   }
 
   private normalize<
@@ -247,15 +252,8 @@ export class PartCategoriesService {
   private async ensureValidParent(
     parentId: string | null,
     categoryId?: string,
-    subtreeHeight = 1,
   ) {
-    if (!parentId) {
-      if (subtreeHeight > 3)
-        throw new BadRequestException(
-          'Максимальная глубина вложенности категорий — 3',
-        );
-      return;
-    }
+    if (!parentId) return;
     if (parentId === categoryId)
       throw new BadRequestException(
         'Категория не может быть родителем самой себе',
@@ -272,7 +270,6 @@ export class PartCategoriesService {
         'Нельзя использовать неактивную родительскую категорию',
       );
 
-    let depth = 1;
     let currentParentId = parent.parentId;
     const visited = new Set<string>([parent.id]);
     while (currentParentId) {
@@ -283,7 +280,6 @@ export class PartCategoriesService {
       if (visited.has(currentParentId))
         throw new BadRequestException('Обнаружен цикл в иерархии категорий');
       visited.add(currentParentId);
-      depth += 1;
       const ancestor = await this.prisma.partCategory.findUnique({
         where: { id: currentParentId },
         select: { parentId: true },
@@ -291,36 +287,6 @@ export class PartCategoriesService {
       if (!ancestor) break;
       currentParentId = ancestor.parentId;
     }
-    if (depth + subtreeHeight > 3)
-      throw new BadRequestException(
-        'Максимальная глубина вложенности категорий — 3',
-      );
-  }
-
-  private async getSubtreeHeight(categoryId: string) {
-    const categories = await this.prisma.partCategory.findMany({
-      select: { id: true, parentId: true },
-    });
-    const childrenByParent = new Map<string, string[]>();
-    for (const category of categories) {
-      if (!category.parentId) continue;
-      childrenByParent.set(category.parentId, [
-        ...(childrenByParent.get(category.parentId) ?? []),
-        category.id,
-      ]);
-    }
-    const height = (id: string, path = new Set<string>()): number => {
-      if (path.has(id))
-        throw new BadRequestException('Обнаружен цикл в иерархии категорий');
-      const children = childrenByParent.get(id) ?? [];
-      return children.length
-        ? 1 +
-            Math.max(
-              ...children.map((child) => height(child, new Set(path).add(id))),
-            )
-        : 1;
-    };
-    return height(categoryId);
   }
 
   private throwUniqueConflict(error: unknown): never {

@@ -37,6 +37,25 @@ describe('PartCatalogMatchingService', () => {
     expect(findPartAlias).not.toHaveBeenCalled();
   });
 
+  it('allows import matching through CROSS and AFTERMARKET numbers', async () => {
+    const { prisma, service } = createService();
+    const findMany = jest
+      .spyOn(prisma.partNumber, 'findMany')
+      .mockResolvedValue([{ partCatalogItemId: 'part-cross' }]);
+
+    await expect(service.match({ partNumber: '90915-YZZE1' })).resolves.toEqual(
+      expect.objectContaining({
+        matched: true,
+        partCatalogItemId: 'part-cross',
+      }),
+    );
+    expect(findMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: expect.not.objectContaining({ type: expect.anything() }),
+      }),
+    );
+  });
+
   it('uses an approved alias when the part number has no match', async () => {
     const { prisma, service } = createService();
     jest

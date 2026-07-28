@@ -68,6 +68,18 @@ const navigationItems: NavigationItem[] = [
     permissions: ['CATALOG_MANAGE'],
     icon: '📚',
   },
+  {
+    href: '/part-numbers',
+    label: 'OEM Numbers',
+    permissions: ['CATALOG_MANAGE'],
+    icon: '#',
+  },
+  {
+    href: '/vin',
+    label: 'VIN Decoder',
+    permissions: ['CATALOG_VIEW'],
+    icon: 'VIN',
+  },
 ];
 
 const roleLabels = {

@@ -1,7 +1,7 @@
 import { clearSession, getToken } from './auth';
 const baseUrl = process.env.NEXT_PUBLIC_API_URL;
 export class ApiError extends Error { constructor(public status: number, message: string) { super(message); } }
-export async function request<T>(path: string, options: RequestInit = {}): Promise<T> { if (!baseUrl) throw new ApiError(0, 'Не задан NEXT_PUBLIC_API_URL'); const token = getToken(); const response = await fetch(`${baseUrl}${path}`, { ...options, headers: { 'Content-Type':'application/json', ...(token ? { Authorization:`Bearer ${token}` } : {}), ...options.headers } }); const body = await response.json().catch(() => null); if (!response.ok) { if (response.status === 401) { clearSession(); if (typeof window !== 'undefined') window.dispatchEvent(new Event('auth:unauthorized')); } throw new ApiError(response.status, body?.message ?? 'Ошибка запроса'); } return body as T; }
+export async function request<T>(path: string, options: RequestInit = {}): Promise<T> { if (!baseUrl) throw new ApiError(0, 'Не задан NEXT_PUBLIC_API_URL'); const token = getToken(); let response:Response; try { response=await fetch(`${baseUrl}${path}`, { ...options, headers: { 'Content-Type':'application/json', ...(token ? { Authorization:`Bearer ${token}` } : {}), ...options.headers } }); } catch { throw new ApiError(0,'Не удалось подключиться к серверу. Проверьте, запущен ли backend'); } const body = await response.json().catch(() => null); if (!response.ok) { if (response.status === 401) { clearSession(); if (typeof window !== 'undefined') window.dispatchEvent(new Event('auth:unauthorized')); } const message=Array.isArray(body?.message)?body.message.join('. '):body?.message; throw new ApiError(response.status, message ?? 'Не удалось выполнить запрос'); } return body as T; }
 export type LoginResponse = { accessToken:string; tokenType:string; user: import('./auth').AuthUser };
 export const login = (phone:string,password:string) => request<LoginResponse>('/auth/login',{method:'POST',body:JSON.stringify({phone,password})});
 export type UserRole='SUPER_ADMIN'|'SHOP_ADMIN'|'MANAGER'|'SELLER'|'VIEWER'; export type CurrentUser={id:string;firstName:string;lastName:string|null;phone:string;role:UserRole;shopId:string|null;isActive:boolean;shop:{id:string;name:string;isActive:boolean}|null;permissions:string[]}; export const getCurrentUser=()=>request<{user:CurrentUser}>('/auth/me');
@@ -26,10 +26,25 @@ export function getPartCatalogCandidates(params:{q:string;categoryId?:string;sid
 export type PartCatalogEntry={id:string;internalCode:string;name:string;slug:string;description:string|null;categoryId:string;category:{id:string;name:string};side:'NONE'|'LEFT'|'RIGHT';position:'NONE'|'FRONT'|'REAR';isUniversal:boolean;isActive:boolean;normalizedName:string;searchTokens:string};
 export type PartCatalogResponse={data:PartCatalogEntry[];meta:Pagination};
 export type PartCatalogPayload={name:string;slug:string;description?:string;categoryId:string;side?:PartCatalogEntry['side'];position?:PartCatalogEntry['position'];isUniversal?:boolean;isActive?:boolean};
-export const getPartCatalog=(params:{search?:string;page?:number;limit?:number;isActive?:boolean}={})=>request<PartCatalogResponse>(`/part-catalog?${documentQuery(params)}`);
+export const getPartCatalog=(params:{search?:string;page?:number;limit?:number;isActive?:boolean;categoryId?:string;rootCategoryId?:string}={})=>request<PartCatalogResponse>(`/part-catalog/search?${documentQuery(params)}`);
 export const getPartCatalogItem=(id:string)=>request<PartCatalogEntry>(`/part-catalog/${id}`);
 export const createPartCatalogItem=(data:PartCatalogPayload)=>request<PartCatalogEntry>('/part-catalog',{method:'POST',body:JSON.stringify(data)});
 export const updatePartCatalogItem=(id:string,data:Partial<PartCatalogPayload>)=>request<PartCatalogEntry>(`/part-catalog/${id}`,{method:'PATCH',body:JSON.stringify(data)});
+export const deactivatePartCatalogItem=(id:string)=>request<PartCatalogEntry>(`/part-catalog/${id}`,{method:'DELETE'});
+export const deletePartCatalogItem=(id:string)=>request<PartCatalogEntry>(`/part-catalog/${id}/permanent`,{method:'DELETE'});
+export type PartAlias={id:string;alias:string;normalizedAlias:string;source:string|null;isApproved:boolean;usageCount:number};
+export const getPartAliases=(id:string)=>request<PartAlias[]>(`/part-catalog/${id}/aliases`);
+export const createPartAlias=(id:string,alias:string)=>request<PartAlias>(`/part-catalog/${id}/aliases`,{method:'POST',body:JSON.stringify({alias,isApproved:true})});
+export const deletePartAlias=(partId:string,aliasId:string)=>request<PartAlias>(`/part-catalog/${partId}/aliases/${aliasId}`,{method:'DELETE'});
+export type PartNumberType='OEM'|'AFTERMARKET'|'CROSS'|'INTERNAL';
+export type PartNumberManufacturer={id:string;name:string;isActive:boolean};
+export type PartNumberEntry={id:string;catalogItemId:string;manufacturer:PartNumberManufacturer|null;number:string;normalizedNumber:string;type:PartNumberType;isPrimary:boolean;createdAt:string;updatedAt:string;catalogItem:{id:string;internalCode:string;name:string;isActive:boolean}};
+export type PartNumberPayload={catalogItemId:string;manufacturerId:string;number:string;type:PartNumberType;isPrimary?:boolean};
+export const getPartNumberManufacturers=()=>request<PartNumberManufacturer[]>('/part-number-manufacturers');
+export const getPartNumbers=(params:{search?:string;manufacturerId?:string;catalogItemId?:string;type?:PartNumberType;page?:number;limit?:number}={})=>request<{data:PartNumberEntry[];meta:Pagination}>(`/part-numbers?${documentQuery(params)}`);
+export const createPartNumber=(data:PartNumberPayload)=>request<PartNumberEntry>('/part-numbers',{method:'POST',body:JSON.stringify(data)});
+export const updatePartNumber=(id:string,data:Partial<PartNumberPayload>)=>request<PartNumberEntry>(`/part-numbers/${id}`,{method:'PATCH',body:JSON.stringify(data)});
+export const deletePartNumber=(id:string)=>request<{id:string}>(`/part-numbers/${id}`,{method:'DELETE'});
 export type PartCategoryOption={id:string;name:string;slug:string;description?:string|null;parentId?:string|null;sortOrder?:number;isActive:boolean;parent:{id:string;name:string}|null;_count:{children:number}};
 export type PartCategoryTreeNode={id:string;name:string;slug:string;description:string|null;parentId:string|null;sortOrder:number;isActive:boolean;children:PartCategoryTreeNode[]};
 export type PartCategoryPayload={name:string;slug:string;description?:string;parentId?:string|null;sortOrder?:number;isActive?:boolean};
@@ -58,10 +73,13 @@ export const getPartCategory=(id:string)=>request<PartCategoryOption & {children
 export const createPartCategory=(data:PartCategoryPayload)=>request<PartCategoryOption>('/part-categories',{method:'POST',body:JSON.stringify(data)});
 export const updatePartCategory=(id:string,data:Partial<PartCategoryPayload>)=>request<PartCategoryOption>(`/part-categories/${id}`,{method:'PATCH',body:JSON.stringify(data)});
 export const deactivatePartCategory=(id:string)=>request<PartCategoryOption>(`/part-categories/${id}`,{method:'DELETE'});
+export const deletePartCategory=(id:string)=>request<PartCategoryOption>(`/part-categories/${id}/permanent`,{method:'DELETE'});
 export type Movement={id:string;type:string;change:number;quantityAfter:number;reference:string|null;notes:string|null;createdAt:string};
 export const inventoryMovements=(id:string)=>request<{data:Movement[];meta:{page:number;total:number} }>(`/inventory-items/${id}/movements`);
-export const createSale=(data:object)=>request<{id:string}>('/sales',{method:'POST',body:JSON.stringify(data)});
-export const createPurchase=(data:object)=>request<{id:string}>('/purchases',{method:'POST',body:JSON.stringify(data)});
+export type CreateSalePayload={shopId?:string;customerName?:string;customerPhone?:string;notes?:string;soldAt?:string;discount?:number;items:Array<{inventoryItemId:string;quantity:number}>};
+export type CreatePurchasePayload={shopId?:string;invoiceNumber?:string;supplierName?:string;supplierPhone?:string;notes?:string;purchasedAt?:string;currency?:string;discount?:number;items:Array<{inventoryItemId?:string;catalogItemId?:string;quantity:number;purchasePrice:number;salePrice?:number}>};
+export const createSale=(data:CreateSalePayload)=>request<{id:string}>('/sales',{method:'POST',body:JSON.stringify(data)});
+export const createPurchase=(data:CreatePurchasePayload)=>request<{id:string}>('/purchases',{method:'POST',body:JSON.stringify(data)});
 export type ImportPreviewRowStatus = 'valid' | 'invalid' | 'requires_review';
 export type InventoryImportPreviewRow = {
   rowNumber: number;
@@ -181,13 +199,13 @@ export async function confirmInventoryImport(file: File, options: { shopId?: str
 export type SaleStatus='COMPLETED'|'CANCELLED';
 export type PurchaseStatus='COMPLETED'|'CANCELLED';
 export type DocumentShop={id:string;name:string};
-export type DocumentUser={id:string;phone:string;firstName:string;lastName:string|null};
+export type DocumentUser={id:string;phone?:string;email?:string|null;role?:UserRole;firstName:string;lastName:string|null};
 export type DocumentInventoryItem={id:string;sku:string|null;oemNumber:string|null;price:string;quantity:number;currency:string};
 export type DocumentCatalogItem={id:string;name:string;internalCode:string;category:{id:string;name:string}};
 export type SaleItem={id:string;itemName:string;brand:string|null;sku:string|null;oemNumber:string|null;quantity:number;unitPrice:string;lineTotal:string;inventoryItem:DocumentInventoryItem;partCatalogItem:DocumentCatalogItem};
 export type PurchaseItem={id:string;itemName:string;brand:string|null;sku:string|null;oemNumber:string|null;quantity:number;purchasePrice:string;salePrice:string|null;lineTotal:string;inventoryItem:DocumentInventoryItem;partCatalogItem:DocumentCatalogItem};
-export type SaleListItem={id:string;number:string;status:SaleStatus;createdAt:string;currency:string;subtotal:string;discount:string;totalAmount:string;customerName:string|null;customerPhone:string|null;shop:DocumentShop;_count:{items:number}};
-export type PurchaseListItem={id:string;number:string;status:PurchaseStatus;purchasedAt:string;currency:string;subtotal:string;discount:string;totalAmount:string;supplierName:string|null;supplierPhone:string|null;shop:DocumentShop;_count:{items:number}};
+export type SaleListItem={id:string;number:string;status:SaleStatus;createdAt:string;currency:string;subtotal:string;discount:string;totalAmount:string;customerName:string|null;customerPhone:string|null;shop:DocumentShop;user:DocumentUser;_count:{items:number}};
+export type PurchaseListItem={id:string;number:string;status:PurchaseStatus;purchasedAt:string;currency:string;subtotal:string;discount:string;totalAmount:string;supplierName:string|null;supplierPhone:string|null;shop:DocumentShop;user:DocumentUser;_count:{items:number}};
 export type SaleDetails=SaleListItem&{notes:string|null;user:DocumentUser;items:SaleItem[];cancelledAt:string|null;cancelledBy:DocumentUser|null;cancelReason:string|null};
 export type PurchaseDetails=PurchaseListItem&{invoiceNumber:string|null;notes:string|null;user:DocumentUser;items:PurchaseItem[];cancelledAt:string|null;cancelledBy:DocumentUser|null;cancelReason:string|null};
 export type Pagination={page:number;limit:number;total:number;totalPages:number};
@@ -273,3 +291,49 @@ export const resetEmployeePassword = (
     `/employees/${id}/reset-password${shopId ? `?shopId=${shopId}` : ''}`,
     { method: 'POST', body: JSON.stringify(payload) },
   );
+
+export type VehicleEngine = { id:string;generationId:string;code:string;name:string;volume:string|null;fuel:string;power:number|null;isActive:boolean };
+export type VehicleTreeGeneration = { id:string;name:string;startYear:number|null;endYear:number|null;isActive:boolean;engines:VehicleEngine[] };
+export type VehicleTreeModel = { id:string;name:string;isActive:boolean;generations:VehicleTreeGeneration[] };
+export type VehicleTreeBrand = { id:string;name:string;country:string|null;isActive:boolean;vehicleModels:VehicleTreeModel[] };
+export type VehicleFitment = {
+  id:string;catalogItemId:string;engineId:string;yearFrom:number|null;yearTo:number|null;notes:string|null;
+  engine:VehicleEngine & {generation:VehicleTreeGeneration & {vehicleModel:VehicleTreeModel & {manufacturer:{id:string;name:string}}}};
+};
+export const getVehicleTree=()=>request<VehicleTreeBrand[]>('/vehicles/tree');
+export const getVehicleFitments=(params:{catalogItemId?:string;search?:string;brandId?:string;modelId?:string;generationId?:string;engineId?:string;page?:number;limit?:number}={})=>
+  request<{data:VehicleFitment[];meta:Pagination}>(`/vehicle-fitments?${documentQuery(params)}`);
+export const searchVehicleFitments=(params:{search?:string;brandId?:string;modelId?:string;generationId?:string;engineId?:string;page?:number;limit?:number}={})=>
+  request<{data:VehicleFitment[];meta:Pagination}>(`/vehicle-fitments/search?${documentQuery(params)}`);
+export const createVehicleFitment=(data:{catalogItemId:string;engineId:string;yearFrom?:number;yearTo?:number;notes?:string})=>
+  request<VehicleFitment>('/vehicle-fitments',{method:'POST',body:JSON.stringify(data)});
+export const deleteVehicleFitment=(id:string)=>request<{id:string}>(`/vehicle-fitments/${id}`,{method:'DELETE'});
+export type VinMatchStatus='FOUND'|'PARTIAL'|'NOT_FOUND';
+export type VinDecodeResponse={
+  vehicle:{vin:string;wmi:string;manufacturer:string|null;model:string|null;generation:string|null;engineCode:string|null;year:number|null;fuel:string|null;body:string|null;transmission:string|null;country:string|null;confidence:number;provider:string;decodedAt:string};
+  cacheHit:boolean;
+  matchStatus:VinMatchStatus;
+  matchedIds:{brandId:string|null;modelId:string|null;generationId:string|null;engineId:string|null};
+  catalogItems:Array<{id:string;internalCode:string;name:string;slug:string;category:{id:string;name:string}}>;
+};
+export const decodeVin=(vin:string)=>request<VinDecodeResponse>('/vin/decode',{method:'POST',body:JSON.stringify({vin})});
+export type MarketplaceOffer={
+  inventoryItemId:string;catalogItemId:string;name:string;internalCode:string;imageUrl:string|null;
+  oemNumbers:string[];crossNumbers:string[];
+  shop:{id:string;name:string;city:string|null;address:string|null};
+  quantity:number;price:string;currency:string;warehouse:string|null;
+  manufacturer:{id:string|null;name:string}|null;
+  category:{id:string;name:string};compatibility:string[];condition:string;
+};
+export type MarketplaceSearchResponse={
+  queryType:'VIN'|'OEM'|'CROSS'|'NAME';
+  vehicle:VinDecodeResponse|null;
+  items:MarketplaceOffer[];
+  pagination:{page:number;limit:number;total:number;totalPages:number};
+};
+export type MarketplaceSearchParams={
+  q:string;inStockOnly?:boolean;originalOnly?:boolean;analogOnly?:boolean;minQuantity?:number;
+  manufacturerId?:string;categoryId?:string;shopId?:string;page?:number;limit?:number;
+};
+export const marketplaceSearch=(params:MarketplaceSearchParams)=>
+  request<MarketplaceSearchResponse>(`/marketplace-search?${documentQuery(params)}`);

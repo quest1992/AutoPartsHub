@@ -17,6 +17,9 @@ describe('PartCatalogService part numbers and aliases', () => {
     const deletePartAlias = jest.fn();
     const runTransaction = jest.fn();
     const transactionClient = {
+      partNumberManufacturer: {
+        upsert: jest.fn().mockResolvedValue({ id: 'manufacturer-id' }),
+      },
       partNumber: {
         updateMany: jest.fn(),
         create: jest.fn().mockResolvedValue({ id: 'number-id' }),
@@ -25,6 +28,7 @@ describe('PartCatalogService part numbers and aliases', () => {
     const prisma = {
       partCatalogItem: {
         findUnique: findPartCatalogItem,
+        findFirst: jest.fn().mockResolvedValue(null),
       },
       partNumber: {
         findMany: jest.fn(),

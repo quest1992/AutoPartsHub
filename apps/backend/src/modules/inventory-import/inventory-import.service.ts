@@ -413,7 +413,7 @@ export class InventoryImportService {
 
         const created = await tx.partCatalogItem.create({
           data: {
-            internalCode: `PRT-${String(sequence.value).padStart(6, '0')}`,
+            internalCode: `AUT-${String(sequence.value).padStart(6, '0')}`,
             name,
             normalizedName: normalizePartName(name),
             searchTokens: getPartNameSearchTokens(name),
@@ -432,9 +432,20 @@ export class InventoryImportService {
         partCatalogItemId = created.id;
 
         if (normalized.rawPartNumber && normalized.partNumber) {
+          const unknownManufacturer = await tx.partNumberManufacturer.upsert({
+            where: { normalizedName: 'UNKNOWN' },
+            update: { isActive: true },
+            create: {
+              name: 'Unknown',
+              normalizedName: 'UNKNOWN',
+              isActive: true,
+            },
+            select: { id: true },
+          });
           await tx.partNumber.create({
             data: {
               partCatalogItemId: created.id,
+              manufacturerId: unknownManufacturer.id,
               rawNumber: normalized.rawPartNumber,
               normalizedNumber: normalized.partNumber,
               type: PartNumberType.OEM,

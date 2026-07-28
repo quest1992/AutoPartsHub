@@ -1,529 +1,315 @@
 'use client';
 
 import Link from 'next/link';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { ProtectedLayout } from '../../components/protected-layout';
 import { useAuth } from '../../components/auth-provider';
 import {
-  ApiError,
+  deactivatePartCatalogItem,
+  deletePartCatalogItem,
   getPartCatalog,
-  getPartCategories,
+  getPartCategoryTree,
   PartCatalogResponse,
-  PartCategoryOption,
+  PartCategoryTreeNode,
   updatePartCatalogItem,
 } from '../../lib/api';
 
-const UNASSIGNED_CATEGORY_NAME = 'Не распределено';
+function CategoryBranch({
+  nodes,
+  selectedId,
+  onSelect,
+}: {
+  nodes: PartCategoryTreeNode[];
+  selectedId: string;
+  onSelect: (id: string) => void;
+}) {
+  return (
+    <ul className="space-y-1">
+      {nodes.map((node) => (
+        <li key={node.id}>
+          <button
+            type="button"
+            onClick={() => onSelect(node.id)}
+            className={`w-full rounded-lg px-3 py-2 text-left text-sm ${
+              selectedId === node.id
+                ? 'bg-blue-600 text-white'
+                : 'text-slate-700 hover:bg-slate-100'
+            }`}
+          >
+            {node.name}
+          </button>
+          {node.children.length > 0 && (
+            <div className="ml-4 border-l border-slate-200 pl-2">
+              <CategoryBranch
+                nodes={node.children}
+                selectedId={selectedId}
+                onSelect={onSelect}
+              />
+            </div>
+          )}
+        </li>
+      ))}
+    </ul>
+  );
+}
 
 export default function PartCatalogPage() {
   const { hasPermission, isLoading } = useAuth();
-
-  const [query, setQuery] = useState('');
-  const [data, setData] = useState<PartCatalogResponse | null>(null);
-  const [selectedCategories, setSelectedCategories] = useState<
-    Record<string, string>
-  >({});
-  const [categorySearch, setCategorySearch] = useState<
-    Record<string, string>
-  >({});
-  const [categoryResults, setCategoryResults] = useState<
-    Record<string, PartCategoryOption[]>
-  >({});
-  const [categoryLoading, setCategoryLoading] = useState<
-    Record<string, boolean>
-  >({});
-  const [activeCategoryRowId, setActiveCategoryRowId] = useState<string | null>(
-    null,
-  );
-  const [onlyUnassigned, setOnlyUnassigned] = useState(false);
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [savingId, setSavingId] = useState<string | null>(null);
-
   const canManage = hasPermission('CATALOG_MANAGE');
+  const [tree, setTree] = useState<PartCategoryTreeNode[]>([]);
+  const [selectedCategoryId, setSelectedCategoryId] = useState('');
+  const [query, setQuery] = useState('');
+  const [showInactive, setShowInactive] = useState(false);
+  const [data, setData] = useState<PartCatalogResponse | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
-  const getCategoryLabel = useCallback(
-    (category: PartCategoryOption) =>
-      category.parent
-        ? `${category.parent.name} → ${category.name}`
-        : category.name,
-    [],
-  );
-
-  const load = useCallback(
+  const loadCatalog = useCallback(
     async (page = 1) => {
-      if (!canManage) {
-        return;
-      }
-
+      if (!canManage) return;
       setLoading(true);
       setError('');
-
       try {
-        const catalogResponse = await getPartCatalog({
-          search: query.trim() || undefined,
-          page,
-          limit: 20,
-          isActive: true,
-        });
-        setData(catalogResponse);
-      } catch (e) {
+        setData(
+          await getPartCatalog({
+            search: query.trim() || undefined,
+            rootCategoryId: selectedCategoryId || undefined,
+            isActive: showInactive ? undefined : true,
+            page,
+            limit: 30,
+          }),
+        );
+      } catch (reason) {
         setError(
-          e instanceof ApiError && e.status === 403
-            ? 'Недостаточно прав'
-            : e instanceof Error
-              ? e.message
-              : 'Ошибка загрузки',
+          reason instanceof Error
+            ? reason.message
+            : 'Не удалось загрузить каталог',
         );
       } finally {
         setLoading(false);
       }
     },
-    [canManage, query],
+    [canManage, query, selectedCategoryId, showInactive],
   );
 
   useEffect(() => {
-    const timer = window.setTimeout(() => {
-      void load();
-    }, 300);
-
-    return () => window.clearTimeout(timer);
-  }, [load]);
+    if (!canManage) return;
+    void getPartCategoryTree(false)
+      .then(setTree)
+      .catch((reason) =>
+        setError(
+          reason instanceof Error
+            ? reason.message
+            : 'Не удалось загрузить категории',
+        ),
+      );
+  }, [canManage]);
 
   useEffect(() => {
-    if (!activeCategoryRowId) {
-      return;
-    }
+    const timer = window.setTimeout(() => void loadCatalog(1), 250);
+    return () => window.clearTimeout(timer);
+  }, [loadCatalog]);
 
-    const itemId = activeCategoryRowId;
-    const search = (categorySearch[itemId] ?? '').trim();
-
-    if (search.length < 1) {
-      return;
-    }
-
-    let cancelled = false;
-    const timer = window.setTimeout(() => {
-      const requestParams = {
-        search,
-        isActive: true,
-        limit: 20,
-        page: 1,
-      };
-
-      console.log('[Catalog table][REQUEST]', {
-        itemId,
-        search,
-        requestParams,
-      });
-
-      setCategoryLoading((previous) => ({
-        ...previous,
-        [itemId]: true,
-      }));
-
-      void getPartCategories(requestParams)
-        .then((result) => {
-          console.log('[Catalog table][RESPONSE]', {
-            itemId,
-            search,
-            result: result.data.map((category) => ({
-              id: category.id,
-              name: category.name,
-              childrenCount: category._count?.children,
-            })),
-          });
-
-          if (cancelled) {
-            return;
-          }
-
-          setCategoryResults((previous) => ({
-            ...previous,
-            [itemId]: result.data,
-          }));
-        })
-        .catch((reason) => {
-          if (cancelled) {
-            return;
-          }
-
-          setCategoryResults((previous) => ({
-            ...previous,
-            [itemId]: [],
-          }));
-          setError(
-            reason instanceof Error
-              ? reason.message
-              : 'Не удалось найти категории.',
-          );
-        })
-        .finally(() => {
-          if (cancelled) {
-            return;
-          }
-
-          setCategoryLoading((previous) => ({
-            ...previous,
-            [itemId]: false,
-          }));
-        });
-    }, 300);
-
-    return () => {
-      cancelled = true;
-      window.clearTimeout(timer);
-    };
-  }, [activeCategoryRowId, categorySearch]);
-
-  const visibleItems = useMemo(() => {
-    const items = data?.data ?? [];
-
-    if (!onlyUnassigned) {
-      return items;
-    }
-
-    return items.filter(
-      (item) => item.category.name === UNASSIGNED_CATEGORY_NAME,
-    );
-  }, [data, onlyUnassigned]);
-
-  function handleCategorySelect(
-    itemId: string,
-    category: PartCategoryOption,
-  ) {
-    setSelectedCategories((current) => ({
-      ...current,
-      [itemId]: category.id,
-    }));
-    setCategorySearch((current) => ({
-      ...current,
-      [itemId]: getCategoryLabel(category),
-    }));
-    setActiveCategoryRowId(null);
-  }
-
-  async function saveCategory(itemId: string) {
-    const categoryId = selectedCategories[itemId];
-
-    if (!categoryId) {
-      setError('Сначала выберите категорию.');
-      return;
-    }
-
-    setSavingId(itemId);
+  async function toggleStatus(id: string, isActive: boolean) {
     setError('');
-    setSuccess('');
-
     try {
-      const updatedItem = await updatePartCatalogItem(itemId, {
-        categoryId,
-      });
-
-      setData((current) => {
-        if (!current) {
-          return current;
-        }
-
-        return {
-          ...current,
-          data: current.data.map((item) =>
-            item.id === itemId
-              ? {
-                  ...item,
-                  categoryId: updatedItem.categoryId,
-                  category: updatedItem.category,
-                }
-              : item,
-          ),
-        };
-      });
-
-      setSelectedCategories((current) => {
-        const next = { ...current };
-        delete next[itemId];
-        return next;
-      });
-
-      setSuccess(`Категория для «${updatedItem.name}» сохранена.`);
-    } catch (e) {
+      if (isActive) {
+        await deactivatePartCatalogItem(id);
+      } else {
+        await updatePartCatalogItem(id, { isActive: true });
+      }
+      await loadCatalog(data?.meta.page ?? 1);
+    } catch (reason) {
       setError(
-        e instanceof Error ? e.message : 'Не удалось сохранить категорию.',
+        reason instanceof Error ? reason.message : 'Не удалось изменить статус',
       );
-    } finally {
-      setSavingId(null);
     }
   }
 
-  const currentPage = data?.meta.page ?? 1;
+  async function removePermanently(id: string) {
+    if (
+      !window.confirm(
+        'Удалить эту неиспользуемую запись навсегда? Действие необратимо.',
+      )
+    ) {
+      return;
+    }
+    setError('');
+    try {
+      await deletePartCatalogItem(id);
+      await loadCatalog(data?.meta.page ?? 1);
+    } catch (reason) {
+      setError(
+        reason instanceof Error ? reason.message : 'Не удалось удалить запись',
+      );
+    }
+  }
+
+  const page = data?.meta.page ?? 1;
   const totalPages = data?.meta.totalPages ?? 1;
 
   return (
     <ProtectedLayout>
       {!isLoading && !canManage ? (
         <section className="rounded-xl bg-white p-6">
-          <h1 className="text-2xl font-bold">Центральный каталог</h1>
-          <p className="mt-3">
-            Недостаточно прав для управления каталогом.
-          </p>
+          Недостаточно прав для управления каталогом.
         </section>
       ) : (
         <>
-          <div className="flex flex-wrap justify-between gap-3">
+          <header className="flex flex-wrap items-start justify-between gap-4">
             <div>
-              <h1 className="text-2xl font-bold">Центральный каталог</h1>
+              <h1 className="text-2xl font-bold">Единый каталог запчастей</h1>
               <p className="text-slate-500">
-                Единый справочник запчастей для всех магазинов
+                Общий справочник, на который ссылаются остатки всех магазинов
               </p>
             </div>
-
             <Link
               href="/part-catalog/new"
-              className="rounded bg-blue-600 px-4 py-2 text-white"
+              className="rounded-lg bg-blue-600 px-4 py-2 text-white"
             >
-              Добавить позицию
+              Добавить деталь
             </Link>
-          </div>
+          </header>
 
-          <div className="mt-5 rounded-xl bg-white p-4">
-            <div className="flex flex-wrap items-center gap-3">
-              <input
-  value={query}
-  onChange={(event) => setQuery(event.target.value)}
-  onKeyDown={(event) => {
-    if (event.key === 'Enter') {
-      void load(1);
-    }
-  }}
-  className="w-full max-w-lg rounded border p-2"
-  placeholder="Название, slug или внутренний код"
-/>
+          <div className="mt-5 grid gap-5 xl:grid-cols-[280px_minmax(0,1fr)]">
+            <aside className="self-start rounded-xl bg-white p-4 shadow-sm">
+              <div className="mb-3 flex items-center justify-between">
+                <h2 className="font-semibold">Категории</h2>
+                {selectedCategoryId && (
+                  <button
+                    type="button"
+                    onClick={() => setSelectedCategoryId('')}
+                    className="text-xs text-blue-700"
+                  >
+                    Сбросить
+                  </button>
+                )}
+              </div>
+              <CategoryBranch
+                nodes={tree}
+                selectedId={selectedCategoryId}
+                onSelect={setSelectedCategoryId}
+              />
+            </aside>
 
-              <button
-                onClick={() => void load(1)}
-                className="rounded border px-4 py-2 hover:bg-slate-50"
-              >
-                Найти
-              </button>
-
-              <label className="flex cursor-pointer items-center gap-2">
+            <section className="min-w-0">
+              <div className="flex flex-wrap gap-3 rounded-xl bg-white p-4 shadow-sm">
                 <input
-                  type="checkbox"
-                  checked={onlyUnassigned}
-                  onChange={(event) =>
-                    setOnlyUnassigned(event.target.checked)
-                  }
+                  value={query}
+                  onChange={(event) => setQuery(event.target.value)}
+                  className="min-w-64 flex-1 rounded-lg border p-2"
+                  placeholder="Название, синоним или внутренний код"
                 />
-                <span>Только «Не распределено»</span>
-              </label>
-            </div>
-          </div>
+                <label className="flex items-center gap-2 text-sm">
+                  <input
+                    type="checkbox"
+                    checked={showInactive}
+                    onChange={(event) => setShowInactive(event.target.checked)}
+                  />
+                  Показать отключённые
+                </label>
+              </div>
 
-          {error && (
-            <p className="mt-4 rounded bg-red-50 p-3 text-red-700">
-              {error}
-            </p>
-          )}
+              {error && (
+                <p className="mt-4 rounded-lg bg-red-50 p-3 text-red-700">
+                  {error}
+                </p>
+              )}
 
-          {success && (
-            <p className="mt-4 rounded bg-green-50 p-3 text-green-700">
-              {success}
-            </p>
-          )}
-
-          {loading ? (
-            <p className="mt-5">Загрузка…</p>
-          ) : visibleItems.length === 0 ? (
-            <p className="mt-5 rounded bg-white p-5">
-              {onlyUnassigned
-                ? 'На этой странице нет нераспределённых деталей.'
-                : 'Позиций каталога пока нет.'}
-            </p>
-          ) : (
-            <div className="mt-5 overflow-x-auto rounded-xl bg-white">
-              <table className="w-full min-w-[1000px] text-sm">
-                <thead className="bg-slate-50">
-                  <tr>
-                    <th className="p-3 text-left">Название</th>
-                    <th className="p-3 text-left">Код</th>
-                    <th className="p-3 text-left">Категория</th>
-                    <th className="p-3 text-left">Сторона</th>
-                    <th className="p-3 text-left">Положение</th>
-                    <th className="p-3 text-left">Статус</th>
-                    <th className="p-3 text-left">Действие</th>
-                  </tr>
-                </thead>
-
-                <tbody>
-                  {visibleItems.map((item) => {
-                    const isUnassigned =
-                      item.category.name === UNASSIGNED_CATEGORY_NAME;
-                    const rowSearch = categorySearch[item.id] ?? '';
-                    const rowResults = categoryResults[item.id] ?? [];
-                    const rowLoading = categoryLoading[item.id] ?? false;
-
-                    console.log('[Catalog table][RENDER]', {
-                      itemId: item.id,
-                      search: rowSearch,
-                      results: rowResults,
-                      open: activeCategoryRowId === item.id,
-                    });
-
-                    return (
-                      <tr key={item.id} className="border-t align-middle">
-                        <td className="p-3 font-medium">{item.name}</td>
-
-                        <td className="p-3">{item.internalCode}</td>
-
-                        <td className="p-3">
-                          {isUnassigned ? (
-                            <div className="flex min-w-[280px] gap-2">
-                              <div className="relative w-full">
-                                <input
-                                  type="text"
-                                  value={rowSearch}
-                                  onFocus={() =>
-                                    setActiveCategoryRowId(item.id)
-                                  }
-                                  onBlur={() => {
-                                    window.setTimeout(() => {
-                                      setActiveCategoryRowId((current) =>
-                                        current === item.id ? null : current,
-                                      );
-                                    }, 150);
-                                  }}
-                                  onChange={(event) => {
-                                    const value = event.target.value;
-
-                                    console.log('[Catalog table][INPUT]', {
-                                      itemId: item.id,
-                                      value,
-                                    });
-
-                                    setCategorySearch((previous) => ({
-                                      ...previous,
-                                      [item.id]: value,
-                                    }));
-                                    setActiveCategoryRowId(item.id);
-                                    setSelectedCategories((previous) => ({
-                                      ...previous,
-                                      [item.id]: '',
-                                    }));
-
-                                    if (value.trim().length < 1) {
-                                      setCategoryResults((previous) => ({
-                                        ...previous,
-                                        [item.id]: [],
-                                      }));
-                                      setCategoryLoading((previous) => ({
-                                        ...previous,
-                                        [item.id]: false,
-                                      }));
-                                    }
-                                  }}
-                                  placeholder="Начните вводить категорию..."
-                                  autoComplete="off"
-                                  className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
-                                />
-
-                                {activeCategoryRowId === item.id &&
-                                  rowSearch.trim() && (
-                                    <div className="absolute left-0 right-0 top-full z-50 mt-1 max-h-64 overflow-y-auto rounded-lg border border-slate-200 bg-white shadow-xl">
-                                      {rowLoading ? (
-                                        <p className="px-3 py-3 text-sm text-slate-500">
-                                          Поиск категорий…
-                                        </p>
-                                      ) : rowResults.length > 0 ? (
-                                        rowResults.map((category) => (
-                                          <button
-                                            key={category.id}
-                                            type="button"
-                                            onMouseDown={(event) => {
-                                              event.preventDefault();
-                                              handleCategorySelect(
-                                                item.id,
-                                                category,
-                                              );
-                                            }}
-                                            className="block w-full border-b border-slate-100 px-3 py-2.5 text-left text-sm text-slate-700 last:border-b-0 hover:bg-blue-50 hover:text-blue-700"
-                                          >
-                                            {category.name}
-                                          </button>
-                                        ))
-                                      ) : (
-                                        <p className="px-3 py-3 text-sm text-slate-500">
-                                          Категория не найдена
-                                        </p>
-                                      )}
-                                    </div>
-                                  )}
-                              </div>
-
-                              <button
-                                onClick={() => void saveCategory(item.id)}
-                                disabled={
-                                  savingId === item.id ||
-                                  !selectedCategories[item.id]
-                                }
-                                className="rounded bg-green-600 px-3 py-2 text-white disabled:cursor-not-allowed disabled:opacity-50"
-                              >
-                                {savingId === item.id
-                                  ? 'Сохраняю…'
-                                  : 'Сохранить'}
-                              </button>
-                            </div>
-                          ) : (
-                            item.category.name
-                          )}
-                        </td>
-
-                        <td className="p-3">{item.side}</td>
-                        <td className="p-3">{item.position}</td>
-
-                        <td className="p-3">
-                          {item.isActive ? 'Активна' : 'Отключена'}
-                        </td>
-
-                        <td className="p-3">
-                          <Link
-                            className="text-blue-700"
-                            href={`/part-catalog/${item.id}/edit`}
-                          >
-                            Редактировать
-                          </Link>
+              <div className="mt-4 overflow-x-auto rounded-xl bg-white shadow-sm">
+                <table className="w-full min-w-[850px] text-sm">
+                  <thead className="bg-slate-100 text-left">
+                    <tr>
+                      <th className="p-3">Код</th>
+                      <th className="p-3">Название</th>
+                      <th className="p-3">Категория</th>
+                      <th className="p-3">Статус</th>
+                      <th className="p-3">Действия</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {loading ? (
+                      <tr>
+                        <td className="p-5 text-slate-500" colSpan={5}>
+                          Загрузка…
                         </td>
                       </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-          )}
+                    ) : data?.data.length ? (
+                      data.data.map((item) => (
+                        <tr key={item.id} className="border-t align-top">
+                          <td className="p-3 font-mono">{item.internalCode}</td>
+                          <td className="p-3">
+                            <p className="font-medium">{item.name}</p>
+                            <p className="text-xs text-slate-500">
+                              {item.normalizedName}
+                            </p>
+                          </td>
+                          <td className="p-3">{item.category.name}</td>
+                          <td className="p-3">
+                            {item.isActive ? 'Активна' : 'Отключена'}
+                          </td>
+                          <td className="p-3">
+                            <div className="flex flex-wrap gap-3">
+                              <Link
+                                className="text-blue-700"
+                                href={`/part-catalog/${item.id}/edit`}
+                              >
+                                Изменить
+                              </Link>
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  void toggleStatus(item.id, item.isActive)
+                                }
+                                className="text-amber-700"
+                              >
+                                {item.isActive ? 'Отключить' : 'Включить'}
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => void removePermanently(item.id)}
+                                className="text-red-700"
+                              >
+                                Удалить
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td className="p-5 text-slate-500" colSpan={5}>
+                          Детали не найдены.
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
 
-          {data && (
-            <div className="mt-4 flex flex-wrap items-center gap-3">
-              <button
-                disabled={currentPage <= 1 || loading}
-                onClick={() => void load(currentPage - 1)}
-                className="rounded border px-4 py-2 disabled:opacity-50"
-              >
-                Назад
-              </button>
-
-              <span>
-                Страница {currentPage} из {totalPages}
-              </span>
-
-              <button
-                disabled={currentPage >= totalPages || loading}
-                onClick={() => void load(currentPage + 1)}
-                className="rounded border px-4 py-2 disabled:opacity-50"
-              >
-                Далее
-              </button>
-            </div>
-          )}
+              <div className="mt-4 flex items-center gap-3">
+                <button
+                  type="button"
+                  disabled={page <= 1 || loading}
+                  onClick={() => void loadCatalog(page - 1)}
+                  className="rounded border px-4 py-2 disabled:opacity-50"
+                >
+                  Назад
+                </button>
+                <span>
+                  Страница {page} из {totalPages}
+                </span>
+                <button
+                  type="button"
+                  disabled={page >= totalPages || loading}
+                  onClick={() => void loadCatalog(page + 1)}
+                  className="rounded border px-4 py-2 disabled:opacity-50"
+                >
+                  Далее
+                </button>
+              </div>
+            </section>
+          </div>
         </>
       )}
     </ProtectedLayout>

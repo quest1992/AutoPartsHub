@@ -8,6 +8,7 @@ import {
   Patch,
   Post,
   Query,
+  Optional,
   UseGuards,
 } from '@nestjs/common';
 import { UserRole } from '@prisma/client';
@@ -30,6 +31,7 @@ import { RequirePermissions } from '../../common/permissions/require-permissions
 import { Permission } from '../../common/permissions/permission.enum';
 import { PermissionsGuard } from '../../common/permissions/permissions.guard';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { CatalogSearchService } from './catalog-search.service';
 import { CreatePartCatalogItemDto } from './dto/create-part-catalog-item.dto';
 import { CreatePartAliasDto } from './dto/create-part-alias.dto';
 import { CreatePartNumberDto } from './dto/create-part-number.dto';
@@ -46,7 +48,10 @@ import { PartCatalogService } from './part-catalog.service';
 @ApiForbiddenResponse({ description: 'Доступно только SUPER_ADMIN' })
 @Controller('part-catalog')
 export class PartCatalogController {
-  constructor(private readonly partCatalogService: PartCatalogService) {}
+  constructor(
+    private readonly partCatalogService: PartCatalogService,
+    @Optional() private readonly catalogSearchService?: CatalogSearchService,
+  ) {}
 
   @Post()
   @RequirePermissions(Permission.CATALOG_MANAGE)
@@ -79,6 +84,26 @@ export class PartCatalogController {
   @ApiOkResponse({ description: 'Список с фильтрами и пагинацией' })
   findAll(@Query() query: PartCatalogItemQueryDto) {
     return this.partCatalogService.findAll(query);
+  }
+
+  @Get('search')
+  @RequirePermissions(Permission.CATALOG_VIEW)
+  @Roles(
+    UserRole.SUPER_ADMIN,
+    UserRole.SHOP_ADMIN,
+    UserRole.MANAGER,
+    UserRole.SELLER,
+    UserRole.VIEWER,
+  )
+  @ApiOperation({
+    summary:
+      'Поиск по названию, нормализованному названию и подтверждённым синонимам',
+  })
+  search(@Query() query: PartCatalogItemQueryDto) {
+    return (
+      this.catalogSearchService?.search(query) ??
+      this.partCatalogService.findAll(query)
+    );
   }
 
   @Get('candidates')
@@ -242,6 +267,19 @@ export class PartCatalogController {
     @Body() dto: UpdatePartCatalogItemDto,
   ) {
     return this.partCatalogService.update(id, dto);
+  }
+
+  @Delete(':id/permanent')
+  @RequirePermissions(Permission.CATALOG_MANAGE)
+  @ApiOperation({
+    summary: 'Физически удалить неиспользуемую деталь каталога',
+  })
+  @ApiConflictResponse({
+    description: 'На деталь ссылаются остатки, документы или совместимости',
+  })
+  @ApiNotFoundResponse({ description: 'Деталь каталога не найдена' })
+  deletePermanently(@Param('id', ParseUUIDPipe) id: string) {
+    return this.partCatalogService.deletePermanently(id);
   }
 
   @Delete(':id')

@@ -13,7 +13,8 @@ import {
 } from 'class-validator';
 
 export class PurchaseLineDto {
-  @ApiProperty() @IsUUID() inventoryItemId!: string;
+  @ApiPropertyOptional() @IsOptional() @IsUUID() inventoryItemId?: string;
+  @ApiPropertyOptional() @IsOptional() @IsUUID() catalogItemId?: string;
   @ApiProperty({ minimum: 1 })
   @Type(() => Number)
   @IsInt()
@@ -36,6 +37,10 @@ export class CreatePurchaseDto {
   @ApiPropertyOptional() @IsOptional() @IsString() supplierName?: string;
   @ApiPropertyOptional() @IsOptional() @IsString() supplierPhone?: string;
   @ApiPropertyOptional() @IsOptional() @IsString() notes?: string;
+  @ApiPropertyOptional({ default: 'TJS' })
+  @IsOptional()
+  @IsString()
+  currency?: string;
   @ApiPropertyOptional({ example: '2026-07-19T10:00:00.000Z' })
   @IsOptional()
   @IsDateString()

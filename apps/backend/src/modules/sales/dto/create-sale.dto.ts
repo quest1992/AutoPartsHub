@@ -2,6 +2,7 @@ import { Type } from 'class-transformer';
 import {
   ArrayMinSize,
   IsArray,
+  IsDateString,
   IsInt,
   IsOptional,
   IsString,
@@ -18,6 +19,7 @@ export class CreateSaleDto {
   @IsOptional() @IsString() customerName?: string;
   @IsOptional() @IsString() customerPhone?: string;
   @IsOptional() @IsString() notes?: string;
+  @IsOptional() @IsDateString() soldAt?: string;
   @IsOptional() @Type(() => Number) @Min(0) discount?: number;
   @IsArray()
   @ArrayMinSize(1)

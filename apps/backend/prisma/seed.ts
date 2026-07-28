@@ -8,10 +8,32 @@ const prisma = new PrismaClient();
 const DEVELOPMENT_ADMIN_PHONE = '+992900000000';
 const DEVELOPMENT_ADMIN_PASSWORD = 'TempAdmin123!';
 
+const vehicleBrands = [
+  ['Toyota', 'toyota', 'Japan'],
+  ['Honda', 'honda', 'Japan'],
+  ['Hyundai', 'hyundai', 'South Korea'],
+  ['Kia', 'kia', 'South Korea'],
+  ['BMW', 'bmw', 'Germany'],
+  ['Mercedes', 'mercedes', 'Germany'],
+  ['Audi', 'audi', 'Germany'],
+  ['Volkswagen', 'volkswagen', 'Germany'],
+  ['Nissan', 'nissan', 'Japan'],
+  ['Lexus', 'lexus', 'Japan'],
+] as const;
+
 async function main() {
   if (process.env.NODE_ENV === 'production') {
     throw new Error('The development SUPER_ADMIN seed cannot run in production.');
   }
+
+  for (const [name, slug, country] of vehicleBrands) {
+    await prisma.manufacturer.upsert({
+      where: { name },
+      update: { country },
+      create: { name, slug, country, isActive: true },
+    });
+  }
+  console.log(`${vehicleBrands.length} vehicle brands seeded.`);
 
   const existingSuperAdmin = await prisma.user.findFirst({
     where: { role: UserRole.SUPER_ADMIN },

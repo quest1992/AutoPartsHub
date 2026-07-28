@@ -35,25 +35,31 @@ import { SalesService } from './sales.service';
 @Controller('sales')
 export class SalesController {
   constructor(private s: SalesService) {}
-  @Post() @RequirePermissions(Permission.SALES_CREATE) @ApiOperation({ summary: 'Создать продажу' }) create(
-    @Body() d: CreateSaleDto,
-    @Req() r: { user: InventoryActor },
-  ) {
+  @Post()
+  @RequirePermissions(Permission.SALES_CREATE)
+  @ApiOperation({ summary: 'Создать продажу' })
+  create(@Body() d: CreateSaleDto, @Req() r: { user: InventoryActor }) {
     return this.s.create(d, r.user);
   }
-  @Get() @RequirePermissions(Permission.SALES_VIEW) @ApiOperation({ summary: 'Список продаж' }) all(
-    @Query() q: QuerySalesDto,
-    @Req() r: { user: InventoryActor },
-  ) {
+  @Get()
+  @RequirePermissions(Permission.SALES_VIEW)
+  @ApiOperation({ summary: 'Список продаж' })
+  all(@Query() q: QuerySalesDto, @Req() r: { user: InventoryActor }) {
     return this.s.all(r.user, q);
   }
-  @Get(':id') @RequirePermissions(Permission.SALES_VIEW) @ApiOperation({ summary: 'Продажа по ID' }) one(
+  @Get(':id')
+  @RequirePermissions(Permission.SALES_VIEW)
+  @ApiOperation({ summary: 'Продажа по ID' })
+  one(
     @Param('id', ParseUUIDPipe) id: string,
     @Req() r: { user: InventoryActor },
   ) {
     return this.s.one(id, r.user);
   }
-  @Post(':id/cancel') @RequirePermissions(Permission.SALES_CANCEL) @ApiOperation({ summary: 'Отменить продажу' }) cancel(
+  @Post(':id/cancel')
+  @RequirePermissions(Permission.SALES_CANCEL)
+  @ApiOperation({ summary: 'Отменить продажу' })
+  cancel(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() d: CancelSaleDto,
     @Req() r: { user: InventoryActor },

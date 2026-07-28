@@ -4,6 +4,7 @@ import { PrismaClient, UserRole } from '@prisma/client';
 import * as bcrypt from 'bcryptjs';
 import request from 'supertest';
 import { AppModule } from '../src/app.module';
+import { createPartCatalogItem } from './helpers/create-part-catalog-item';
 
 describe('Inventory search (e2e)', () => {
   let app: INestApplication,
@@ -60,19 +61,24 @@ describe('Inventory search (e2e)', () => {
     const cat = await prisma.partCategory.create({
       data: { name: `${prefix}-cat`, slug: `${prefix}-cat` },
     });
-    const part = await prisma.partCatalogItem.create({
-      data: {
-        internalCode: `${prefix}-CODE`,
-        name: `Turbo Filter ${prefix}`,
-        slug: `turbo-filter-${prefix}`,
-        categoryId: cat.id,
-      },
-    });
+    const [partA, partZero, partB, partOff] = await Promise.all(
+      ['CODE', 'ZERO', 'B', 'OFF'].map((suffix) =>
+        createPartCatalogItem(prisma, {
+          data: {
+            internalCode:
+              suffix === 'B' ? `${prefix}-CODE-B` : `${prefix}-${suffix}`,
+            name: `Turbo Filter ${prefix} ${suffix}`,
+            slug: `turbo-filter-${prefix}-${suffix.toLowerCase()}`,
+            categoryId: cat.id,
+          },
+        }),
+      ),
+    );
     await prisma.shopInventoryItem.createMany({
       data: [
         {
           shopId: shopA,
-          partCatalogItemId: part.id,
+          partCatalogItemId: partA.id,
           brand: 'A',
           oemNumber: `OEM-${prefix}`,
           price: 100,
@@ -80,21 +86,21 @@ describe('Inventory search (e2e)', () => {
         },
         {
           shopId: shopA,
-          partCatalogItemId: part.id,
+          partCatalogItemId: partZero.id,
           brand: 'ZERO',
           price: 50,
           quantity: 0,
         },
         {
           shopId: shopB,
-          partCatalogItemId: part.id,
+          partCatalogItemId: partB.id,
           brand: 'B',
           price: 200,
           quantity: 3,
         },
         {
           shopId: shopB,
-          partCatalogItemId: part.id,
+          partCatalogItemId: partOff.id,
           brand: 'OFF',
           price: 300,
           quantity: 2,
@@ -113,19 +119,21 @@ describe('Inventory search (e2e)', () => {
     shopToken = await login(user.phone);
   });
   afterAll(async () => {
+    const shopIds = [shopA, shopB].filter(Boolean);
+    const userIds = [adminId, shopUserId].filter(Boolean);
     await prisma.inventoryMovement.deleteMany({
-      where: { shopId: { in: [shopA, shopB] } },
+      where: { shopId: { in: shopIds } },
     });
     await prisma.shopInventoryItem.deleteMany({
-      where: { shopId: { in: [shopA, shopB] } },
+      where: { shopId: { in: shopIds } },
     });
-    await prisma.shop.deleteMany({ where: { id: { in: [shopA, shopB] } } });
+    await prisma.shop.deleteMany({ where: { id: { in: shopIds } } });
     await prisma.partCatalogItem.deleteMany({
-      where: { internalCode: `${prefix}-CODE` },
+      where: { internalCode: { startsWith: prefix } },
     });
     await prisma.partCategory.deleteMany({ where: { slug: `${prefix}-cat` } });
     await prisma.user.deleteMany({
-      where: { id: { in: [adminId, shopUserId] } },
+      where: { id: { in: userIds } },
     });
     await app.close();
     await prisma.$disconnect();

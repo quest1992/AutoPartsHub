@@ -192,6 +192,7 @@ model VehicleGeneration {
   vehicleModelId  String
   vehicleModel    VehicleModel        @relation(fields: [vehicleModelId], references: [id], onDelete: Restrict)
   compatibilities PartCompatibility[]
+  engines         Engine[]
   inventoryItems  ShopInventoryItem[]
 
   startYear Int?
@@ -207,6 +208,31 @@ model VehicleGeneration {
   @@index([isActive])
   @@index([startYear])
   @@index([endYear])
+}
+
+model Engine {
+  id String @id @default(uuid())
+
+  generationId String
+  generation   VehicleGeneration @relation(fields: [generationId], references: [id], onDelete: Restrict)
+
+  code   String
+  name   String
+  volume Decimal? @db.Decimal(4, 2)
+  fuel   String
+  power  Int?
+
+  isActive Boolean          @default(true)
+  fitments VehicleFitment[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([generationId, code])
+  @@index([generationId])
+  @@index([code])
+  @@index([fuel])
+  @@index([isActive])
 }
 
 model PartCategory {
@@ -259,6 +285,7 @@ model PartCatalogItem {
   isActive    Boolean      @default(true)
 
   compatibilities PartCompatibility[]
+  vehicleFitments VehicleFitment[]
 
   createdAt          DateTime            @default(now())
   updatedAt          DateTime            @updatedAt
@@ -288,15 +315,34 @@ model PartNumber {
   normalizedNumber String
   type             PartNumberType
   brand            String?
-  isPrimary        Boolean        @default(false)
+  manufacturerId   String
+  manufacturer     PartNumberManufacturer @relation(fields: [manufacturerId], references: [id], onDelete: Restrict)
+  isPrimary        Boolean                @default(false)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@unique([partCatalogItemId, normalizedNumber, type])
+  @@unique([manufacturerId, normalizedNumber])
   @@index([normalizedNumber])
   @@index([partCatalogItemId])
+  @@index([manufacturerId])
   @@index([type])
+}
+
+model PartNumberManufacturer {
+  id String @id @default(uuid())
+
+  name           String  @unique
+  normalizedName String  @unique
+  isActive       Boolean @default(true)
+
+  partNumbers PartNumber[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([isActive])
 }
 
 model PartAlias {
@@ -340,6 +386,58 @@ model PartCompatibility {
   @@index([vehicleGenerationId])
 }
 
+model VehicleFitment {
+  id String @id @default(uuid())
+
+  catalogItemId String
+  catalogItem   PartCatalogItem @relation(fields: [catalogItemId], references: [id], onDelete: Restrict)
+
+  engineId String
+  engine   Engine @relation(fields: [engineId], references: [id], onDelete: Restrict)
+
+  yearFrom Int?
+  yearTo   Int?
+  notes    String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([catalogItemId, engineId, yearFrom, yearTo])
+  @@index([catalogItemId])
+  @@index([engineId])
+  @@index([yearFrom])
+  @@index([yearTo])
+}
+
+model VinDecodeCache {
+  id String @id @default(uuid())
+
+  vin          String   @unique
+  wmi          String
+  manufacturer String?
+  model        String?
+  generation   String?
+  engineCode   String?
+  year         Int?
+  fuel         String?
+  body         String?
+  transmission String?
+  country      String?
+  confidence   Float
+  provider     String
+  decodedAt    DateTime
+  rawData      Json
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([wmi])
+  @@index([manufacturer])
+  @@index([model])
+  @@index([engineCode])
+  @@index([decodedAt])
+}
+
 model ShopInventoryItem {
   id String @id @default(uuid())
 
@@ -373,6 +471,7 @@ model ShopInventoryItem {
   vehicleGeneration   VehicleGeneration? @relation(fields: [vehicleGenerationId], references: [id])
   vehicleGenerationId String?
 
+  @@unique([shopId, partCatalogItemId])
   @@index([shopId])
   @@index([partCatalogItemId])
   @@index([isActive])

@@ -4,6 +4,7 @@ import { PrismaClient, UserRole } from '@prisma/client';
 import * as bcrypt from 'bcryptjs';
 import request from 'supertest';
 import { AppModule } from '../src/app.module';
+import { createPartCatalogItem } from './helpers/create-part-catalog-item';
 
 describe('Purchases (e2e)', () => {
   let app: INestApplication;
@@ -13,6 +14,12 @@ describe('Purchases (e2e)', () => {
   let itemId: string;
   let adminId: string;
   let purchaseId: string;
+  let catalogItemId: string;
+  let viewerToken: string;
+  let sellerToken: string;
+  let otherToken: string;
+  let otherShopId: string;
+  const userIds: string[] = [];
   const prefix = `e2e-purchases-${Date.now()}`;
   beforeAll(async () => {
     prisma = new PrismaClient();
@@ -42,7 +49,7 @@ describe('Purchases (e2e)', () => {
     const category = await prisma.partCategory.create({
       data: { name: `${prefix}-cat`, slug: `${prefix}-cat` },
     });
-    const part = await prisma.partCatalogItem.create({
+    const part = await createPartCatalogItem(prisma, {
       data: {
         internalCode: `${prefix}-part`,
         name: `${prefix}-part`,
@@ -50,6 +57,16 @@ describe('Purchases (e2e)', () => {
         categoryId: category.id,
       },
     });
+    catalogItemId = (
+      await createPartCatalogItem(prisma, {
+        data: {
+          internalCode: `${prefix}-catalog-only`,
+          name: `${prefix}-catalog-only`,
+          slug: `${prefix}-catalog-only`,
+          categoryId: category.id,
+        },
+      })
+    ).id;
     itemId = (
       await prisma.shopInventoryItem.create({
         data: { shopId, partCatalogItemId: part.id, price: 100, quantity: 2 },
@@ -60,15 +77,45 @@ describe('Purchases (e2e)', () => {
       .send({ phone: admin.phone, password: 'E2Epass123!' })
       .expect(201);
     token = login.body.accessToken;
+    otherShopId = (
+      await prisma.shop.create({ data: { name: `${prefix}-other-shop` } })
+    ).id;
+    for (const [role, targetShop] of [
+      [UserRole.VIEWER, shopId],
+      [UserRole.SELLER, shopId],
+      [UserRole.VIEWER, otherShopId],
+    ] as const) {
+      const user = await prisma.user.create({
+        data: {
+          firstName: role,
+          phone: `+992${String(Date.now() + userIds.length + 20).slice(-9)}`,
+          passwordHash: await bcrypt.hash('E2Epass123!', 12),
+          role,
+          shopId: targetShop,
+        },
+      });
+      userIds.push(user.id);
+      const response = await request(app.getHttpServer())
+        .post('/auth/login')
+        .send({ phone: user.phone, password: 'E2Epass123!' })
+        .expect(201);
+      if (role === UserRole.SELLER) sellerToken = response.body.accessToken;
+      else if (targetShop === shopId) viewerToken = response.body.accessToken;
+      else otherToken = response.body.accessToken;
+    }
   });
   afterAll(async () => {
+    const shopIds = [shopId, otherShopId].filter(Boolean);
     await prisma.inventoryMovement.deleteMany({ where: { shopId } });
     await prisma.purchaseItem.deleteMany({ where: { purchase: { shopId } } });
     await prisma.purchase.deleteMany({ where: { shopId } });
     await prisma.shopInventoryItem.deleteMany({ where: { shopId } });
-    await prisma.shop.delete({ where: { id: shopId } });
+    await prisma.user.deleteMany({ where: { id: { in: userIds } } });
+    await prisma.shop.deleteMany({
+      where: { id: { in: shopIds } },
+    });
     await prisma.partCatalogItem.deleteMany({
-      where: { internalCode: `${prefix}-part` },
+      where: { internalCode: { startsWith: prefix } },
     });
     await prisma.partCategory.deleteMany({ where: { slug: `${prefix}-cat` } });
     await prisma.user.delete({ where: { id: adminId } });
@@ -126,6 +173,10 @@ describe('Purchases (e2e)', () => {
       .set('Authorization', `Bearer ${token}`)
       .expect(200);
     await request(app.getHttpServer())
+      .get(`/purchases/${purchaseId}`)
+      .set('Authorization', `Bearer ${otherToken}`)
+      .expect(404);
+    await request(app.getHttpServer())
       .post(`/purchases/${purchaseId}/cancel`)
       .set('Authorization', `Bearer ${token}`)
       .send({ reason: 'E2E cancel' })
@@ -142,5 +193,51 @@ describe('Purchases (e2e)', () => {
       .set('Authorization', `Bearer ${token}`)
       .send({ reason: 'again' })
       .expect(409);
+  });
+
+  it('creates one inventory item for repeated catalog purchases', async () => {
+    const ids: string[] = [];
+    for (let attempt = 0; attempt < 2; attempt++) {
+      const response = await request(app.getHttpServer())
+        .post('/purchases')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          shopId,
+          currency: 'TJS',
+          items: [
+            { catalogItemId, quantity: 2, purchasePrice: 50, salePrice: 75 },
+          ],
+        })
+        .expect(201);
+      ids.push(response.body.id);
+    }
+    expect(
+      await prisma.shopInventoryItem.count({
+        where: { shopId, partCatalogItemId: catalogItemId },
+      }),
+    ).toBe(1);
+    for (const id of ids.reverse()) {
+      await request(app.getHttpServer())
+        .post(`/purchases/${id}/cancel`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({ reason: 'cleanup' })
+        .expect(201);
+    }
+  });
+
+  it('rejects purchase creation for viewer and seller', async () => {
+    const payload = {
+      items: [{ inventoryItemId: itemId, quantity: 1, purchasePrice: 1 }],
+    };
+    await request(app.getHttpServer())
+      .post('/purchases')
+      .set('Authorization', `Bearer ${viewerToken}`)
+      .send(payload)
+      .expect(403);
+    await request(app.getHttpServer())
+      .post('/purchases')
+      .set('Authorization', `Bearer ${sellerToken}`)
+      .send(payload)
+      .expect(403);
   });
 });

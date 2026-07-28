@@ -186,6 +186,26 @@ describe('Part catalog normalization (e2e)', () => {
       .set('Authorization', `Bearer ${adminToken}`)
       .query({ categoryId, side: PartSide.LEFT, position: PartPosition.FRONT })
       .expect(200);
-    expect(list.body.data.some((item: { id: string }) => item.id === firstPartId)).toBe(true);
+    expect(
+      list.body.data.some((item: { id: string }) => item.id === firstPartId),
+    ).toBe(true);
+  });
+
+  it('finds a catalog item by an approved alias through the search endpoint', async () => {
+    await request(app.getHttpServer())
+      .post(`/part-catalog/${firstPartId}/aliases`)
+      .set('Authorization', `Bearer ${adminToken}`)
+      .send({ alias: `${prefix} brake pad`, isApproved: true })
+      .expect(201);
+
+    const result = await request(app.getHttpServer())
+      .get('/part-catalog/search')
+      .set('Authorization', `Bearer ${adminToken}`)
+      .query({ search: `${prefix} BRAKE PAD` })
+      .expect(200);
+
+    expect(
+      result.body.data.some((item: { id: string }) => item.id === firstPartId),
+    ).toBe(true);
   });
 });

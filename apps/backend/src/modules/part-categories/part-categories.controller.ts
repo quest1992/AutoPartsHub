@@ -39,7 +39,13 @@ import { PartCategoriesService } from './part-categories.service';
 @ApiTags('Part Categories')
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard, RolesGuard, PermissionsGuard)
-@Roles(UserRole.SUPER_ADMIN, UserRole.SHOP_ADMIN, UserRole.MANAGER, UserRole.SELLER, UserRole.VIEWER)
+@Roles(
+  UserRole.SUPER_ADMIN,
+  UserRole.SHOP_ADMIN,
+  UserRole.MANAGER,
+  UserRole.SELLER,
+  UserRole.VIEWER,
+)
 @Controller('part-categories')
 export class PartCategoriesController {
   constructor(private readonly partCategoriesService: PartCategoriesService) {}
@@ -63,14 +69,8 @@ export class PartCategoriesController {
   @Get()
   @RequirePermissions(Permission.CATALOG_VIEW)
   @ApiOperation({ summary: 'Получить список категорий деталей' })
-  async findAll(@Query() query: PartCategoryQueryDto) {
-    console.log('[Category search][Controller] query.search:', query.search);
-    const result = await this.partCategoriesService.findAll(query);
-    console.log(
-      '[Category search][Controller] response JSON:',
-      JSON.stringify(result),
-    );
-    return result;
+  findAll(@Query() query: PartCategoryQueryDto) {
+    return this.partCategoriesService.findAll(query);
   }
 
   @Get('tree')
@@ -105,6 +105,20 @@ export class PartCategoriesController {
     @Body() dto: UpdatePartCategoryDto,
   ) {
     return this.partCategoriesService.update(id, dto);
+  }
+
+  @Delete(':id/permanent')
+  @Roles(UserRole.SUPER_ADMIN)
+  @RequirePermissions(Permission.CATALOG_MANAGE)
+  @ApiOperation({
+    summary: 'Физически удалить пустую категорию деталей',
+  })
+  @ApiConflictResponse({
+    description: 'В категории есть дочерние категории или детали каталога',
+  })
+  @ApiNotFoundResponse({ description: 'Категория не найдена' })
+  deletePermanently(@Param('id', ParseUUIDPipe) id: string) {
+    return this.partCategoriesService.deletePermanently(id);
   }
 
   @Delete(':id')

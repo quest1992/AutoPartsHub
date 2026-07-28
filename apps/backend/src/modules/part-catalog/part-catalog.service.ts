@@ -20,7 +20,6 @@ import {
   normalizePartName,
 } from '../../common/utils/part-name-normalizer';
 
-
 import { normalizePartNumber } from '../../common/utils/part-number-normalizer';
 import { CreatePartAliasDto } from './dto/create-part-alias.dto';
 import { PartCatalogCandidatesQueryDto } from './dto/part-catalog-candidates-query.dto';
@@ -83,7 +82,7 @@ const partAliasSelect = {
 
 @Injectable()
 export class PartCatalogService {
-constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) {}
 
   async create(dto: CreatePartCatalogItemDto) {
     const data = this.normalizePart(dto);
@@ -115,7 +114,7 @@ constructor(private readonly prisma: PrismaService) {}
             searchTokens,
             side,
             position,
-            internalCode: `PRT-${String(sequence.value).padStart(6, '0')}`,
+            internalCode: `AUT-${String(sequence.value).padStart(6, '0')}`,
           },
           include: {
             category: { select: categorySelect },
@@ -151,6 +150,14 @@ constructor(private readonly prisma: PrismaService) {}
           { name: { contains: search, mode: 'insensitive' } },
           { normalizedName: { contains: normalizedSearch } },
           { searchTokens: { contains: getPartNameSearchTokens(search) } },
+          {
+            aliases: {
+              some: {
+                isApproved: true,
+                normalizedAlias: { contains: normalizedSearch },
+              },
+            },
+          },
           { slug: { contains: search, mode: 'insensitive' } },
           {
             internalCode: {
@@ -221,10 +228,12 @@ constructor(private readonly prisma: PrismaService) {}
     const normalizedQuery = normalizePartName(query.q);
     const queryTokens = getPartNameTokens(query.q);
     const querySearchTokens = queryTokens.join(' ');
-    const tokenSearches = queryTokens.slice(0, 6).flatMap((token) => [
-      { normalizedName: { contains: token } },
-      { searchTokens: { contains: token } },
-    ]);
+    const tokenSearches = queryTokens
+      .slice(0, 6)
+      .flatMap((token) => [
+        { normalizedName: { contains: token } },
+        { searchTokens: { contains: token } },
+      ]);
     const candidates = await this.prisma.partCatalogItem.findMany({
       where: {
         isActive: true,
@@ -287,8 +296,9 @@ constructor(private readonly prisma: PrismaService) {}
             left.name.localeCompare(right.name, 'ru'),
         )
         .slice(0, query.limit ?? 10)
-        .map(({ searchTokens: _searchTokens, rank: _rank, ...candidate }) =>
-          candidate,
+        .map(
+          ({ searchTokens: _searchTokens, rank: _rank, ...candidate }) =>
+            candidate,
         ),
     };
   }
@@ -364,10 +374,35 @@ constructor(private readonly prisma: PrismaService) {}
     });
   }
 
-  async addPartNumber(
-    partCatalogItemId: string,
-    dto: CreatePartNumberDto,
-  ) {
+  async deletePermanently(id: string) {
+    await this.findOne(id);
+    const [inventoryItems, saleItems, purchaseItems, compatibilities] =
+      await this.prisma.$transaction([
+        this.prisma.shopInventoryItem.count({
+          where: { partCatalogItemId: id },
+        }),
+        this.prisma.saleItem.count({ where: { partCatalogItemId: id } }),
+        this.prisma.purchaseItem.count({ where: { partCatalogItemId: id } }),
+        this.prisma.partCompatibility.count({
+          where: { partCatalogItemId: id },
+        }),
+      ]);
+
+    if (
+      inventoryItems > 0 ||
+      saleItems > 0 ||
+      purchaseItems > 0 ||
+      compatibilities > 0
+    ) {
+      throw new ConflictException(
+        'Нельзя удалить деталь каталога, пока на неё ссылаются остатки, документы или совместимости',
+      );
+    }
+
+    return this.prisma.partCatalogItem.delete({ where: { id } });
+  }
+
+  async addPartNumber(partCatalogItemId: string, dto: CreatePartNumberDto) {
     await this.ensurePartCatalogItemExists(partCatalogItemId);
     const rawNumber = dto.rawNumber.trim();
     const normalizedNumber = normalizePartNumber(rawNumber);
@@ -377,6 +412,21 @@ constructor(private readonly prisma: PrismaService) {}
 
     return this.withPartNumberUniqueHandling(
       this.prisma.$transaction(async (tx) => {
+        const manufacturerName = dto.brand?.trim() || 'Unknown';
+        const normalizedManufacturerName =
+          manufacturerName.replace(/[^a-zA-Z0-9]/g, '').toUpperCase() ||
+          'UNKNOWN';
+        const manufacturer = await tx.partNumberManufacturer.upsert({
+          where: { normalizedName: normalizedManufacturerName },
+          update: { isActive: true },
+          create: {
+            name: manufacturerName,
+            normalizedName: normalizedManufacturerName,
+            isActive: true,
+          },
+          select: { id: true },
+        });
+
         if (dto.isPrimary === true) {
           await tx.partNumber.updateMany({
             where: { partCatalogItemId, type: dto.type, isPrimary: true },
@@ -390,6 +440,7 @@ constructor(private readonly prisma: PrismaService) {}
             rawNumber,
             normalizedNumber,
             type: dto.type,
+            manufacturerId: manufacturer.id,
             ...(dto.brand !== undefined && { brand: dto.brand.trim() }),
             isPrimary: dto.isPrimary ?? false,
           },
@@ -429,6 +480,29 @@ constructor(private readonly prisma: PrismaService) {}
     const normalizedAlias = normalizePartName(alias);
     if (!normalizedAlias) {
       throw new BadRequestException('Вариант названия не должен быть пустым');
+    }
+
+    if (dto.isApproved ?? true) {
+      const conflictingPart = await this.prisma.partCatalogItem.findFirst({
+        where: {
+          id: { not: partCatalogItemId },
+          isActive: true,
+          OR: [
+            { normalizedName: normalizedAlias },
+            {
+              aliases: {
+                some: { normalizedAlias, isApproved: true },
+              },
+            },
+          ],
+        },
+        select: { id: true },
+      });
+      if (conflictingPart) {
+        throw new ConflictException(
+          'Этот синоним уже относится к другой детали каталога',
+        );
+      }
     }
 
     return this.withPartAliasUniqueHandling(

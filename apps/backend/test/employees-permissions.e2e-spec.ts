@@ -6,12 +6,140 @@ import request from 'supertest';
 import { AppModule } from '../src/app.module';
 
 describe('Employees permissions (e2e)', () => {
-  let app: INestApplication; let prisma: PrismaClient; let shopA: string; let shopB: string; let superToken: string; let adminToken: string; let managerToken: string; let employeeB: string; const prefix=`e2e-employees-${Date.now()}`;
+  let app: INestApplication;
+  let prisma: PrismaClient;
+  let shopA: string;
+  let shopB: string;
+  let superToken: string;
+  let adminToken: string;
+  let managerToken: string;
+  let employeeB: string;
+  const prefix = `e2e-employees-${Date.now()}`;
   const createdUserIds: string[] = [];
   const createdShopIds: string[] = [];
-  const noSensitive=(body:unknown)=>expect(JSON.stringify(body)).not.toMatch(/passwordHash|temporaryPassword/);
-  beforeAll(async()=>{ const url=process.env.DATABASE_URL_TEST; if(!url)throw new Error('DATABASE_URL_TEST is required for E2E tests'); const db=new URL(url).pathname.replace(/^\/+/, '').split('/')[0]; if(!/test/i.test(db))throw new Error(`Unsafe E2E database: ${db}. Database name must contain test.`); process.env.DATABASE_URL=url; prisma=new PrismaClient(); const mod=await Test.createTestingModule({imports:[AppModule]}).compile();app=mod.createNestApplication();app.useGlobalPipes(new ValidationPipe({whitelist:true,transform:true,forbidNonWhitelisted:true}));await app.init(); const a=await prisma.shop.create({data:{name:`${prefix}-a`,isActive:true}}); const b=await prisma.shop.create({data:{name:`${prefix}-b`,isActive:true}}); createdShopIds.push(a.id,b.id);shopA=a.id;shopB=b.id;const hash=await bcrypt.hash('Password1',12);const [sa,admin,manager,other]=await Promise.all([prisma.user.create({data:{firstName:'super',phone:`+991${Date.now()}`,passwordHash:hash,role:UserRole.SUPER_ADMIN}}),prisma.user.create({data:{firstName:'admin',phone:`+992${Date.now()}`,passwordHash:hash,role:UserRole.SHOP_ADMIN,shopId:shopA}}),prisma.user.create({data:{firstName:'manager',phone:`+993${Date.now()}`,passwordHash:hash,role:UserRole.MANAGER,shopId:shopA}}),prisma.user.create({data:{firstName:'other',phone:`+994${Date.now()}`,passwordHash:hash,role:UserRole.SELLER,shopId:shopB}})]);createdUserIds.push(sa.id,admin.id,manager.id,other.id);employeeB=other.id;const login=async(phone:string)=>request(app.getHttpServer()).post('/auth/login').send({phone,password:'Password1'});const [x,y,z]=await Promise.all([login(sa.phone),login(admin.phone),login(manager.phone)]);superToken=x.body.accessToken;adminToken=y.body.accessToken;managerToken=z.body.accessToken;});
-  afterAll(async()=>{if(createdUserIds.length)await prisma.user.deleteMany({where:{id:{in:[...new Set(createdUserIds)]}}});if(createdShopIds.length)await prisma.shop.deleteMany({where:{id:{in:[...new Set(createdShopIds)]}}});await app.close();await prisma.$disconnect();});
-  it('removes legacy /users routes',async()=>{await request(app.getHttpServer()).get('/users').expect(404);await request(app.getHttpServer()).post('/users').expect(404);});
-  it('enforces employee shop context and permissions',async()=>{await request(app.getHttpServer()).get('/employees').set('Authorization',`Bearer ${superToken}`).expect(400);const r=await request(app.getHttpServer()).get(`/employees?shopId=${shopA}`).set('Authorization',`Bearer ${superToken}`).expect(200);noSensitive(r.body);await request(app.getHttpServer()).get(`/employees?shopId=${shopB}`).set('Authorization',`Bearer ${adminToken}`).expect(403);await request(app.getHttpServer()).get('/employees').set('Authorization',`Bearer ${managerToken}`).expect(403);await request(app.getHttpServer()).get(`/employees/${employeeB}`).set('Authorization',`Bearer ${adminToken}`).expect(404);});
+  const noSensitive = (body: unknown) =>
+    expect(JSON.stringify(body)).not.toMatch(/passwordHash|temporaryPassword/);
+  beforeAll(async () => {
+    const url = process.env.DATABASE_URL_TEST;
+    if (!url) throw new Error('DATABASE_URL_TEST is required for E2E tests');
+    const db = new URL(url).pathname.replace(/^\/+/, '').split('/')[0];
+    if (!/test/i.test(db))
+      throw new Error(
+        `Unsafe E2E database: ${db}. Database name must contain test.`,
+      );
+    process.env.DATABASE_URL = url;
+    prisma = new PrismaClient();
+    const mod = await Test.createTestingModule({
+      imports: [AppModule],
+    }).compile();
+    app = mod.createNestApplication();
+    app.useGlobalPipes(
+      new ValidationPipe({
+        whitelist: true,
+        transform: true,
+        forbidNonWhitelisted: true,
+      }),
+    );
+    await app.init();
+    const a = await prisma.shop.create({
+      data: { name: `${prefix}-a`, isActive: true },
+    });
+    const b = await prisma.shop.create({
+      data: { name: `${prefix}-b`, isActive: true },
+    });
+    createdShopIds.push(a.id, b.id);
+    shopA = a.id;
+    shopB = b.id;
+    const hash = await bcrypt.hash('Password1', 12);
+    const [sa, admin, manager, other] = await Promise.all([
+      prisma.user.create({
+        data: {
+          firstName: 'super',
+          phone: `+991${Date.now()}`,
+          passwordHash: hash,
+          role: UserRole.SUPER_ADMIN,
+        },
+      }),
+      prisma.user.create({
+        data: {
+          firstName: 'admin',
+          phone: `+992${Date.now()}`,
+          passwordHash: hash,
+          role: UserRole.SHOP_ADMIN,
+          shopId: shopA,
+        },
+      }),
+      prisma.user.create({
+        data: {
+          firstName: 'manager',
+          phone: `+993${Date.now()}`,
+          passwordHash: hash,
+          role: UserRole.MANAGER,
+          shopId: shopA,
+        },
+      }),
+      prisma.user.create({
+        data: {
+          firstName: 'other',
+          phone: `+994${Date.now()}`,
+          passwordHash: hash,
+          role: UserRole.SELLER,
+          shopId: shopB,
+        },
+      }),
+    ]);
+    createdUserIds.push(sa.id, admin.id, manager.id, other.id);
+    employeeB = other.id;
+    const login = async (phone: string) =>
+      request(app.getHttpServer())
+        .post('/auth/login')
+        .send({ phone, password: 'Password1' });
+    const [x, y, z] = await Promise.all([
+      login(sa.phone),
+      login(admin.phone),
+      login(manager.phone),
+    ]);
+    superToken = x.body.accessToken;
+    adminToken = y.body.accessToken;
+    managerToken = z.body.accessToken;
+  });
+  afterAll(async () => {
+    if (createdUserIds.length)
+      await prisma.user.deleteMany({
+        where: { id: { in: [...new Set(createdUserIds)] } },
+      });
+    if (createdShopIds.length)
+      await prisma.shop.deleteMany({
+        where: { id: { in: [...new Set(createdShopIds)] } },
+      });
+    await app.close();
+    await prisma.$disconnect();
+  });
+  it('removes legacy /users routes', async () => {
+    await request(app.getHttpServer()).get('/users').expect(404);
+    await request(app.getHttpServer()).post('/users').expect(404);
+  });
+  it('enforces employee shop context and permissions', async () => {
+    await request(app.getHttpServer())
+      .get('/employees')
+      .set('Authorization', `Bearer ${superToken}`)
+      .expect(400);
+    const r = await request(app.getHttpServer())
+      .get(`/employees?shopId=${shopA}`)
+      .set('Authorization', `Bearer ${superToken}`)
+      .expect(200);
+    noSensitive(r.body);
+    await request(app.getHttpServer())
+      .get(`/employees?shopId=${shopB}`)
+      .set('Authorization', `Bearer ${adminToken}`)
+      .expect(403);
+    await request(app.getHttpServer())
+      .get('/employees')
+      .set('Authorization', `Bearer ${managerToken}`)
+      .expect(403);
+    await request(app.getHttpServer())
+      .get(`/employees/${employeeB}`)
+      .set('Authorization', `Bearer ${adminToken}`)
+      .expect(404);
+  });
 });

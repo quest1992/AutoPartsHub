@@ -27,7 +27,7 @@ describe('InventoryImageService validation', () => {
     uploadImage: jest.fn(),
     deleteImage: jest.fn(),
   };
-  const service = new InventoryImageService(cloudinary as never);
+  const service = new InventoryImageService(cloudinary);
   it('rejects unsupported files', () => {
     expect(() => service.validate({ ...file, mimetype: 'image/gif' })).toThrow(
       BadRequestException,

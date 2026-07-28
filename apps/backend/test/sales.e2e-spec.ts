@@ -4,6 +4,7 @@ import { PrismaClient, UserRole } from '@prisma/client';
 import * as bcrypt from 'bcryptjs';
 import request from 'supertest';
 import { AppModule } from '../src/app.module';
+import { createPartCatalogItem } from './helpers/create-part-catalog-item';
 
 describe('Sales (e2e)', () => {
   let app: INestApplication;
@@ -13,6 +14,11 @@ describe('Sales (e2e)', () => {
   let inventoryItemId: string;
   let saleId: string;
   let createdAdminId: string;
+  let sellerToken: string;
+  let viewerToken: string;
+  let otherToken: string;
+  let otherShopId: string;
+  const userIds: string[] = [];
   const prefix = `e2e-sales-${Date.now()}`;
 
   beforeAll(async () => {
@@ -43,6 +49,33 @@ describe('Sales (e2e)', () => {
       },
     });
     createdAdminId = admin.id;
+    const otherShop = await prisma.shop.create({
+      data: { name: `${prefix}-other-shop` },
+    });
+    otherShopId = otherShop.id;
+    for (const [role, targetShop] of [
+      [UserRole.SELLER, shopId],
+      [UserRole.VIEWER, shopId],
+      [UserRole.VIEWER, otherShopId],
+    ] as const) {
+      const user = await prisma.user.create({
+        data: {
+          firstName: role,
+          phone: `+992${String(Date.now() + userIds.length + 10).slice(-9)}`,
+          passwordHash: await bcrypt.hash('E2Epass123!', 12),
+          role,
+          shopId: targetShop,
+        },
+      });
+      userIds.push(user.id);
+      const response = await request(app.getHttpServer())
+        .post('/auth/login')
+        .send({ phone: user.phone, password: 'E2Epass123!' })
+        .expect(201);
+      if (role === UserRole.SELLER) sellerToken = response.body.accessToken;
+      else if (targetShop === shopId) viewerToken = response.body.accessToken;
+      else otherToken = response.body.accessToken;
+    }
     const manufacturer = await prisma.manufacturer.create({
       data: {
         name: `${prefix}-manufacturer`,
@@ -73,7 +106,7 @@ describe('Sales (e2e)', () => {
         isActive: true,
       },
     });
-    const part = await prisma.partCatalogItem.create({
+    const part = await createPartCatalogItem(prisma, {
       data: {
         internalCode: `${prefix}-part`,
         name: `${prefix}-part`,
@@ -101,11 +134,15 @@ describe('Sales (e2e)', () => {
   });
 
   afterAll(async () => {
+    const shopIds = [shopId, otherShopId].filter(Boolean);
     await prisma.inventoryMovement.deleteMany({ where: { shopId } });
     await prisma.saleItem.deleteMany({ where: { sale: { shopId } } });
     await prisma.sale.deleteMany({ where: { shopId } });
     await prisma.shopInventoryItem.deleteMany({ where: { shopId } });
-    await prisma.shop.deleteMany({ where: { id: shopId } });
+    await prisma.user.deleteMany({ where: { id: { in: userIds } } });
+    await prisma.shop.deleteMany({
+      where: { id: { in: shopIds } },
+    });
     await prisma.partCatalogItem.deleteMany({
       where: { internalCode: `${prefix}-part` },
     });
@@ -169,10 +206,16 @@ describe('Sales (e2e)', () => {
       .get('/sales')
       .set('Authorization', `Bearer ${token}`)
       .expect(200);
-    await request(app.getHttpServer())
+    const detail = await request(app.getHttpServer())
       .get(`/sales/${saleId}`)
       .set('Authorization', `Bearer ${token}`)
       .expect(200);
+    expect(detail.body.user.passwordHash).toBeUndefined();
+    expect(detail.body.cancelledBy?.passwordHash).toBeUndefined();
+    await request(app.getHttpServer())
+      .get(`/sales/${saleId}`)
+      .set('Authorization', `Bearer ${otherToken}`)
+      .expect(404);
     await request(app.getHttpServer())
       .post(`/sales/${saleId}/cancel`)
       .set('Authorization', `Bearer ${token}`)
@@ -195,5 +238,72 @@ describe('Sales (e2e)', () => {
       .set('Authorization', `Bearer ${token}`)
       .send({ reason: 'again' })
       .expect(409);
+  });
+
+  it('rejects overselling without changing stock', async () => {
+    await request(app.getHttpServer())
+      .post('/sales')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ shopId, items: [{ inventoryItemId, quantity: 3 }] })
+      .expect(409);
+    expect(
+      (
+        await prisma.shopInventoryItem.findUniqueOrThrow({
+          where: { id: inventoryItemId },
+        })
+      ).quantity,
+    ).toBe(2);
+  });
+
+  it('allows only one of two concurrent sales', async () => {
+    const responses = await Promise.all([
+      request(app.getHttpServer())
+        .post('/sales')
+        .set('Authorization', `Bearer ${token}`)
+        .send({ shopId, items: [{ inventoryItemId, quantity: 2 }] }),
+      request(app.getHttpServer())
+        .post('/sales')
+        .set('Authorization', `Bearer ${token}`)
+        .send({ shopId, items: [{ inventoryItemId, quantity: 2 }] }),
+    ]);
+    expect(responses.map((response) => response.status).sort()).toEqual([
+      201, 409,
+    ]);
+    expect(
+      (
+        await prisma.shopInventoryItem.findUniqueOrThrow({
+          where: { id: inventoryItemId },
+        })
+      ).quantity,
+    ).toBe(0);
+    const successful = responses.find((response) => response.status === 201)!;
+    await request(app.getHttpServer())
+      .post(`/sales/${successful.body.id}/cancel`)
+      .set('Authorization', `Bearer ${token}`)
+      .send({ reason: 'cleanup' })
+      .expect(201);
+  });
+
+  it('enforces viewer and seller permissions', async () => {
+    await request(app.getHttpServer())
+      .post('/sales')
+      .set('Authorization', `Bearer ${viewerToken}`)
+      .send({ items: [{ inventoryItemId, quantity: 1 }] })
+      .expect(403);
+    const created = await request(app.getHttpServer())
+      .post('/sales')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ shopId, items: [{ inventoryItemId, quantity: 1 }] })
+      .expect(201);
+    await request(app.getHttpServer())
+      .post(`/sales/${created.body.id}/cancel`)
+      .set('Authorization', `Bearer ${sellerToken}`)
+      .send({ reason: 'not allowed' })
+      .expect(403);
+    await request(app.getHttpServer())
+      .post(`/sales/${created.body.id}/cancel`)
+      .set('Authorization', `Bearer ${token}`)
+      .send({ reason: 'cleanup' })
+      .expect(201);
   });
 });

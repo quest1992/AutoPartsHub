@@ -1,35 +1,239 @@
 'use client';
+
 import Link from 'next/link';
-import { Fragment, useCallback, useEffect, useMemo, useState } from 'react';
-import { useAuth } from '../../components/auth-provider';
+import { Fragment, useCallback, useEffect, useState } from 'react';
 import { ProtectedLayout } from '../../components/protected-layout';
-import { deactivatePartCategory, getPartCategoryTree, PartCategoryTreeNode, updatePartCategory } from '../../lib/api';
-
-const STORAGE_KEY = 'autostock.part-categories.expanded';
-type LevelFilter = 'all' | 'root' | 'child' | 'leaf';
-type Row = { node: PartCategoryTreeNode; level: number; path: string[] };
-
-function flatten(nodes: PartCategoryTreeNode[], level = 1, path: string[] = []): Row[] {
-  return nodes.flatMap((node) => [{ node, level, path: [...path, node.name] }, ...flatten(node.children, level + 1, [...path, node.name])]);
-}
+import { useAuth } from '../../components/auth-provider';
+import {
+  deactivatePartCategory,
+  deletePartCategory,
+  getPartCategoryTree,
+  PartCategoryTreeNode,
+  updatePartCategory,
+} from '../../lib/api';
 
 export default function PartCategoriesPage() {
   const { hasPermission, isLoading } = useAuth();
+  const canManage = hasPermission('CATALOG_MANAGE');
   const [tree, setTree] = useState<PartCategoryTreeNode[]>([]);
-  const [all, setAll] = useState(false); const [error, setError] = useState(''); const [loading, setLoading] = useState(false);
-  const [query, setQuery] = useState(''); const [levelFilter, setLevelFilter] = useState<LevelFilter>('all');
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
-  const allowed = hasPermission('CATALOG_MANAGE');
-  useEffect(() => { queueMicrotask(() => { try { const ids = JSON.parse(localStorage.getItem(STORAGE_KEY) ?? '[]'); if (Array.isArray(ids)) setExpanded(new Set(ids.filter((id): id is string => typeof id === 'string'))); } catch { /* ignore invalid persisted UI state */ } }); }, []);
-  useEffect(() => { localStorage.setItem(STORAGE_KEY, JSON.stringify([...expanded])); }, [expanded]);
-  const load = useCallback(async () => { if (!allowed) return; setLoading(true); try { setTree(await getPartCategoryTree(all)); } catch (reason) { setError(reason instanceof Error ? reason.message : 'Ошибка загрузки'); } finally { setLoading(false); } }, [all, allowed]);
-  useEffect(() => { queueMicrotask(() => { void load(); }); }, [load]);
-  const allRows = useMemo(() => flatten(tree), [tree]);
-  const matchingIds = useMemo(() => { const needle = query.trim().toLowerCase(); return new Set(allRows.filter(({ node }) => !needle || node.name.toLowerCase().includes(needle) || node.slug.toLowerCase().includes(needle)).map(({ node }) => node.id)); }, [allRows, query]);
-  const relatedIds = useMemo(() => { if (!query.trim()) return new Set<string>(); const ids = new Set<string>(); const visit = (nodes: PartCategoryTreeNode[], ancestors: string[]) => nodes.forEach((node) => { const match = matchingIds.has(node.id); if (match) ancestors.forEach((id) => ids.add(id)); if (match || node.children.some((child) => matchingIds.has(child.id))) ids.add(node.id); visit(node.children, [...ancestors, node.id]); }); visit(tree, []); return ids; }, [matchingIds, query, tree]);
-  const expandedForSearch = useMemo(() => { const ids = new Set(expanded); if (query.trim()) allRows.forEach(({ node, path }) => { if (matchingIds.has(node.id)) path.forEach((_, index) => { const ancestor = allRows.find((row) => row.path.length === index + 1 && row.path.every((name, i) => name === path[i])); if (ancestor) ids.add(ancestor.node.id); }); }); return ids; }, [allRows, expanded, matchingIds, query]);
-  const setAllExpanded = (value: boolean) => setExpanded(value ? new Set(allRows.filter(({ node }) => node.children.length).map(({ node }) => node.id)) : new Set());
-  async function toggleStatus(node: PartCategoryTreeNode) { if (node.isActive && !confirm('Отключить категорию?')) return; try { if (node.isActive) await deactivatePartCategory(node.id); else await updatePartCategory(node.id, { isActive: true }); await load(); } catch (reason) { setError(reason instanceof Error ? reason.message : 'Не удалось изменить категорию'); } }
-  const rows = (nodes: PartCategoryTreeNode[], level = 1, path: string[] = []): React.ReactNode => nodes.flatMap((node) => { const visibleBySearch = !query.trim() || relatedIds.has(node.id); const visibleByLevel = levelFilter === 'all' || (levelFilter === 'root' && level === 1) || (levelFilter === 'child' && level === 2) || (levelFilter === 'leaf' && node.children.length === 0); if (!visibleBySearch || !visibleByLevel && !query.trim()) return []; const open = expandedForSearch.has(node.id); return [<Fragment key={node.id}><tr className="border-t border-slate-100 odd:bg-white even:bg-slate-50 hover:bg-blue-50"><td className="px-5 py-4 font-medium" style={{ paddingLeft: `${20 + (level - 1) * 28}px` }}>{node.children.length > 0 ? <button onClick={() => setExpanded((current) => { const next = new Set(current); if (next.has(node.id)) { next.delete(node.id); } else { next.add(node.id); } return next; })} className="mr-2 text-slate-500">{open ? '▾' : '▸'}</button> : <span className="mr-6" />}{node.name}{(query.trim() || levelFilter !== 'all') && <span className="ml-2 text-xs font-normal text-slate-400">{path.join(' → ')}</span>}</td><td className="px-5 py-4 text-slate-600">{node.slug}</td><td className="px-5 py-4"><span className={node.isActive ? 'rounded-full bg-emerald-100 px-2.5 py-1 text-xs font-medium text-emerald-800' : 'rounded-full bg-slate-200 px-2.5 py-1 text-xs font-medium text-slate-700'}>{node.isActive ? 'Активна' : 'Неактивна'}</span></td><td className="px-5 py-4 text-center">{node.sortOrder}</td><td className="px-5 py-4 text-center">{node.children.length}</td><td className="px-5 py-4"><div className="flex flex-wrap gap-x-4 gap-y-2 whitespace-nowrap"><Link className="text-blue-700 hover:underline" href={`/part-categories/new?parentId=${node.id}`}>Добавить подкатегорию</Link><Link className="text-blue-700 hover:underline" href={`/part-categories/${node.id}/edit`}>Редактировать</Link><button onClick={() => void toggleStatus(node)} className="text-amber-700 hover:underline">{node.isActive ? 'Отключить' : 'Активировать'}</button></div></td></tr>{(open || query.trim()) && rows(node.children, level + 1, [...path, node.name])}</Fragment>]; });
-  return <ProtectedLayout>{!isLoading && !allowed ? <p className="rounded bg-white p-5">Недостаточно прав для управления категориями.</p> : <><div className="flex flex-wrap justify-between gap-4"><div><h1 className="text-2xl font-bold">Категории запчастей</h1><p className="text-slate-500">Иерархический справочник категорий центрального каталога</p></div><Link href="/part-categories/new" className="rounded bg-blue-600 px-4 py-2 text-white">Добавить корневую категорию</Link></div><div className="mt-5 flex flex-wrap items-end gap-3 rounded-xl bg-white p-4 shadow-sm"><label className="flex-1 min-w-56 text-sm">Поиск по названию или slug<input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Например, двигатель или maslyanye-filtry" className="mt-1 w-full rounded border p-2" /></label>{query && <button onClick={() => setQuery('')} className="rounded border px-3 py-2">Очистить</button>}<label className="text-sm">Уровень<select value={levelFilter} onChange={(event) => setLevelFilter(event.target.value as LevelFilter)} className="mt-1 rounded border p-2"><option value="all">Все уровни</option><option value="root">Корневые категории</option><option value="child">Подкатегории</option><option value="leaf">Конечные категории</option></select></label><button onClick={() => setAllExpanded(true)} className="rounded border px-3 py-2">Развернуть всё</button><button onClick={() => setAllExpanded(false)} className="rounded border px-3 py-2">Свернуть всё</button></div><label className="mt-4 flex gap-2"><input type="checkbox" checked={all} onChange={(event) => setAll(event.target.checked)} />Показать неактивные</label><p className="mt-3 text-sm text-slate-500">{query.trim() ? `Найдено: ${matchingIds.size} из ${allRows.length}` : levelFilter !== 'all' ? `Показано: ${allRows.filter(({ node, level }) => levelFilter === 'root' ? level === 1 : levelFilter === 'child' ? level === 2 : node.children.length === 0).length} из ${allRows.length}` : `Всего категорий: ${allRows.length}`}</p>{error && <p className="mt-4 text-red-700">{error}</p>}{loading ? <p className="mt-5">Загрузка…</p> : <div className="mt-5 overflow-x-auto rounded-xl bg-white shadow-sm"><table className="w-full min-w-[1050px] table-fixed text-sm"><thead className="bg-slate-100 text-xs uppercase tracking-wide text-slate-600"><tr><th className="w-[30%] px-5 py-4 text-left">Название</th><th className="w-[19%] px-5 py-4 text-left">Slug</th><th className="w-[13%] px-5 py-4 text-left">Статус</th><th className="w-[9%] px-5 py-4">Порядок</th><th className="w-[11%] px-5 py-4">Дочерние</th><th className="w-[18%] px-5 py-4 text-left">Действия</th></tr></thead><tbody>{rows(tree)}</tbody></table></div>}</>}</ProtectedLayout>;
+  const [query, setQuery] = useState('');
+  const [showInactive, setShowInactive] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  const load = useCallback(async () => {
+    if (!canManage) return;
+    setLoading(true);
+    setError('');
+    try {
+      setTree(await getPartCategoryTree(showInactive));
+    } catch (reason) {
+      setError(
+        reason instanceof Error
+          ? reason.message
+          : 'Не удалось загрузить категории',
+      );
+    } finally {
+      setLoading(false);
+    }
+  }, [canManage, showInactive]);
+
+  useEffect(() => {
+    queueMicrotask(() => void load());
+  }, [load]);
+
+  async function toggleStatus(node: PartCategoryTreeNode) {
+    setError('');
+    try {
+      if (node.isActive) {
+        await deactivatePartCategory(node.id);
+      } else {
+        await updatePartCategory(node.id, { isActive: true });
+      }
+      await load();
+    } catch (reason) {
+      setError(
+        reason instanceof Error ? reason.message : 'Не удалось изменить статус',
+      );
+    }
+  }
+
+  async function removePermanently(node: PartCategoryTreeNode) {
+    if (
+      !window.confirm(
+        `Удалить пустую категорию «${node.name}» навсегда?`,
+      )
+    ) {
+      return;
+    }
+    setError('');
+    try {
+      await deletePartCategory(node.id);
+      await load();
+    } catch (reason) {
+      setError(
+        reason instanceof Error
+          ? reason.message
+          : 'Не удалось удалить категорию',
+      );
+    }
+  }
+
+  function toggleExpanded(id: string) {
+    setExpanded((current) => {
+      const next = new Set(current);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }
+
+  const needle = query.trim().toLocaleLowerCase('ru-RU');
+  const hasMatch = (node: PartCategoryTreeNode): boolean =>
+    !needle ||
+    node.name.toLocaleLowerCase('ru-RU').includes(needle) ||
+    node.slug.toLocaleLowerCase('ru-RU').includes(needle) ||
+    node.children.some(hasMatch);
+
+  const rows = (
+    nodes: PartCategoryTreeNode[],
+    level = 0,
+  ): React.ReactNode =>
+    nodes.flatMap((node) => {
+      if (!hasMatch(node)) return [];
+      const open = Boolean(needle) || expanded.has(node.id);
+      return [
+        <Fragment key={node.id}>
+          <tr className="border-t hover:bg-blue-50">
+            <td
+              className="p-3 font-medium"
+              style={{ paddingLeft: `${12 + level * 24}px` }}
+            >
+              {node.children.length > 0 ? (
+                <button
+                  type="button"
+                  onClick={() => toggleExpanded(node.id)}
+                  className="mr-2 text-slate-500"
+                >
+                  {open ? '▾' : '▸'}
+                </button>
+              ) : (
+                <span className="mr-6" />
+              )}
+              {node.name}
+            </td>
+            <td className="p-3 text-slate-600">{node.slug}</td>
+            <td className="p-3">
+              {node.isActive ? 'Активна' : 'Отключена'}
+            </td>
+            <td className="p-3 text-center">{node.children.length}</td>
+            <td className="p-3">
+              <div className="flex flex-wrap gap-3">
+                <Link
+                  href={`/part-categories/new?parentId=${node.id}`}
+                  className="text-blue-700"
+                >
+                  Добавить дочернюю
+                </Link>
+                <Link
+                  href={`/part-categories/${node.id}/edit`}
+                  className="text-blue-700"
+                >
+                  Изменить
+                </Link>
+                <button
+                  type="button"
+                  onClick={() => void toggleStatus(node)}
+                  className="text-amber-700"
+                >
+                  {node.isActive ? 'Отключить' : 'Включить'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => void removePermanently(node)}
+                  className="text-red-700"
+                >
+                  Удалить
+                </button>
+              </div>
+            </td>
+          </tr>
+          {open && rows(node.children, level + 1)}
+        </Fragment>,
+      ];
+    });
+
+  return (
+    <ProtectedLayout>
+      {!isLoading && !canManage ? (
+        <p className="rounded bg-white p-5">
+          Недостаточно прав для управления категориями.
+        </p>
+      ) : (
+        <>
+          <header className="flex flex-wrap justify-between gap-4">
+            <div>
+              <h1 className="text-2xl font-bold">Категории запчастей</h1>
+              <p className="text-slate-500">
+                Дерево поддерживает неограниченную вложенность
+              </p>
+            </div>
+            <Link
+              href="/part-categories/new"
+              className="rounded-lg bg-blue-600 px-4 py-2 text-white"
+            >
+              Добавить корневую категорию
+            </Link>
+          </header>
+
+          <div className="mt-5 flex flex-wrap gap-3 rounded-xl bg-white p-4 shadow-sm">
+            <input
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+              className="min-w-64 flex-1 rounded border p-2"
+              placeholder="Поиск по названию или slug"
+            />
+            <label className="flex items-center gap-2 text-sm">
+              <input
+                type="checkbox"
+                checked={showInactive}
+                onChange={(event) => setShowInactive(event.target.checked)}
+              />
+              Показать отключённые
+            </label>
+          </div>
+
+          {error && (
+            <p className="mt-4 rounded bg-red-50 p-3 text-red-700">{error}</p>
+          )}
+
+          <div className="mt-5 overflow-x-auto rounded-xl bg-white shadow-sm">
+            <table className="w-full min-w-[850px] text-sm">
+              <thead className="bg-slate-100 text-left">
+                <tr>
+                  <th className="p-3">Название</th>
+                  <th className="p-3">Slug</th>
+                  <th className="p-3">Статус</th>
+                  <th className="p-3">Дочерние</th>
+                  <th className="p-3">Действия</th>
+                </tr>
+              </thead>
+              <tbody>
+                {loading ? (
+                  <tr>
+                    <td className="p-5 text-slate-500" colSpan={5}>
+                      Загрузка…
+                    </td>
+                  </tr>
+                ) : (
+                  rows(tree)
+                )}
+              </tbody>
+            </table>
+          </div>
+        </>
+      )}
+    </ProtectedLayout>
+  );
 }

@@ -19,18 +19,20 @@ function buildWorkbook(rows: string[][]) {
   return XLSX.write(workbook, { type: 'buffer', bookType: 'xlsx' }) as Buffer;
 }
 
-function createService(overrides: {
-  match?: jest.Mock;
-  inventoryFindFirst?: jest.Mock;
-  inventoryFindMany?: jest.Mock;
-  inventoryCreate?: jest.Mock;
-  inventoryUpdate?: jest.Mock;
-  movementCreate?: jest.Mock;
-  jobCreate?: jest.Mock;
-  jobUpdate?: jest.Mock;
-  partCatalogFindUnique?: jest.Mock;
-  transaction?: jest.Mock;
-} = {}) {
+function createService(
+  overrides: {
+    match?: jest.Mock;
+    inventoryFindFirst?: jest.Mock;
+    inventoryFindMany?: jest.Mock;
+    inventoryCreate?: jest.Mock;
+    inventoryUpdate?: jest.Mock;
+    movementCreate?: jest.Mock;
+    jobCreate?: jest.Mock;
+    jobUpdate?: jest.Mock;
+    partCatalogFindUnique?: jest.Mock;
+    transaction?: jest.Mock;
+  } = {},
+) {
   const tx = {
     shopInventoryItem: {
       findFirst: jest
@@ -98,7 +100,10 @@ function createService(overrides: {
   };
 
   return {
-    service: new InventoryImportService(prisma as never, matchingService as never),
+    service: new InventoryImportService(
+      prisma as never,
+      matchingService as never,
+    ),
     prisma,
     tx,
     matchingService,
@@ -108,14 +113,9 @@ function createService(overrides: {
 describe('InventoryImportService', () => {
   it('preview does not write to database', async () => {
     const { service, prisma } = createService();
-    const buffer = buildWorkbook([
-      ['04465-YZZR7', 'Колодки', '420', '8'],
-    ]);
+    const buffer = buildWorkbook([['04465-YZZR7', 'Колодки', '420', '8']]);
 
-    await service.preview(
-      { buffer, originalname: 'price.xlsx' },
-      actor,
-    );
+    await service.preview({ buffer, originalname: 'price.xlsx' }, actor);
 
     expect(prisma.inventoryImportJob.create).not.toHaveBeenCalled();
     expect(prisma.$transaction).not.toHaveBeenCalled();
@@ -123,9 +123,7 @@ describe('InventoryImportService', () => {
 
   it('shop user cannot import for another shop', async () => {
     const { service } = createService();
-    const buffer = buildWorkbook([
-      ['04465-YZZR7', 'Колодки', '420', '8'],
-    ]);
+    const buffer = buildWorkbook([['04465-YZZR7', 'Колодки', '420', '8']]);
 
     await expect(
       service.confirm(
@@ -163,7 +161,8 @@ describe('InventoryImportService', () => {
       actor,
       'shop-1',
       {
-        categoryColumn: '\u041d\u0430\u0438\u043c\u0435\u043d\u043e\u0432\u0430\u043d\u0438\u0435',
+        categoryColumn:
+          '\u041d\u0430\u0438\u043c\u0435\u043d\u043e\u0432\u0430\u043d\u0438\u0435',
         nameColumn: 'Наименование',
         priceColumn: 'Цена',
         quantityColumn: 'Остаток',
@@ -189,7 +188,8 @@ describe('InventoryImportService', () => {
       actor,
       'shop-1',
       {
-        categoryColumn: '\u041d\u0430\u0438\u043c\u0435\u043d\u043e\u0432\u0430\u043d\u0438\u0435',
+        categoryColumn:
+          '\u041d\u0430\u0438\u043c\u0435\u043d\u043e\u0432\u0430\u043d\u0438\u0435',
         nameColumn: 'Наименование',
         priceColumn: 'Цена',
         quantityColumn: 'Остаток',
@@ -197,27 +197,22 @@ describe('InventoryImportService', () => {
       },
     );
 
-    expect(result.imported + result.updated + result.skipped).toBeGreaterThan(0);
+    expect(result.imported + result.updated + result.skipped).toBeGreaterThan(
+      0,
+    );
     expect(result.skipped).toBeGreaterThanOrEqual(1);
   });
 
   it('requires mapping columns on confirm', async () => {
     const { service } = createService();
-    const buffer = buildWorkbook([
-      ['04465-YZZR7', 'Колодки', '420', '8'],
-    ]);
+    const buffer = buildWorkbook([['04465-YZZR7', 'Колодки', '420', '8']]);
 
     await expect(
-      service.confirm(
-        { buffer, originalname: 'price.xlsx' },
-        actor,
-        'shop-1',
-        {
-          nameColumn: '',
-          priceColumn: 'Цена',
-          quantityColumn: 'Остаток',
-        },
-      ),
+      service.confirm({ buffer, originalname: 'price.xlsx' }, actor, 'shop-1', {
+        nameColumn: '',
+        priceColumn: 'Цена',
+        quantityColumn: 'Остаток',
+      }),
     ).rejects.toBeInstanceOf(BadRequestException);
   });
 });

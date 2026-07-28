@@ -48,10 +48,10 @@ export class PurchasesController {
   create(@Body() d: CreatePurchaseDto, @Req() r: { user: InventoryActor }) {
     return this.s.create(d, r.user);
   }
-  @Get() @RequirePermissions(Permission.PURCHASES_VIEW) @ApiOperation({ summary: 'Список закупок' }) all(
-    @Query() q: QueryPurchasesDto,
-    @Req() r: { user: InventoryActor },
-  ) {
+  @Get()
+  @RequirePermissions(Permission.PURCHASES_VIEW)
+  @ApiOperation({ summary: 'Список закупок' })
+  all(@Query() q: QueryPurchasesDto, @Req() r: { user: InventoryActor }) {
     return this.s.all(r.user, q);
   }
   @Get(':id')
@@ -64,7 +64,10 @@ export class PurchasesController {
   ) {
     return this.s.one(id, r.user);
   }
-  @Post(':id/cancel') @RequirePermissions(Permission.PURCHASES_CANCEL) @ApiOperation({ summary: 'Отменить закупку' }) cancel(
+  @Post(':id/cancel')
+  @RequirePermissions(Permission.PURCHASES_CANCEL)
+  @ApiOperation({ summary: 'Отменить закупку' })
+  cancel(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() d: CancelPurchaseDto,
     @Req() r: { user: InventoryActor },

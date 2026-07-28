@@ -19,6 +19,20 @@ import { QuerySalesDto } from './dto/query-sales.dto';
 @Injectable()
 export class SalesService {
   constructor(private p: PrismaService) {}
+  private async serializable<T>(
+    work: (tx: Prisma.TransactionClient) => Promise<T>,
+  ): Promise<T> {
+    for (let attempt = 1; ; attempt++) {
+      try {
+        return await this.p.$transaction(work, {
+          isolationLevel: Prisma.TransactionIsolationLevel.Serializable,
+        });
+      } catch (error) {
+        if ((error as { code?: string }).code !== 'P2034' || attempt >= 3)
+          throw error;
+      }
+    }
+  }
   private shop(a: InventoryActor, id?: string) {
     if (a.role === UserRole.SUPER_ADMIN) {
       if (!id) throw new BadRequestException('Необходимо указать shopId');
@@ -34,103 +48,106 @@ export class SalesService {
     const shopId = this.shop(a, d.shopId);
     if (new Set(d.items.map((x) => x.inventoryItemId)).size !== d.items.length)
       throw new BadRequestException('Складская позиция указана дважды');
-    return this.p.$transaction(
-      async (tx) => {
-        const seq = await tx.appSequence.upsert({
-          where: { key: 'SALE' },
-          create: { key: 'SALE', value: 1 },
-          update: { value: { increment: 1 } },
-        });
-        const items = await tx.shopInventoryItem.findMany({
-          where: { id: { in: d.items.map((x) => x.inventoryItemId) } },
-          include: { partCatalogItem: true },
-        });
-        if (items.length !== d.items.length)
-          throw new NotFoundException('Складская позиция не найдена');
-        if (items.some((i) => i.shopId !== shopId))
-          throw new ForbiddenException(
-            'Складская позиция принадлежит другому магазину',
-          );
-        if (items.some((i) => !i.isActive))
-          throw new BadRequestException(
-            'Нельзя продать неактивную складскую позицию',
-          );
-        if (new Set(items.map((i) => i.currency)).size !== 1)
-          throw new BadRequestException(
-            'Все позиции продажи должны иметь одинаковую валюту',
-          );
-        let subtotal = new Prisma.Decimal(0);
-        for (const l of d.items) {
-          const i = items.find((x) => x.id === l.inventoryItemId)!;
-          subtotal = subtotal.plus(i.price.mul(l.quantity));
-        }
-        const discount = new Prisma.Decimal(d.discount ?? 0);
-        if (discount.gt(subtotal))
-          throw new BadRequestException(
-            'Скидка не может превышать сумму продажи',
-          );
-        const number = `SALE-${String(seq.value).padStart(6, '0')}`;
-        const sale = await tx.sale.create({
-          data: {
-            number,
+    return this.serializable(async (tx) => {
+      const seq = await tx.appSequence.upsert({
+        where: { key: 'SALE' },
+        create: { key: 'SALE', value: 1 },
+        update: { value: { increment: 1 } },
+      });
+      const items = await tx.shopInventoryItem.findMany({
+        where: { id: { in: d.items.map((x) => x.inventoryItemId) } },
+        include: { partCatalogItem: true },
+      });
+      if (items.length !== d.items.length)
+        throw new NotFoundException('Складская позиция не найдена');
+      if (items.some((i) => i.shopId !== shopId))
+        throw new ForbiddenException(
+          'Складская позиция принадлежит другому магазину',
+        );
+      if (items.some((i) => !i.isActive))
+        throw new BadRequestException(
+          'Нельзя продать неактивную складскую позицию',
+        );
+      if (new Set(items.map((i) => i.currency)).size !== 1)
+        throw new BadRequestException(
+          'Все позиции продажи должны иметь одинаковую валюту',
+        );
+      let subtotal = new Prisma.Decimal(0);
+      for (const l of d.items) {
+        const i = items.find((x) => x.id === l.inventoryItemId)!;
+        subtotal = subtotal.plus(i.price.mul(l.quantity));
+      }
+      const discount = new Prisma.Decimal(d.discount ?? 0);
+      if (discount.gt(subtotal))
+        throw new BadRequestException(
+          'Скидка не может превышать сумму продажи',
+        );
+      const number = `SAL-${String(seq.value).padStart(6, '0')}`;
+      const sale = await tx.sale.create({
+        data: {
+          number,
+          shopId,
+          userId: a.id,
+          customerName: d.customerName?.trim() || null,
+          customerPhone: d.customerPhone?.trim() || null,
+          notes: d.notes?.trim() || null,
+          createdAt: d.soldAt ? new Date(d.soldAt) : new Date(),
+          currency: items[0].currency,
+          subtotal,
+          discount,
+          totalAmount: subtotal.minus(discount),
+        },
+      });
+      for (const l of d.items) {
+        const i = items.find((x) => x.id === l.inventoryItemId)!;
+        const updated = await tx.shopInventoryItem.updateMany({
+          where: {
+            id: i.id,
             shopId,
-            userId: a.id,
-            customerName: d.customerName?.trim() || null,
-            customerPhone: d.customerPhone?.trim() || null,
-            notes: d.notes?.trim() || null,
-            currency: items[0].currency,
-            subtotal,
-            discount,
-            totalAmount: subtotal.minus(discount),
+            quantity: { gte: l.quantity },
+            isActive: true,
+          },
+          data: { quantity: { decrement: l.quantity } },
+        });
+        if (!updated.count) {
+          const current = await tx.shopInventoryItem.findUnique({
+            where: { id: i.id },
+            select: { quantity: true },
+          });
+          throw new ConflictException(
+            `Недостаточно товара “${i.partCatalogItem.name}”. Доступно: ${current?.quantity ?? 0}, запрошено: ${l.quantity}`,
+          );
+        }
+        await tx.saleItem.create({
+          data: {
+            saleId: sale.id,
+            inventoryItemId: i.id,
+            partCatalogItemId: i.partCatalogItemId,
+            itemName: i.partCatalogItem.name,
+            brand: i.brand,
+            sku: i.sku,
+            oemNumber: i.oemNumber,
+            quantity: l.quantity,
+            unitPrice: i.price,
+            lineTotal: i.price.mul(l.quantity),
           },
         });
-        for (const l of d.items) {
-          const i = items.find((x) => x.id === l.inventoryItemId)!;
-          if (
-            !(
-              await tx.shopInventoryItem.updateMany({
-                where: {
-                  id: i.id,
-                  quantity: { gte: l.quantity },
-                  isActive: true,
-                },
-                data: { quantity: { decrement: l.quantity } },
-              })
-            ).count
-          )
-            throw new ConflictException('Недостаточно товара на складе');
-          await tx.saleItem.create({
-            data: {
-              saleId: sale.id,
-              inventoryItemId: i.id,
-              partCatalogItemId: i.partCatalogItemId,
-              itemName: i.partCatalogItem.name,
-              brand: i.brand,
-              sku: i.sku,
-              oemNumber: i.oemNumber,
-              quantity: l.quantity,
-              unitPrice: i.price,
-              lineTotal: i.price.mul(l.quantity),
-            },
-          });
-          await tx.inventoryMovement.create({
-            data: {
-              shopId,
-              inventoryItemId: i.id,
-              userId: a.id,
-              type: InventoryMovementType.SALE,
-              change: -l.quantity,
-              quantityBefore: i.quantity,
-              quantityAfter: i.quantity - l.quantity,
-              reference: number,
-              notes: `Продажа ${number}`,
-            },
-          });
-        }
-        return sale;
-      },
-      { isolationLevel: Prisma.TransactionIsolationLevel.Serializable },
-    );
+        await tx.inventoryMovement.create({
+          data: {
+            shopId,
+            inventoryItemId: i.id,
+            userId: a.id,
+            type: InventoryMovementType.SALE,
+            change: -l.quantity,
+            quantityBefore: i.quantity,
+            quantityAfter: i.quantity - l.quantity,
+            reference: number,
+            notes: `Продажа ${number}`,
+          },
+        });
+      }
+      return sale;
+    });
   }
   async all(a: InventoryActor, query: QuerySalesDto) {
     const page = query.page ?? 1;
@@ -240,8 +257,24 @@ export class SalesService {
           },
         },
         shop: true,
-        user: true,
-        cancelledBy: true,
+        user: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            email: true,
+            role: true,
+          },
+        },
+        cancelledBy: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            email: true,
+            role: true,
+          },
+        },
       },
     });
     if (!s || (a.role !== UserRole.SUPER_ADMIN && s.shopId !== this.shop(a)))
@@ -253,52 +286,46 @@ export class SalesService {
       throw new ForbiddenException(
         'Отменять продажу может только администратор или менеджер магазина',
       );
-    return this.p.$transaction(
-      async (tx) => {
-        const s = await tx.sale.findUnique({
-          where: { id },
-          include: { items: true },
+    return this.serializable(async (tx) => {
+      const s = await tx.sale.findUnique({
+        where: { id },
+        include: { items: true },
+      });
+      if (!s || (a.role !== UserRole.SUPER_ADMIN && s.shopId !== this.shop(a)))
+        throw new NotFoundException('Продажа не найдена');
+      if (s.status === SaleStatus.CANCELLED)
+        throw new ConflictException('Продажа уже отменена');
+      for (const x of s.items) {
+        const i = await tx.shopInventoryItem.findUniqueOrThrow({
+          where: { id: x.inventoryItemId },
         });
-        if (
-          !s ||
-          (a.role !== UserRole.SUPER_ADMIN && s.shopId !== this.shop(a))
-        )
-          throw new NotFoundException('Продажа не найдена');
-        if (s.status === SaleStatus.CANCELLED)
-          throw new ConflictException('Продажа уже отменена');
-        for (const x of s.items) {
-          const i = await tx.shopInventoryItem.findUniqueOrThrow({
-            where: { id: x.inventoryItemId },
-          });
-          await tx.shopInventoryItem.update({
-            where: { id: i.id },
-            data: { quantity: { increment: x.quantity } },
-          });
-          await tx.inventoryMovement.create({
-            data: {
-              shopId: s.shopId,
-              inventoryItemId: i.id,
-              userId: a.id,
-              type: InventoryMovementType.SALE_CANCEL,
-              change: x.quantity,
-              quantityBefore: i.quantity,
-              quantityAfter: i.quantity + x.quantity,
-              reference: s.number,
-              notes: `Отмена продажи ${s.number}: ${d.reason}`,
-            },
-          });
-        }
-        return tx.sale.update({
-          where: { id },
+        await tx.shopInventoryItem.update({
+          where: { id: i.id },
+          data: { quantity: { increment: x.quantity } },
+        });
+        await tx.inventoryMovement.create({
           data: {
-            status: SaleStatus.CANCELLED,
-            cancelledAt: new Date(),
-            cancelledById: a.id,
-            cancelReason: d.reason,
+            shopId: s.shopId,
+            inventoryItemId: i.id,
+            userId: a.id,
+            type: InventoryMovementType.SALE_CANCEL,
+            change: x.quantity,
+            quantityBefore: i.quantity,
+            quantityAfter: i.quantity + x.quantity,
+            reference: s.number,
+            notes: `Отмена продажи ${s.number}: ${d.reason}`,
           },
         });
-      },
-      { isolationLevel: Prisma.TransactionIsolationLevel.Serializable },
-    );
+      }
+      return tx.sale.update({
+        where: { id },
+        data: {
+          status: SaleStatus.CANCELLED,
+          cancelledAt: new Date(),
+          cancelledById: a.id,
+          cancelReason: d.reason,
+        },
+      });
+    });
   }
 }

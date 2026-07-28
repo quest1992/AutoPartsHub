@@ -19,6 +19,10 @@ import { DashboardModule } from './modules/dashboard/dashboard.module';
 import { PermissionsModule } from './common/permissions/permissions.module';
 import { EmployeesModule } from './modules/employees/employees.module';
 import { CloudinaryModule } from './cloudinary/cloudinary.module';
+import { PartNumbersModule } from './modules/part-numbers/part-numbers.module';
+import { VehicleFitmentsModule } from './modules/vehicle-fitments/vehicle-fitments.module';
+import { VinModule } from './modules/vin/vin.module';
+import { MarketplaceSearchModule } from './modules/marketplace-search/marketplace-search.module';
 
 
 @Module({
@@ -35,6 +39,10 @@ import { CloudinaryModule } from './cloudinary/cloudinary.module';
     VehicleGenerationsModule,
     PartCategoriesModule,
     PartCatalogModule,
+    PartNumbersModule,
+    VehicleFitmentsModule,
+    VinModule,
+    MarketplaceSearchModule,
     InventoryItemsModule,
     InventoryMovementsModule,
     SalesModule,

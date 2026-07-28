@@ -9,6 +9,7 @@ import {
 import * as bcrypt from 'bcryptjs';
 import request from 'supertest';
 import { AppModule } from '../src/app.module';
+import { createPartCatalogItem } from './helpers/create-part-catalog-item';
 
 describe('Dashboard (e2e)', () => {
   let app: INestApplication;
@@ -74,7 +75,7 @@ describe('Dashboard (e2e)', () => {
     ownerId = owner.id;
     const [partA, partB, partC, otherPart] = await Promise.all(
       ['a', 'b', 'c', 'other'].map((suffix) =>
-        prisma.partCatalogItem.create({
+        createPartCatalogItem(prisma, {
           data: {
             internalCode: `${prefix}-${suffix}`,
             name: `${prefix}-${suffix}`,
@@ -205,6 +206,8 @@ describe('Dashboard (e2e)', () => {
     ownerToken = (logins[1].body as { accessToken: string }).accessToken;
   });
   afterAll(async () => {
+    const shopIds = [shopId, otherShopId].filter(Boolean);
+    const userIds = [adminId, ownerId].filter(Boolean);
     await prisma.saleItem.deleteMany({
       where: { sale: { number: { startsWith: prefix } } },
     });
@@ -216,15 +219,15 @@ describe('Dashboard (e2e)', () => {
       where: { number: { startsWith: prefix } },
     });
     await prisma.shopInventoryItem.deleteMany({
-      where: { shopId: { in: [shopId, otherShopId] } },
+      where: { shopId: { in: shopIds } },
     });
     await prisma.partCatalogItem.deleteMany({
       where: { internalCode: { startsWith: prefix } },
     });
     await prisma.partCategory.delete({ where: { id: categoryId } });
-    await prisma.user.deleteMany({ where: { id: { in: [adminId, ownerId] } } });
+    await prisma.user.deleteMany({ where: { id: { in: userIds } } });
     await prisma.shop.deleteMany({
-      where: { id: { in: [shopId, otherShopId] } },
+      where: { id: { in: shopIds } },
     });
     await app.close();
     await prisma.$disconnect();

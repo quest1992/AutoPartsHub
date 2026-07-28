@@ -34,7 +34,9 @@ describe('PartCatalogService normalization', () => {
     };
     jest
       .spyOn(prisma, '$transaction')
-      .mockImplementation(async (callback: never) => callback(transactionClient));
+      .mockImplementation(async (callback: never) =>
+        callback(transactionClient),
+      );
 
     await service.create({
       name: 'Колодки — тормозные',
@@ -47,7 +49,7 @@ describe('PartCatalogService normalization', () => {
         data: expect.objectContaining({
           normalizedName: 'колодки тормозные',
           searchTokens: 'колодки тормозные',
-          internalCode: 'PRT-000007',
+          internalCode: 'AUT-000007',
         }),
       }),
     );
@@ -74,9 +76,7 @@ describe('PartCatalogService normalization', () => {
           categoryId: 'category-id',
           side: PartSide.NONE,
           position: PartPosition.NONE,
-          OR: expect.arrayContaining([
-            { normalizedName: 'колодки тормозные' },
-          ]),
+          OR: expect.arrayContaining([{ normalizedName: 'колодки тормозные' }]),
         }),
       }),
     );
@@ -115,12 +115,45 @@ describe('PartCatalogService normalization', () => {
 
     const result = await service.findCandidates({ q: 'Колодки тормозные' });
 
-    expect(result.items.map((item) => item.id)).toEqual(['exact', 'same-tokens']);
+    expect(result.items.map((item) => item.id)).toEqual([
+      'exact',
+      'same-tokens',
+    ]);
     expect(result.items[0].matchType).toBe('EXACT_NORMALIZED_NAME');
     expect(result.items[1].matchType).toBe('SAME_TOKENS');
     expect(findMany).toHaveBeenCalledWith(
-      expect.objectContaining({ where: expect.objectContaining({ isActive: true }), take: 100 }),
+      expect.objectContaining({
+        where: expect.objectContaining({ isActive: true }),
+        take: 100,
+      }),
     );
     expect(prisma).toBeDefined();
+  });
+
+  it('includes approved aliases in case-insensitive catalog search', async () => {
+    const findMany = jest.fn().mockResolvedValue([]);
+    const count = jest.fn().mockResolvedValue(0);
+    const { service } = createService({
+      partCatalogItem: { findMany, count },
+    });
+
+    await service.findAll({ search: 'Brake Pad', page: 1, limit: 20 });
+
+    expect(findMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: expect.objectContaining({
+          OR: expect.arrayContaining([
+            {
+              aliases: {
+                some: {
+                  isApproved: true,
+                  normalizedAlias: { contains: 'brake pad' },
+                },
+              },
+            },
+          ]),
+        }),
+      }),
+    );
   });
 });

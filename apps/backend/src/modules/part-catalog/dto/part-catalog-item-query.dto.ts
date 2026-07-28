@@ -28,7 +28,7 @@ export class PartCatalogItemQueryDto {
   search?: string;
 
   @ApiPropertyOptional({
-    example: 'PRT-000001',
+    example: 'AUT-000001',
     description: 'Точный внутренний код',
   })
   @IsOptional()
