@@ -32,6 +32,11 @@ npm-debug.log*
 # Testing
 coverage/
 
+# Local database release artifacts
+backups/
+*.dump
+production-*-counts-*.json
+
 # Misc
 .cache/
 .next/
