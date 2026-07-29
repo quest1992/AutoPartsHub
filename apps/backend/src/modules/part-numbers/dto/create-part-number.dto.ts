@@ -1,6 +1,12 @@
 import { PartNumberType } from '@prisma/client';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsBoolean, IsEnum, IsString, IsUUID, MinLength } from 'class-validator';
+import {
+  IsBoolean,
+  IsEnum,
+  IsString,
+  IsUUID,
+  MinLength,
+} from 'class-validator';
 import { IsOptional } from 'class-validator';
 
 export class CreatePartNumberDto {

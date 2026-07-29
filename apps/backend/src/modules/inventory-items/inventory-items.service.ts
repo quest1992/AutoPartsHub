@@ -13,6 +13,9 @@ import {
   UserRole,
 } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
+import { buildInventoryKey } from '../../common/utils/inventory-key';
+import { ShopWarehousesService } from '../shop-warehouses/shop-warehouses.service';
+import { AdjustInventoryDto } from './dto/adjust-inventory.dto';
 import { ChangeQuantityDto } from './dto/change-quantity.dto';
 import { CreateShopInventoryItemDto } from './dto/create-shop-inventory-item.dto';
 import { ShopInventoryItemQueryDto } from './dto/shop-inventory-item-query.dto';
@@ -29,6 +32,7 @@ export interface InventoryActor {
 }
 const include = {
   shop: { select: { id: true, name: true, isActive: true } },
+  warehouse: true,
   partCatalogItem: {
     include: {
       category: { include: { parent: true } },
@@ -50,6 +54,7 @@ export class InventoryItemsService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly images: InventoryImageService,
+    private readonly warehouses: ShopWarehousesService,
   ) {}
 
   async create(dto: CreateShopInventoryItemDto, actor: InventoryActor) {
@@ -57,16 +62,23 @@ export class InventoryItemsService {
     const data = this.normalize(dto);
     await this.ensureActiveShop(shopId);
     await this.ensureActivePart(data.partCatalogItemId);
-    await this.ensureNoDuplicate(
-      shopId,
-      data.partCatalogItemId,
-      data.brand,
-      data.sku,
-      data.condition ?? PartCondition.NEW,
-    );
     return this.prisma.$transaction(async (tx) => {
+      const warehouse = await this.warehouses.resolve(
+        tx,
+        shopId,
+        data.warehouseId,
+      );
+      const inventoryKey = buildInventoryKey({
+        shopId,
+        warehouseId: warehouse.id,
+        partCatalogItemId: data.partCatalogItemId,
+        brand: data.brand,
+        sku: data.sku,
+        oemNumber: data.oemNumber,
+        condition: data.condition,
+      });
       const item = await tx.shopInventoryItem.create({
-        data: { ...data, shopId },
+        data: { ...data, shopId, warehouseId: warehouse.id, inventoryKey },
         include,
       });
       if (item.quantity > 0)
@@ -74,6 +86,11 @@ export class InventoryItemsService {
           data: {
             shopId,
             inventoryItemId: item.id,
+            warehouseId: warehouse.id,
+            warehouseNameSnapshot: warehouse.name,
+            partCatalogItemId: item.partCatalogItemId,
+            partCatalogItemNameSnapshot: item.partCatalogItem.name,
+            documentType: 'OPENING_BALANCE',
             userId: actor.id,
             type: InventoryMovementType.INITIAL_BALANCE,
             change: item.quantity,
@@ -94,6 +111,7 @@ export class InventoryItemsService {
       : undefined;
     const where: Prisma.ShopInventoryItemWhereInput = {
       ...(shopId && { shopId }),
+      ...(query.warehouseId && { warehouseId: query.warehouseId }),
       ...(query.partCatalogItemId && {
         partCatalogItemId: query.partCatalogItemId,
       }),
@@ -121,6 +139,7 @@ export class InventoryItemsService {
         },
       }),
       ...(query.inStock && { quantity: { gt: 0 } }),
+      ...(query.hasReservation && { reservedQuantity: { gt: 0 } }),
       ...(query.search?.trim() && {
         OR: [
           { brand: { contains: query.search.trim(), mode: 'insensitive' } },
@@ -178,6 +197,126 @@ export class InventoryItemsService {
   async findOne(id: string, actor: InventoryActor) {
     return this.withStatus(await this.scopedItem(id, actor));
   }
+  async history(id: string, actor: InventoryActor) {
+    const item = await this.scopedItem(id, actor);
+    const movements = await this.prisma.inventoryMovement.findMany({
+      where: { inventoryItemId: id },
+      include: { user: { select: { firstName: true, lastName: true } } },
+      orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
+    });
+    const activeOrders = await this.prisma.customerOrderItem.findMany({
+      where: {
+        inventoryItemId: id,
+        reservationStatus: 'RESERVED',
+        order: { status: 'RESERVED' },
+      },
+      select: {
+        quantity: true,
+        order: {
+          select: {
+            id: true,
+            number: true,
+            customerNameSnapshot: true,
+            reservationExpiresAt: true,
+          },
+        },
+      },
+    });
+    return {
+      inventoryItem: {
+        id: item.id,
+        name: item.partCatalogItem.name,
+        warehouse: item.warehouse?.name ?? item.location ?? 'Без склада',
+        quantity: item.quantity,
+        reservedQuantity: item.reservedQuantity,
+        availableQuantity: item.quantity - item.reservedQuantity,
+      },
+      activeOrders,
+      movements: movements.map((movement) => ({
+        id: movement.id,
+        type: movement.type,
+        quantityDelta: movement.change,
+        quantityBefore: movement.quantityBefore,
+        quantityAfter: movement.quantityAfter,
+        documentType: movement.documentType,
+        documentId: movement.documentId,
+        documentNumber: movement.documentNumber ?? movement.reference,
+        reason: movement.notes,
+        createdBy: movement.user
+          ? [movement.user.firstName, movement.user.lastName]
+              .filter(Boolean)
+              .join(' ')
+          : null,
+        createdAt: movement.createdAt,
+      })),
+    };
+  }
+  async adjust(id: string, dto: AdjustInventoryDto, actor: InventoryActor) {
+    for (let attempt = 0; attempt < 3; attempt++)
+      try {
+        return await this.prisma.$transaction(
+          async (tx) => {
+            const item = await tx.shopInventoryItem.findUnique({
+              where: { id },
+              include: { warehouse: true, partCatalogItem: true },
+            });
+            if (
+              !item ||
+              (actor.role !== UserRole.SUPER_ADMIN &&
+                item.shopId !== actor.shopId)
+            )
+              throw new NotFoundException('Складская позиция не найдена');
+            const after =
+              dto.type === 'INCREASE'
+                ? item.quantity + dto.quantity
+                : dto.type === 'DECREASE'
+                  ? item.quantity - dto.quantity
+                  : dto.quantity;
+            if (after < item.reservedQuantity)
+              throw new ConflictException(
+                'Нельзя уменьшить физический остаток ниже зарезервированного количества',
+              );
+            const change = after - item.quantity;
+            if (change === 0) return item;
+            const updated = await tx.shopInventoryItem.updateMany({
+              where: { id, quantity: item.quantity },
+              data: { quantity: after },
+            });
+            if (!updated.count)
+              throw new Prisma.PrismaClientKnownRequestError(
+                'Concurrent inventory update',
+                { code: 'P2034', clientVersion: '6.19.3' },
+              );
+            await tx.inventoryMovement.create({
+              data: {
+                shopId: item.shopId,
+                inventoryItemId: item.id,
+                userId: actor.id,
+                warehouseId: item.warehouseId,
+                warehouseNameSnapshot: item.warehouse?.name,
+                partCatalogItemId: item.partCatalogItemId,
+                partCatalogItemNameSnapshot: item.partCatalogItem.name,
+                type:
+                  change > 0
+                    ? InventoryMovementType.ADJUSTMENT_IN
+                    : InventoryMovementType.ADJUSTMENT_OUT,
+                change,
+                quantityBefore: item.quantity,
+                quantityAfter: after,
+                documentType: 'MANUAL_ADJUSTMENT',
+                notes: dto.reason.trim(),
+              },
+            });
+            return { ...item, quantity: after };
+          },
+          { isolationLevel: Prisma.TransactionIsolationLevel.Serializable },
+        );
+      } catch (error) {
+        if ((error as { code?: string }).code !== 'P2034' || attempt === 2)
+          throw error;
+      }
+    throw new ConflictException('Не удалось безопасно скорректировать остаток');
+  }
   async update(
     id: string,
     dto: UpdateShopInventoryItemDto,
@@ -188,21 +327,29 @@ export class InventoryItemsService {
     const brand = data.brand ?? existing.brand,
       sku = data.sku ?? existing.sku,
       condition = data.condition ?? existing.condition;
-    await this.ensureNoDuplicate(
-      existing.shopId,
-      existing.partCatalogItemId,
-      brand,
-      sku,
-      condition,
-      id,
-    );
-    return this.withStatus(
-      await this.prisma.shopInventoryItem.update({
-        where: { id },
-        data,
-        include,
-      }),
-    );
+    return this.prisma.$transaction(async (tx) => {
+      const warehouse = await this.warehouses.resolve(
+        tx,
+        existing.shopId,
+        data.warehouseId ?? existing.warehouseId,
+      );
+      const inventoryKey = buildInventoryKey({
+        shopId: existing.shopId,
+        warehouseId: warehouse.id,
+        partCatalogItemId: existing.partCatalogItemId,
+        brand,
+        sku,
+        oemNumber: data.oemNumber ?? existing.oemNumber,
+        condition,
+      });
+      return this.withStatus(
+        await tx.shopInventoryItem.update({
+          where: { id },
+          data: { ...data, warehouseId: warehouse.id, inventoryKey },
+          include,
+        }),
+      );
+    });
   }
   async remove(id: string, actor: InventoryActor) {
     await this.scopedItem(id, actor);
@@ -241,7 +388,8 @@ export class InventoryItemsService {
 
   async deleteImage(id: string, actor: InventoryActor) {
     const existing = await this.scopedItem(id, actor);
-    if (existing.imagePublicId) await this.images.remove(existing.imagePublicId);
+    if (existing.imagePublicId)
+      await this.images.remove(existing.imagePublicId);
     return this.withStatus(
       await this.prisma.shopInventoryItem.update({
         where: { id },
@@ -266,8 +414,13 @@ export class InventoryItemsService {
                 id: true,
                 shopId: true,
                 quantity: true,
+                reservedQuantity: true,
                 minQuantity: true,
                 isActive: true,
+                warehouseId: true,
+                warehouse: { select: { name: true } },
+                partCatalogItemId: true,
+                partCatalogItem: { select: { name: true } },
               },
             });
             if (
@@ -282,7 +435,9 @@ export class InventoryItemsService {
             const changed = await tx.shopInventoryItem.updateMany({
               where: {
                 id,
-                quantity: { gte: dto.change < 0 ? -dto.change : 0 },
+                quantity: {
+                  gte: dto.change < 0 ? item.reservedQuantity - dto.change : 0,
+                },
               },
               data: { quantity: { increment: dto.change } },
             });
@@ -293,6 +448,11 @@ export class InventoryItemsService {
               data: {
                 shopId: item.shopId,
                 inventoryItemId: id,
+                warehouseId: item.warehouseId,
+                warehouseNameSnapshot: item.warehouse?.name ?? null,
+                partCatalogItemId: item.partCatalogItemId,
+                partCatalogItemNameSnapshot: item.partCatalogItem.name,
+                documentType: 'MANUAL_QUANTITY_CHANGE',
                 userId: actor.id,
                 type: dto.type,
                 change: dto.change,
@@ -478,11 +638,16 @@ export class InventoryItemsService {
         ? 'LOW_STOCK'
         : 'IN_STOCK';
   }
-  private withStatus<T extends { quantity: number; minQuantity: number }>(
-    item: T,
-  ) {
+  private withStatus<
+    T extends {
+      quantity: number;
+      minQuantity: number;
+      reservedQuantity: number;
+    },
+  >(item: T) {
     return {
       ...item,
+      availableQuantity: item.quantity - item.reservedQuantity,
       stockStatus: this.stockStatus(item.quantity, item.minQuantity),
     };
   }

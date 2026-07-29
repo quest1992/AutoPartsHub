@@ -1,26 +1,28 @@
 import { CatalogSearchService } from './catalog-search.service';
-import { PartCatalogService } from './part-catalog.service';
 
 describe('CatalogSearchService', () => {
-  it('delegates filters and pagination to the central catalog query', async () => {
-    const findAll = jest.fn().mockResolvedValue({
+  it('builds the only database query with filters and pagination', async () => {
+    const findMany = jest.fn().mockResolvedValue([]);
+    const count = jest.fn().mockResolvedValue(0);
+    const service = new CatalogSearchService({
+      partCatalogItem: { findMany, count },
+      partCategory: { findMany: jest.fn().mockResolvedValue([]) },
+    } as never);
+
+    await expect(
+      service.search({
+        search: 'brake pad',
+        rootCategoryId: undefined,
+        page: 2,
+        limit: 10,
+      }),
+    ).resolves.toEqual({
       data: [],
+      categoryMatches: [],
       meta: { page: 2, limit: 10, total: 0, totalPages: 0 },
     });
-    const service = new CatalogSearchService({
-      findAll,
-    } as unknown as PartCatalogService);
-
-    const query = {
-      search: 'brake pad',
-      rootCategoryId: '44444444-4444-4444-8444-444444444444',
-      page: 2,
-      limit: 10,
-    };
-
-    await expect(service.search(query)).resolves.toEqual(
-      expect.objectContaining({ data: [] }),
+    expect(findMany).toHaveBeenCalledWith(
+      expect.objectContaining({ skip: 10, take: 10 }),
     );
-    expect(findAll).toHaveBeenCalledWith(query);
   });
 });

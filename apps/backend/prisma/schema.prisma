@@ -27,6 +27,38 @@ enum PartPosition {
   REAR
 }
 
+enum PartCategoryClassification {
+  CATEGORY
+  CATALOG_ITEM
+  INVALID
+  REVIEW
+}
+
+enum PartTaxonomyDecisionStatus {
+  DRAFT
+  READY
+  APPROVED
+  APPLYING
+  APPLIED
+  FAILED
+  CANCELLED
+}
+
+enum PartTaxonomyRiskLevel {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum PartTaxonomyDuplicateStrategy {
+  CREATE_NEW
+  USE_EXISTING
+  MERGE_WITH_EXISTING
+  KEEP_SEPARATE
+  REQUIRE_REVIEW
+}
+
 enum PartCondition {
   NEW
   USED
@@ -42,6 +74,7 @@ enum PartNumberType {
 
 enum InventoryMovementType {
   INITIAL_BALANCE
+  IMPORT
   STOCK_IN
   SALE
   SALE_CANCEL
@@ -50,7 +83,87 @@ enum InventoryMovementType {
   CUSTOMER_RETURN
   SUPPLIER_RETURN
   ADJUSTMENT
+  ADJUSTMENT_IN
+  ADJUSTMENT_OUT
   WRITE_OFF
+  TRANSFER_OUT
+  TRANSFER_IN
+}
+
+enum CustomerOrderStatus {
+  DRAFT
+  RESERVED
+  CONFIRMED
+  READY
+  COMPLETED
+  CANCELLED
+  EXPIRED
+}
+
+enum OrderDeliveryType {
+  PICKUP
+  DELIVERY
+}
+
+enum OrderPaymentStatus {
+  UNPAID
+  PARTIALLY_PAID
+  PAID
+  REFUNDED
+}
+
+enum OrderItemReservationStatus {
+  NOT_RESERVED
+  RESERVED
+  RELEASED
+  CONVERTED_TO_SALE
+}
+
+enum OrderCommissionType {
+  MARKUP
+  PERCENT
+  FIXED
+  MANUAL
+}
+
+enum ShopCommissionType {
+  MARKUP
+  PERCENT
+  FIXED
+}
+
+enum PaymentMethod {
+  CASH
+  CARD
+  BANK_TRANSFER
+  MOBILE_WALLET
+  OTHER
+}
+
+enum PaymentTransactionStatus {
+  COMPLETED
+  CANCELLED
+  REFUNDED
+}
+
+enum ShopPayableStatus {
+  PENDING
+  PARTIALLY_PAID
+  PAID
+  CANCELLED
+}
+
+enum PayoutMethod {
+  CASH
+  BANK_TRANSFER
+  CARD
+  OTHER
+}
+
+enum ShopPayoutStatus {
+  DRAFT
+  COMPLETED
+  CANCELLED
 }
 
 model Shop {
@@ -76,9 +189,19 @@ model Shop {
   inventoryItems            ShopInventoryItem[]
   inventoryMovements        InventoryMovement[]
   inventoryImportJobs       InventoryImportJob[]
+  inventoryImportSessions   InventoryImportSession[]
   catalogModerationRequests CatalogModerationRequest[]
+  partCatalogSuggestions    PartCatalogSuggestion[]
   sales                     Sale[]
   purchases                 Purchase[]
+  warehouses                ShopWarehouse[]
+  inventoryTransfers        InventoryTransfer[]
+  stocktakes                Stocktake[]
+  customers                 Customer[]
+  customerOrderItems        CustomerOrderItem[]
+  commissionSetting         ShopCommissionSetting?
+  payables                  ShopPayable[]
+  payouts                   ShopPayout[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -105,13 +228,33 @@ model User {
 
   isActive Boolean @default(true)
 
-  inventoryMovements         InventoryMovement[]
-  salesCreated               Sale[]                     @relation("SaleCreatedBy")
-  salesCancelled             Sale[]                     @relation("SaleCancelledBy")
-  purchasesCreated           Purchase[]                 @relation("PurchaseCreatedBy")
-  purchasesCancelled         Purchase[]                 @relation("PurchaseCancelledBy")
-  inventoryImportJobs        InventoryImportJob[]       @relation("InventoryImportCreatedBy")
-  moderationRequestsResolved CatalogModerationRequest[] @relation("CatalogModerationResolvedBy")
+  inventoryMovements              InventoryMovement[]
+  salesCreated                    Sale[]                           @relation("SaleCreatedBy")
+  salesCancelled                  Sale[]                           @relation("SaleCancelledBy")
+  purchasesCreated                Purchase[]                       @relation("PurchaseCreatedBy")
+  purchasesCancelled              Purchase[]                       @relation("PurchaseCancelledBy")
+  inventoryImportJobs             InventoryImportJob[]             @relation("InventoryImportCreatedBy")
+  inventoryImportSessions         InventoryImportSession[]
+  inventoryTransfersCreated       InventoryTransfer[]
+  stocktakesCreated               Stocktake[]
+  customersCreated                Customer[]                       @relation("CustomerCreatedBy")
+  customerOrdersCreated           CustomerOrder[]                  @relation("CustomerOrderCreatedBy")
+  customerOrdersConfirmed         CustomerOrder[]                  @relation("CustomerOrderConfirmedBy")
+  customerOrdersCancelled         CustomerOrder[]                  @relation("CustomerOrderCancelledBy")
+  customerOrderStatusHistory      CustomerOrderStatusHistory[]
+  customerOrderPaymentsReceived   CustomerOrderPayment[]           @relation("PaymentReceivedBy")
+  customerOrderPaymentsCancelled  CustomerOrderPayment[]           @relation("PaymentCancelledBy")
+  shopPayoutsCreated              ShopPayout[]                     @relation("PayoutCreatedBy")
+  shopPayoutsCancelled            ShopPayout[]                     @relation("PayoutCancelledBy")
+  moderationRequestsResolved      CatalogModerationRequest[]       @relation("CatalogModerationResolvedBy")
+  catalogSuggestionsCreated       PartCatalogSuggestion[]          @relation("CatalogSuggestionCreatedBy")
+  catalogSuggestionsResolved      PartCatalogSuggestion[]          @relation("CatalogSuggestionResolvedBy")
+  vehicleDataChanges              VehicleDataChange[]
+  partCategoryCatalogItemMappings PartCategoryCatalogItemMapping[]
+  taxonomyDecisionsCreated        PartTaxonomyDecision[]           @relation("TaxonomyDecisionCreatedBy")
+  taxonomyDecisionsApproved       PartTaxonomyDecision[]           @relation("TaxonomyDecisionApprovedBy")
+  taxonomyDecisionsApplied        PartTaxonomyDecision[]           @relation("TaxonomyDecisionAppliedBy")
+  taxonomyAuditEvents             PartTaxonomyAuditEvent[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -148,9 +291,12 @@ model Manufacturer {
   name        String  @unique
   slug        String  @unique
   country     String?
+  website     String?
+  logo        String?
   description String?
 
   vehicleModels VehicleModel[]
+  engines       Engine[]
 
   isActive Boolean @default(true)
 
@@ -163,9 +309,10 @@ model Manufacturer {
 model VehicleModel {
   id String @id @default(uuid())
 
-  name        String
-  slug        String
-  description String?
+  name         String
+  slug         String
+  description  String?
+  internalCode String?
 
   manufacturerId String
   manufacturer   Manufacturer        @relation(fields: [manufacturerId], references: [id], onDelete: Restrict)
@@ -188,11 +335,15 @@ model VehicleGeneration {
   name        String
   slug        String
   description String?
+  code        String?
+  displayName String?
+  notes       String?
 
   vehicleModelId  String
-  vehicleModel    VehicleModel        @relation(fields: [vehicleModelId], references: [id], onDelete: Restrict)
+  vehicleModel    VehicleModel          @relation(fields: [vehicleModelId], references: [id], onDelete: Restrict)
   compatibilities PartCompatibility[]
   engines         Engine[]
+  modifications   VehicleModification[]
   inventoryItems  ShopInventoryItem[]
 
   startYear Int?
@@ -213,26 +364,196 @@ model VehicleGeneration {
 model Engine {
   id String @id @default(uuid())
 
-  generationId String
-  generation   VehicleGeneration @relation(fields: [generationId], references: [id], onDelete: Restrict)
+  generationId String?
+  generation   VehicleGeneration? @relation(fields: [generationId], references: [id], onDelete: Restrict)
 
-  code   String
-  name   String
-  volume Decimal? @db.Decimal(4, 2)
-  fuel   String
-  power  Int?
+  manufacturerId String
+  manufacturer   Manufacturer @relation(fields: [manufacturerId], references: [id], onDelete: Restrict)
 
-  isActive Boolean          @default(true)
-  fitments VehicleFitment[]
+  fuelTypeId String
+  fuelType   FuelType @relation(fields: [fuelTypeId], references: [id], onDelete: Restrict)
+
+  code             String
+  name             String
+  volume           Decimal? @db.Decimal(4, 2)
+  fuel             String
+  power            Int?
+  displacementCC   Int?
+  cylinders        Int?
+  horsepower       Int?
+  torque           Int?
+  turbo            Boolean  @default(false)
+  aspiration       String?
+  valveCount       Int?
+  emissionStandard String?
+  notes            String?
+
+  isActive      Boolean               @default(true)
+  fitments      VehicleFitment[]
+  modifications VehicleModification[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@unique([generationId, code])
+  @@unique([manufacturerId, code])
   @@index([generationId])
+  @@index([manufacturerId])
+  @@index([fuelTypeId])
   @@index([code])
+  @@index([displacementCC])
+  @@index([horsepower])
   @@index([fuel])
   @@index([isActive])
+}
+
+model BodyType {
+  id            String                @id @default(uuid())
+  name          String                @unique
+  slug          String                @unique
+  description   String?
+  isActive      Boolean               @default(true)
+  modifications VehicleModification[]
+  createdAt     DateTime              @default(now())
+  updatedAt     DateTime              @updatedAt
+
+  @@index([isActive])
+}
+
+model FuelType {
+  id            String                @id @default(uuid())
+  name          String                @unique
+  slug          String                @unique
+  description   String?
+  isActive      Boolean               @default(true)
+  engines       Engine[]
+  modifications VehicleModification[]
+  createdAt     DateTime              @default(now())
+  updatedAt     DateTime              @updatedAt
+
+  @@index([isActive])
+}
+
+model DriveType {
+  id            String                @id @default(uuid())
+  name          String                @unique
+  slug          String                @unique
+  description   String?
+  isActive      Boolean               @default(true)
+  modifications VehicleModification[]
+  createdAt     DateTime              @default(now())
+  updatedAt     DateTime              @updatedAt
+
+  @@index([isActive])
+}
+
+model TransmissionType {
+  id            String                @id @default(uuid())
+  name          String                @unique
+  slug          String                @unique
+  description   String?
+  isActive      Boolean               @default(true)
+  modifications VehicleModification[]
+  createdAt     DateTime              @default(now())
+  updatedAt     DateTime              @updatedAt
+
+  @@index([isActive])
+}
+
+model SteeringPosition {
+  id            String                @id @default(uuid())
+  name          String                @unique
+  slug          String                @unique
+  description   String?
+  isActive      Boolean               @default(true)
+  modifications VehicleModification[]
+  createdAt     DateTime              @default(now())
+  updatedAt     DateTime              @updatedAt
+
+  @@index([isActive])
+}
+
+model MarketRegion {
+  id            String                @id @default(uuid())
+  name          String                @unique
+  slug          String                @unique
+  description   String?
+  isActive      Boolean               @default(true)
+  modifications VehicleModification[]
+  createdAt     DateTime              @default(now())
+  updatedAt     DateTime              @updatedAt
+
+  @@index([isActive])
+}
+
+model VehicleModification {
+  id String @id @default(uuid())
+
+  generationId       String
+  generation         VehicleGeneration @relation(fields: [generationId], references: [id], onDelete: Restrict)
+  bodyTypeId         String
+  bodyType           BodyType          @relation(fields: [bodyTypeId], references: [id], onDelete: Restrict)
+  engineId           String
+  engine             Engine            @relation(fields: [engineId], references: [id], onDelete: Restrict)
+  transmissionTypeId String
+  transmissionType   TransmissionType  @relation(fields: [transmissionTypeId], references: [id], onDelete: Restrict)
+  driveTypeId        String
+  driveType          DriveType         @relation(fields: [driveTypeId], references: [id], onDelete: Restrict)
+  fuelTypeId         String
+  fuelType           FuelType          @relation(fields: [fuelTypeId], references: [id], onDelete: Restrict)
+  steeringPositionId String
+  steeringPosition   SteeringPosition  @relation(fields: [steeringPositionId], references: [id], onDelete: Restrict)
+  marketRegionId     String
+  marketRegion       MarketRegion      @relation(fields: [marketRegionId], references: [id], onDelete: Restrict)
+
+  productionFrom Int?
+  productionTo   Int?
+  doors          Int?
+  powerKW        Int?
+  powerHP        Int?
+  vinFrom        String?
+  vinTo          String?
+  remarks        String?
+  isActive       Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@unique([generationId, bodyTypeId, engineId, transmissionTypeId, driveTypeId, steeringPositionId, marketRegionId, productionFrom, productionTo])
+  @@index([generationId])
+  @@index([engineId])
+  @@index([bodyTypeId])
+  @@index([transmissionTypeId])
+  @@index([driveTypeId])
+  @@index([fuelTypeId])
+  @@index([steeringPositionId])
+  @@index([marketRegionId])
+  @@index([productionFrom, productionTo])
+  @@index([isActive])
+}
+
+model VehicleDataChange {
+  id          String                   @id @default(uuid())
+  entityType  String
+  entityId    String
+  action      String
+  changedById String
+  changedBy   User                     @relation(fields: [changedById], references: [id], onDelete: Restrict)
+  fields      VehicleDataChangeField[]
+  createdAt   DateTime                 @default(now())
+
+  @@index([entityType, entityId])
+  @@index([changedById])
+  @@index([createdAt])
+}
+
+model VehicleDataChangeField {
+  id        String            @id @default(uuid())
+  changeId  String
+  change    VehicleDataChange @relation(fields: [changeId], references: [id], onDelete: Cascade)
+  fieldName String
+  oldValue  String?
+  newValue  String?
+
+  @@index([changeId])
 }
 
 model PartCategory {
@@ -242,11 +563,15 @@ model PartCategory {
   slug        String
   description String?
 
-  parentId               String?
-  parent                 PartCategory?              @relation("PartCategoryHierarchy", fields: [parentId], references: [id], onDelete: Restrict)
-  children               PartCategory[]             @relation("PartCategoryHierarchy")
-  partCatalogItems       PartCatalogItem[]
-  suggestedForModeration CatalogModerationRequest[] @relation("CatalogModerationSuggestedCategory")
+  parentId                String?
+  parent                  PartCategory?                    @relation("PartCategoryHierarchy", fields: [parentId], references: [id], onDelete: Restrict)
+  children                PartCategory[]                   @relation("PartCategoryHierarchy")
+  partCatalogItems        PartCatalogItem[]
+  suggestedForModeration  CatalogModerationRequest[]       @relation("CatalogModerationSuggestedCategory")
+  partCatalogSuggestions  PartCatalogSuggestion[]          @relation("CatalogSuggestionSuggestedCategory")
+  catalogItemMappings     PartCategoryCatalogItemMapping[]
+  taxonomySourceDecisions PartTaxonomyDecision[]           @relation("TaxonomyDecisionSource")
+  taxonomyTargetDecisions PartTaxonomyDecision[]           @relation("TaxonomyDecisionTargetCategory")
 
   sortOrder   Int     @default(0)
   isActive    Boolean @default(true)
@@ -287,13 +612,22 @@ model PartCatalogItem {
   compatibilities PartCompatibility[]
   vehicleFitments VehicleFitment[]
 
-  createdAt          DateTime            @default(now())
-  updatedAt          DateTime            @updatedAt
-  shopInventoryItems ShopInventoryItem[]
-  saleItems          SaleItem[]
-  purchaseItems      PurchaseItem[]
-  partNumbers        PartNumber[]
-  aliases            PartAlias[]
+  createdAt              DateTime                         @default(now())
+  updatedAt              DateTime                         @updatedAt
+  shopInventoryItems     ShopInventoryItem[]
+  saleItems              SaleItem[]
+  purchaseItems          PurchaseItem[]
+  partNumbers            PartNumber[]
+  aliases                PartAlias[]
+  partCatalogSuggestions PartCatalogSuggestion[]          @relation("CatalogSuggestionMergedInto")
+  inventoryTransferItems InventoryTransferItem[]
+  customerOrderItems     CustomerOrderItem[]
+  categoryMappings       PartCategoryCatalogItemMapping[]
+  taxonomyDecisions      PartTaxonomyDecision[]
+
+  replacedById String?
+  replacedBy   PartCatalogItem?  @relation("PartCatalogItemReplacement", fields: [replacedById], references: [id], onDelete: Restrict)
+  replacements PartCatalogItem[] @relation("PartCatalogItemReplacement")
 
   @@unique([categoryId, slug, side, position])
   @@index([categoryId])
@@ -301,8 +635,137 @@ model PartCatalogItem {
   @@index([isUniversal])
   @@index([side])
   @@index([position])
+  @@index([replacedById])
   @@index([normalizedName])
+  @@index([normalizedName(ops: raw("gin_trgm_ops"))], type: Gin, map: "PartCatalogItem_normalizedName_trgm_idx")
+  @@index([searchTokens(ops: raw("gin_trgm_ops"))], type: Gin, map: "PartCatalogItem_searchTokens_trgm_idx")
   @@index([categoryId, side, position, normalizedName])
+}
+
+model PartCategoryCatalogItemMapping {
+  id                  String                     @id @default(uuid())
+  sourceCategoryId    String
+  targetCatalogItemId String?
+  migrationKey        String                     @unique
+  classification      PartCategoryClassification
+  canonicalName       String
+  notes               String?
+  createdById         String?
+  createdAt           DateTime                   @default(now())
+  updatedAt           DateTime                   @updatedAt
+
+  sourceCategory    PartCategory     @relation(fields: [sourceCategoryId], references: [id], onDelete: Restrict)
+  targetCatalogItem PartCatalogItem? @relation(fields: [targetCatalogItemId], references: [id], onDelete: Restrict)
+  createdBy         User?            @relation(fields: [createdById], references: [id], onDelete: SetNull)
+
+  @@unique([sourceCategoryId, targetCatalogItemId])
+  @@index([sourceCategoryId])
+  @@index([targetCatalogItemId])
+  @@index([classification])
+  @@index([createdById])
+}
+
+model PartTaxonomyDecision {
+  id                  String                         @id @default(uuid())
+  sourceCategoryId    String
+  classification      PartCategoryClassification
+  targetCategoryId    String?
+  targetCatalogItemId String?
+  canonicalName       String?
+  canonicalSlug       String?
+  side                PartSide                       @default(NONE)
+  position            PartPosition                   @default(NONE)
+  unit                String?
+  aliases             Json?
+  duplicateStrategy   PartTaxonomyDuplicateStrategy?
+  deactivateSource    Boolean                        @default(true)
+  status              PartTaxonomyDecisionStatus     @default(DRAFT)
+  riskLevel           PartTaxonomyRiskLevel          @default(MEDIUM)
+  notes               String?
+  reviewReason        String?
+  errorMessage        String?
+  createdById         String
+  approvedById        String?
+  appliedById         String?
+  createdAt           DateTime                       @default(now())
+  updatedAt           DateTime                       @updatedAt
+  approvedAt          DateTime?
+  appliedAt           DateTime?
+
+  sourceCategory    PartCategory     @relation("TaxonomyDecisionSource", fields: [sourceCategoryId], references: [id], onDelete: Restrict)
+  targetCategory    PartCategory?    @relation("TaxonomyDecisionTargetCategory", fields: [targetCategoryId], references: [id], onDelete: Restrict)
+  targetCatalogItem PartCatalogItem? @relation(fields: [targetCatalogItemId], references: [id], onDelete: Restrict)
+  createdBy         User             @relation("TaxonomyDecisionCreatedBy", fields: [createdById], references: [id], onDelete: Restrict)
+  approvedBy        User?            @relation("TaxonomyDecisionApprovedBy", fields: [approvedById], references: [id], onDelete: Restrict)
+  appliedBy         User?            @relation("TaxonomyDecisionAppliedBy", fields: [appliedById], references: [id], onDelete: Restrict)
+
+  @@index([sourceCategoryId])
+  @@index([targetCategoryId])
+  @@index([targetCatalogItemId])
+  @@index([status])
+  @@index([classification])
+  @@index([riskLevel])
+  @@index([createdById])
+}
+
+model PartTaxonomyAuditEvent {
+  id         String   @id @default(uuid())
+  userId     String
+  entityType String
+  entityId   String
+  action     String
+  oldValues  Json?
+  newValues  Json?
+  batchId    String?
+  metadata   Json?
+  createdAt  DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Restrict)
+
+  @@index([entityType, entityId])
+  @@index([userId])
+  @@index([batchId])
+  @@index([createdAt])
+}
+
+model PartCatalogSuggestion {
+  id String @id @default(uuid())
+
+  shopId String
+  shop   Shop   @relation(fields: [shopId], references: [id], onDelete: Restrict)
+
+  createdById String
+  createdBy   User   @relation("CatalogSuggestionCreatedBy", fields: [createdById], references: [id], onDelete: Restrict)
+
+  name           String
+  normalizedName String
+  description    String?
+  oemNumber      String?
+
+  suggestedCategoryId String?
+  suggestedCategory   PartCategory? @relation("CatalogSuggestionSuggestedCategory", fields: [suggestedCategoryId], references: [id], onDelete: SetNull)
+
+  status CatalogSuggestionStatus @default(PENDING)
+
+  resolvedById String?
+  resolvedBy   User?   @relation("CatalogSuggestionResolvedBy", fields: [resolvedById], references: [id], onDelete: SetNull)
+
+  resolvedAt      DateTime?
+  rejectionReason String?
+
+  mergedIntoId String?
+  mergedInto   PartCatalogItem? @relation("CatalogSuggestionMergedInto", fields: [mergedIntoId], references: [id], onDelete: SetNull)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([shopId])
+  @@index([createdById])
+  @@index([status])
+  @@index([suggestedCategoryId])
+  @@index([resolvedById])
+  @@index([mergedIntoId])
+  @@index([normalizedName])
 }
 
 model PartNumber {
@@ -447,6 +910,10 @@ model ShopInventoryItem {
   partCatalogItemId String
   partCatalogItem   PartCatalogItem @relation(fields: [partCatalogItemId], references: [id], onDelete: Restrict)
 
+  warehouseId  String?
+  warehouse    ShopWarehouse? @relation(fields: [warehouseId], references: [id], onDelete: Restrict)
+  inventoryKey String         @unique
+
   brand              String?
   sku                String?
   oemNumber          String?
@@ -465,14 +932,19 @@ model ShopInventoryItem {
   saleItems          SaleItem[]
   purchaseItems      PurchaseItem[]
   moderationRequests CatalogModerationRequest[]
+  transferItems      InventoryTransferItem[]
+  stocktakeItems     StocktakeItem[]
+  customerOrderItems CustomerOrderItem[]
+  reservedQuantity   Int                        @default(0)
 
   createdAt           DateTime           @default(now())
   updatedAt           DateTime           @updatedAt
   vehicleGeneration   VehicleGeneration? @relation(fields: [vehicleGenerationId], references: [id])
   vehicleGenerationId String?
 
-  @@unique([shopId, partCatalogItemId])
   @@index([shopId])
+  @@index([warehouseId])
+  @@index([shopId, warehouseId, isActive])
   @@index([partCatalogItemId])
   @@index([isActive])
   @@index([condition])
@@ -480,24 +952,35 @@ model ShopInventoryItem {
 }
 
 model InventoryMovement {
-  id              String                @id @default(uuid())
-  shopId          String
-  shop            Shop                  @relation(fields: [shopId], references: [id], onDelete: Restrict)
-  inventoryItemId String
-  inventoryItem   ShopInventoryItem     @relation(fields: [inventoryItemId], references: [id], onDelete: Restrict)
-  userId          String?
-  user            User?                 @relation(fields: [userId], references: [id], onDelete: SetNull)
-  type            InventoryMovementType
-  change          Int
-  quantityBefore  Int
-  quantityAfter   Int
-  reference       String?
-  notes           String?
-  createdAt       DateTime              @default(now())
+  id                          String                @id @default(uuid())
+  shopId                      String
+  shop                        Shop                  @relation(fields: [shopId], references: [id], onDelete: Restrict)
+  inventoryItemId             String
+  inventoryItem               ShopInventoryItem     @relation(fields: [inventoryItemId], references: [id], onDelete: Restrict)
+  userId                      String?
+  user                        User?                 @relation(fields: [userId], references: [id], onDelete: SetNull)
+  warehouseId                 String?
+  warehouse                   ShopWarehouse?        @relation(fields: [warehouseId], references: [id], onDelete: Restrict)
+  warehouseNameSnapshot       String?
+  partCatalogItemId           String?
+  partCatalogItemNameSnapshot String?
+  documentType                String?
+  documentId                  String?
+  documentNumber              String?
+  type                        InventoryMovementType
+  change                      Int
+  quantityBefore              Int
+  quantityAfter               Int
+  reference                   String?
+  notes                       String?
+  createdAt                   DateTime              @default(now())
 
   @@index([shopId, createdAt])
   @@index([inventoryItemId, createdAt])
   @@index([userId, createdAt])
+  @@index([warehouseId, createdAt])
+  @@index([partCatalogItemId, createdAt])
+  @@index([documentType, documentId])
   @@index([type, createdAt])
 }
 
@@ -519,10 +1002,25 @@ enum InventoryImportJobStatus {
   FAILED
 }
 
+enum InventoryImportStatus {
+  PREVIEW
+  PROCESSING
+  COMPLETED
+  FAILED
+  EXPIRED
+}
+
 enum CatalogModerationStatus {
   PENDING
   APPROVED
   REJECTED
+}
+
+enum CatalogSuggestionStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  MERGED
 }
 
 model Purchase {
@@ -573,6 +1071,8 @@ model PurchaseItem {
   purchase          Purchase          @relation(fields: [purchaseId], references: [id], onDelete: Restrict)
   inventoryItem     ShopInventoryItem @relation(fields: [inventoryItemId], references: [id], onDelete: Restrict)
   partCatalogItem   PartCatalogItem   @relation(fields: [partCatalogItemId], references: [id], onDelete: Restrict)
+  warehouseId       String?
+  warehouseName     String?
 
   @@index([purchaseId])
   @@index([inventoryItemId])
@@ -580,33 +1080,37 @@ model PurchaseItem {
 }
 
 model Sale {
-  id            String     @id @default(uuid())
-  number        String     @unique
-  shopId        String
-  userId        String
-  status        SaleStatus @default(COMPLETED)
-  customerName  String?
-  customerPhone String?
-  notes         String?
-  currency      String     @default("TJS")
-  subtotal      Decimal    @db.Decimal(14, 2)
-  discount      Decimal    @default(0) @db.Decimal(14, 2)
-  totalAmount   Decimal    @db.Decimal(14, 2)
-  createdAt     DateTime   @default(now())
-  updatedAt     DateTime   @updatedAt
-  cancelledAt   DateTime?
-  cancelledById String?
-  cancelReason  String?
-  shop          Shop       @relation(fields: [shopId], references: [id], onDelete: Restrict)
-  user          User       @relation("SaleCreatedBy", fields: [userId], references: [id], onDelete: Restrict)
-  cancelledBy   User?      @relation("SaleCancelledBy", fields: [cancelledById], references: [id], onDelete: Restrict)
-  items         SaleItem[]
+  id              String         @id @default(uuid())
+  number          String         @unique
+  shopId          String
+  userId          String
+  status          SaleStatus     @default(COMPLETED)
+  customerName    String?
+  customerPhone   String?
+  notes           String?
+  currency        String         @default("TJS")
+  subtotal        Decimal        @db.Decimal(14, 2)
+  discount        Decimal        @default(0) @db.Decimal(14, 2)
+  totalAmount     Decimal        @db.Decimal(14, 2)
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+  cancelledAt     DateTime?
+  cancelledById   String?
+  cancelReason    String?
+  shop            Shop           @relation(fields: [shopId], references: [id], onDelete: Restrict)
+  user            User           @relation("SaleCreatedBy", fields: [userId], references: [id], onDelete: Restrict)
+  cancelledBy     User?          @relation("SaleCancelledBy", fields: [cancelledById], references: [id], onDelete: Restrict)
+  items           SaleItem[]
+  customerOrderId String?
+  customerOrder   CustomerOrder? @relation(fields: [customerOrderId], references: [id], onDelete: Restrict)
+  payable         ShopPayable?
 
   @@index([shopId])
   @@index([userId])
   @@index([status])
   @@index([createdAt])
   @@index([customerPhone])
+  @@index([customerOrderId])
 }
 
 model SaleItem {
@@ -625,10 +1129,358 @@ model SaleItem {
   sale              Sale              @relation(fields: [saleId], references: [id], onDelete: Restrict)
   inventoryItem     ShopInventoryItem @relation(fields: [inventoryItemId], references: [id], onDelete: Restrict)
   partCatalogItem   PartCatalogItem   @relation(fields: [partCatalogItemId], references: [id], onDelete: Restrict)
+  warehouseId       String?
+  warehouseName     String?
 
   @@index([saleId])
   @@index([inventoryItemId])
   @@index([partCatalogItemId])
+}
+
+model Customer {
+  id              String          @id @default(uuid())
+  fullName        String
+  phone           String
+  phoneNormalized String?
+  email           String?
+  address         String?
+  note            String?
+  isActive        Boolean         @default(true)
+  shopId          String?
+  shop            Shop?           @relation(fields: [shopId], references: [id], onDelete: SetNull)
+  createdById     String?
+  createdBy       User?           @relation("CustomerCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
+  orders          CustomerOrder[]
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  @@index([phoneNormalized])
+  @@index([fullName])
+  @@index([shopId])
+}
+
+model CustomerOrder {
+  id                      String                       @id @default(uuid())
+  number                  String                       @unique
+  customerId              String?
+  status                  CustomerOrderStatus          @default(DRAFT)
+  customerNameSnapshot    String
+  customerPhoneSnapshot   String?
+  deliveryAddress         String?
+  deliveryType            OrderDeliveryType
+  paymentStatus           OrderPaymentStatus           @default(UNPAID)
+  paidAmount              Decimal                      @default(0) @db.Decimal(14, 2)
+  platformProductRevenue  Decimal                      @default(0) @db.Decimal(14, 2)
+  platformDeliveryRevenue Decimal                      @default(0) @db.Decimal(14, 2)
+  subtotal                Decimal                      @db.Decimal(14, 2)
+  discount                Decimal                      @default(0) @db.Decimal(14, 2)
+  deliveryFee             Decimal                      @default(0) @db.Decimal(14, 2)
+  total                   Decimal                      @db.Decimal(14, 2)
+  note                    String?
+  cancelReason            String?
+  createdById             String
+  confirmedById           String?
+  cancelledById           String?
+  reservationExpiresAt    DateTime?
+  createdAt               DateTime                     @default(now())
+  updatedAt               DateTime                     @updatedAt
+  confirmedAt             DateTime?
+  completedAt             DateTime?
+  cancelledAt             DateTime?
+  customer                Customer?                    @relation(fields: [customerId], references: [id], onDelete: SetNull)
+  createdBy               User                         @relation("CustomerOrderCreatedBy", fields: [createdById], references: [id], onDelete: Restrict)
+  confirmedBy             User?                        @relation("CustomerOrderConfirmedBy", fields: [confirmedById], references: [id], onDelete: SetNull)
+  cancelledBy             User?                        @relation("CustomerOrderCancelledBy", fields: [cancelledById], references: [id], onDelete: SetNull)
+  items                   CustomerOrderItem[]
+  sales                   Sale[]
+  statusHistory           CustomerOrderStatusHistory[]
+  payments                CustomerOrderPayment[]
+  payables                ShopPayable[]
+
+  @@index([status, createdAt])
+  @@index([customerId, createdAt])
+  @@index([reservationExpiresAt])
+}
+
+model CustomerOrderItem {
+  id                String                     @id @default(uuid())
+  orderId           String
+  inventoryItemId   String
+  shopId            String
+  warehouseId       String
+  catalogItemId     String
+  quantity          Int
+  unitPrice         Decimal                    @db.Decimal(14, 2)
+  discount          Decimal                    @default(0) @db.Decimal(14, 2)
+  total             Decimal                    @db.Decimal(14, 2)
+  shopUnitPrice     Decimal                    @db.Decimal(14, 2)
+  clientUnitPrice   Decimal                    @db.Decimal(14, 2)
+  grossAmount       Decimal                    @db.Decimal(14, 2)
+  discountAmount    Decimal                    @default(0) @db.Decimal(14, 2)
+  clientAmount      Decimal                    @db.Decimal(14, 2)
+  shopAmount        Decimal                    @db.Decimal(14, 2)
+  platformRevenue   Decimal                    @db.Decimal(14, 2)
+  commissionType    OrderCommissionType        @default(MANUAL)
+  commissionValue   Decimal                    @default(0) @db.Decimal(14, 2)
+  catalogItemName   String
+  shopName          String
+  warehouseName     String
+  article           String?
+  oem               String?
+  brand             String?
+  reservationStatus OrderItemReservationStatus @default(NOT_RESERVED)
+  createdAt         DateTime                   @default(now())
+  order             CustomerOrder              @relation(fields: [orderId], references: [id], onDelete: Restrict)
+  inventoryItem     ShopInventoryItem          @relation(fields: [inventoryItemId], references: [id], onDelete: Restrict)
+  shop              Shop                       @relation(fields: [shopId], references: [id], onDelete: Restrict)
+  warehouse         ShopWarehouse              @relation(fields: [warehouseId], references: [id], onDelete: Restrict)
+  catalogItem       PartCatalogItem            @relation(fields: [catalogItemId], references: [id], onDelete: Restrict)
+
+  @@index([orderId])
+  @@index([inventoryItemId])
+  @@index([shopId])
+  @@index([warehouseId])
+}
+
+model CustomerOrderStatusHistory {
+  id        String              @id @default(uuid())
+  orderId   String
+  status    CustomerOrderStatus
+  userId    String?
+  note      String?
+  createdAt DateTime            @default(now())
+  order     CustomerOrder       @relation(fields: [orderId], references: [id], onDelete: Restrict)
+  user      User?               @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([orderId, createdAt])
+}
+
+model ShopCommissionSetting {
+  id              String             @id @default(uuid())
+  shopId          String             @unique
+  commissionType  ShopCommissionType
+  commissionValue Decimal            @db.Decimal(14, 2)
+  isActive        Boolean            @default(true)
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+  shop            Shop               @relation(fields: [shopId], references: [id], onDelete: Restrict)
+}
+
+model PlatformOrderSetting {
+  id                     String             @id @default(uuid())
+  defaultCommissionType  ShopCommissionType
+  defaultCommissionValue Decimal            @db.Decimal(14, 2)
+  reservationMinutes     Int                @default(120)
+  currencyCode           String             @default("TJS")
+  isActive               Boolean            @default(true)
+  createdAt              DateTime           @default(now())
+  updatedAt              DateTime           @updatedAt
+}
+
+model CustomerOrderPayment {
+  id                   String                   @id @default(uuid())
+  orderId              String
+  amount               Decimal                  @db.Decimal(14, 2)
+  method               PaymentMethod
+  status               PaymentTransactionStatus @default(COMPLETED)
+  originalPaymentId    String?
+  transactionReference String?
+  note                 String?
+  receivedById         String
+  receivedAt           DateTime
+  cancelledAt          DateTime?
+  cancelledById        String?
+  cancelReason         String?
+  createdAt            DateTime                 @default(now())
+  updatedAt            DateTime                 @updatedAt
+  order                CustomerOrder            @relation(fields: [orderId], references: [id], onDelete: Restrict)
+  receivedBy           User                     @relation("PaymentReceivedBy", fields: [receivedById], references: [id], onDelete: Restrict)
+  cancelledBy          User?                    @relation("PaymentCancelledBy", fields: [cancelledById], references: [id], onDelete: SetNull)
+  originalPayment      CustomerOrderPayment?    @relation("PaymentRefunds", fields: [originalPaymentId], references: [id], onDelete: Restrict)
+  refunds              CustomerOrderPayment[]   @relation("PaymentRefunds")
+
+  @@index([orderId, status])
+  @@index([receivedAt])
+  @@index([originalPaymentId])
+}
+
+model ShopPayable {
+  id              String                 @id @default(uuid())
+  shopId          String
+  customerOrderId String
+  saleId          String                 @unique
+  grossShopAmount Decimal                @db.Decimal(14, 2)
+  adjustments     Decimal                @default(0) @db.Decimal(14, 2)
+  payableAmount   Decimal                @db.Decimal(14, 2)
+  paidAmount      Decimal                @default(0) @db.Decimal(14, 2)
+  status          ShopPayableStatus      @default(PENDING)
+  dueAt           DateTime?
+  createdAt       DateTime               @default(now())
+  updatedAt       DateTime               @updatedAt
+  shop            Shop                   @relation(fields: [shopId], references: [id], onDelete: Restrict)
+  customerOrder   CustomerOrder          @relation(fields: [customerOrderId], references: [id], onDelete: Restrict)
+  sale            Sale                   @relation(fields: [saleId], references: [id], onDelete: Restrict)
+  allocations     ShopPayoutAllocation[]
+
+  @@index([shopId, status])
+  @@index([customerOrderId])
+}
+
+model ShopPayout {
+  id                   String                 @id @default(uuid())
+  number               String                 @unique
+  shopId               String
+  amount               Decimal                @db.Decimal(14, 2)
+  method               PayoutMethod
+  status               ShopPayoutStatus       @default(DRAFT)
+  transactionReference String?
+  note                 String?
+  createdById          String
+  paidAt               DateTime?
+  cancelledAt          DateTime?
+  cancelledById        String?
+  cancelReason         String?
+  createdAt            DateTime               @default(now())
+  updatedAt            DateTime               @updatedAt
+  shop                 Shop                   @relation(fields: [shopId], references: [id], onDelete: Restrict)
+  createdBy            User                   @relation("PayoutCreatedBy", fields: [createdById], references: [id], onDelete: Restrict)
+  cancelledBy          User?                  @relation("PayoutCancelledBy", fields: [cancelledById], references: [id], onDelete: SetNull)
+  allocations          ShopPayoutAllocation[]
+
+  @@index([shopId, status])
+}
+
+model ShopPayoutAllocation {
+  id        String      @id @default(uuid())
+  payoutId  String
+  payableId String
+  amount    Decimal     @db.Decimal(14, 2)
+  payout    ShopPayout  @relation(fields: [payoutId], references: [id], onDelete: Restrict)
+  payable   ShopPayable @relation(fields: [payableId], references: [id], onDelete: Restrict)
+
+  @@unique([payoutId, payableId])
+  @@index([payableId])
+}
+
+model ShopWarehouse {
+  id        String   @id @default(uuid())
+  shopId    String
+  name      String
+  code      String?
+  address   String?
+  note      String?
+  isDefault Boolean  @default(false)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  shop               Shop                @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  inventoryItems     ShopInventoryItem[]
+  movements          InventoryMovement[]
+  transfersFrom      InventoryTransfer[] @relation("TransferFromWarehouse")
+  transfersTo        InventoryTransfer[] @relation("TransferToWarehouse")
+  stocktakes         Stocktake[]
+  customerOrderItems CustomerOrderItem[]
+
+  @@unique([shopId, name])
+  @@unique([shopId, code])
+  @@index([shopId, isActive])
+  @@map("shop_warehouses")
+}
+
+enum StocktakeStatus {
+  DRAFT
+  COMPLETED
+  CANCELLED
+}
+
+model Stocktake {
+  id          String          @id @default(uuid())
+  shopId      String
+  warehouseId String
+  number      String
+  status      StocktakeStatus @default(DRAFT)
+  note        String?
+  createdById String
+  createdAt   DateTime        @default(now())
+  completedAt DateTime?
+  cancelledAt DateTime?
+
+  shop      Shop            @relation(fields: [shopId], references: [id], onDelete: Restrict)
+  warehouse ShopWarehouse   @relation(fields: [warehouseId], references: [id], onDelete: Restrict)
+  createdBy User            @relation(fields: [createdById], references: [id], onDelete: Restrict)
+  items     StocktakeItem[]
+
+  @@unique([shopId, number])
+  @@index([shopId, createdAt])
+  @@index([warehouseId, status])
+}
+
+model StocktakeItem {
+  id               String @id @default(uuid())
+  stocktakeId      String
+  inventoryItemId  String
+  expectedQuantity Int
+  actualQuantity   Int?
+  difference       Int?
+
+  stocktake     Stocktake         @relation(fields: [stocktakeId], references: [id], onDelete: Cascade)
+  inventoryItem ShopInventoryItem @relation(fields: [inventoryItemId], references: [id], onDelete: Restrict)
+
+  @@unique([stocktakeId, inventoryItemId])
+  @@index([inventoryItemId])
+}
+
+enum InventoryTransferStatus {
+  DRAFT
+  COMPLETED
+  CANCELLED
+}
+
+model InventoryTransfer {
+  id              String                  @id @default(uuid())
+  shopId          String
+  number          String
+  fromWarehouseId String
+  toWarehouseId   String
+  status          InventoryTransferStatus @default(DRAFT)
+  note            String?
+  createdById     String
+  createdAt       DateTime                @default(now())
+  completedAt     DateTime?
+  cancelledAt     DateTime?
+
+  shop          Shop                    @relation(fields: [shopId], references: [id], onDelete: Restrict)
+  fromWarehouse ShopWarehouse           @relation("TransferFromWarehouse", fields: [fromWarehouseId], references: [id], onDelete: Restrict)
+  toWarehouse   ShopWarehouse           @relation("TransferToWarehouse", fields: [toWarehouseId], references: [id], onDelete: Restrict)
+  createdBy     User                    @relation(fields: [createdById], references: [id], onDelete: Restrict)
+  items         InventoryTransferItem[]
+
+  @@unique([shopId, number])
+  @@index([shopId, createdAt])
+  @@index([fromWarehouseId])
+  @@index([toWarehouseId])
+}
+
+model InventoryTransferItem {
+  id                    String        @id @default(uuid())
+  transferId            String
+  catalogItemId         String
+  sourceInventoryItemId String?
+  quantity              Int
+  catalogItemName       String
+  article               String?
+  oem                   String?
+  manufacturer          String?
+  condition             PartCondition @default(NEW)
+
+  transfer            InventoryTransfer  @relation(fields: [transferId], references: [id], onDelete: Cascade)
+  catalogItem         PartCatalogItem    @relation(fields: [catalogItemId], references: [id], onDelete: Restrict)
+  sourceInventoryItem ShopInventoryItem? @relation(fields: [sourceInventoryItemId], references: [id], onDelete: Restrict)
+
+  @@index([transferId])
+  @@index([catalogItemId])
+  @@index([sourceInventoryItemId])
 }
 
 model InventoryImportJob {
@@ -660,6 +1512,29 @@ model InventoryImportJob {
   @@index([status])
   @@index([createdAt])
   @@index([createdByUserId])
+}
+
+model InventoryImportSession {
+  id String @id @default(uuid())
+
+  shopId String
+  shop   Shop   @relation(fields: [shopId], references: [id], onDelete: Restrict)
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Restrict)
+
+  status      InventoryImportStatus @default(PREVIEW)
+  fileName    String
+  totalRows   Int
+  previewData Json
+  resultData  Json?
+  expiresAt   DateTime
+  createdAt   DateTime              @default(now())
+  updatedAt   DateTime              @updatedAt
+
+  @@index([shopId, status])
+  @@index([userId])
+  @@index([expiresAt])
 }
 
 model CatalogModerationRequest {

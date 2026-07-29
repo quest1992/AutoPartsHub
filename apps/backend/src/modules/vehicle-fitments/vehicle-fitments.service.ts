@@ -92,7 +92,10 @@ export class VehicleFitmentsService {
       select: {
         isActive: true,
         vehicleModel: {
-          select: { isActive: true, manufacturer: { select: { isActive: true } } },
+          select: {
+            isActive: true,
+            manufacturer: { select: { id: true, isActive: true } },
+          },
         },
       },
     });
@@ -104,9 +107,30 @@ export class VehicleFitmentsService {
     ) {
       throw new BadRequestException('Иерархия автомобиля отключена');
     }
+    const normalizedFuel = dto.fuel.trim().toUpperCase();
+    const fuelType = await this.prisma.fuelType.findFirst({
+      where: {
+        name: { equals: normalizedFuel, mode: 'insensitive' },
+        isActive: true,
+      },
+      select: { id: true },
+    });
+    if (!fuelType) {
+      throw new BadRequestException('Тип топлива не найден в справочнике');
+    }
     try {
       return await this.prisma.engine.create({
-        data: { ...dto, code: dto.code.trim().toUpperCase(), fuel: dto.fuel.trim().toUpperCase() },
+        data: {
+          ...dto,
+          code: dto.code.trim().toUpperCase(),
+          fuel: normalizedFuel,
+          manufacturerId: generation.vehicleModel.manufacturer.id,
+          fuelTypeId: fuelType.id,
+          displacementCC: dto.volume
+            ? Math.round(dto.volume * 1000)
+            : undefined,
+          horsepower: dto.power,
+        },
       });
     } catch (error) {
       this.handleUnique(error, 'Такой код двигателя уже есть в поколении');
@@ -133,9 +157,15 @@ export class VehicleFitmentsService {
     ]);
     if (!catalogItem) throw new NotFoundException('Деталь каталога не найдена');
     if (!engine) throw new NotFoundException('Двигатель не найден');
-    if (!catalogItem.isActive) throw new BadRequestException('Деталь отключена');
+    if (!engine.generation) {
+      throw new BadRequestException('Двигатель не привязан к поколению');
+    }
+    if (!catalogItem.isActive)
+      throw new BadRequestException('Деталь отключена');
     if (catalogItem.isUniversal) {
-      throw new BadRequestException('Универсальной детали применяемость не требуется');
+      throw new BadRequestException(
+        'Универсальной детали применяемость не требуется',
+      );
     }
     if (
       !engine.isActive ||
@@ -160,7 +190,8 @@ export class VehicleFitmentsService {
       },
       select: { id: true },
     });
-    if (duplicate) throw new ConflictException('Такая применяемость уже существует');
+    if (duplicate)
+      throw new ConflictException('Такая применяемость уже существует');
     try {
       return await this.prisma.vehicleFitment.create({
         data: dto,
@@ -199,13 +230,17 @@ export class VehicleFitmentsService {
   }
 
   async remove(id: string) {
-    const found = await this.prisma.vehicleFitment.findUnique({ where: { id } });
+    const found = await this.prisma.vehicleFitment.findUnique({
+      where: { id },
+    });
     if (!found) throw new NotFoundException('Применяемость не найдена');
     await this.prisma.vehicleFitment.delete({ where: { id } });
     return { id };
   }
 
-  private buildWhere(query: VehicleFitmentQueryDto): Prisma.VehicleFitmentWhereInput {
+  private buildWhere(
+    query: VehicleFitmentQueryDto,
+  ): Prisma.VehicleFitmentWhereInput {
     const search = query.search?.trim();
     return {
       catalogItemId: query.catalogItemId,

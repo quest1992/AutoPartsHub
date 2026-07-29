@@ -78,10 +78,10 @@ describe('Part catalog normalization (e2e)', () => {
     await prisma.$disconnect();
   });
 
-  it('rejects unauthenticated candidate requests', () =>
+  it('rejects unauthenticated catalog search requests', () =>
     request(app.getHttpServer())
-      .get('/part-catalog/candidates')
-      .query({ q: 'колодки' })
+      .get('/part-catalog/search')
+      .query({ search: 'колодки' })
       .expect(401));
 
   it('stores normalization, rejects exact technical duplicates, and permits another side', async () => {
@@ -127,26 +127,24 @@ describe('Part catalog normalization (e2e)', () => {
     createdPartIds.push(anotherSide.body.id);
   });
 
-  it('returns exact and same-token candidates, excluding inactive items', async () => {
+  it('returns exact and same-token searches, excluding inactive items', async () => {
     const exact = await request(app.getHttpServer())
-      .get('/part-catalog/candidates')
+      .get('/part-catalog/search')
       .set('Authorization', `Bearer ${adminToken}`)
-      .query({ q: 'Колодки-тормозные', categoryId, limit: 10 })
-      .expect(200);
-    expect(exact.body.items[0]).toMatchObject({
-      id: firstPartId,
-      matchType: 'EXACT_NORMALIZED_NAME',
-    });
-
-    const sameTokens = await request(app.getHttpServer())
-      .get('/part-catalog/candidates')
-      .set('Authorization', `Bearer ${adminToken}`)
-      .query({ q: 'Тормозные колодки', categoryId, limit: 10 })
+      .query({ search: 'Колодки-тормозные', categoryId, limit: 10 })
       .expect(200);
     expect(
-      sameTokens.body.items.some(
-        (item: { id: string; matchType: string }) =>
-          item.id === firstPartId && item.matchType === 'SAME_TOKENS',
+      exact.body.data.some((item: { id: string }) => item.id === firstPartId),
+    ).toBe(true);
+
+    const sameTokens = await request(app.getHttpServer())
+      .get('/part-catalog/search')
+      .set('Authorization', `Bearer ${adminToken}`)
+      .query({ search: 'Тормозные колодки', categoryId, limit: 10 })
+      .expect(200);
+    expect(
+      sameTokens.body.data.some(
+        (item: { id: string }) => item.id === firstPartId,
       ),
     ).toBe(true);
 
@@ -155,12 +153,12 @@ describe('Part catalog normalization (e2e)', () => {
       data: { isActive: false },
     });
     const withoutInactive = await request(app.getHttpServer())
-      .get('/part-catalog/candidates')
+      .get('/part-catalog/search')
       .set('Authorization', `Bearer ${adminToken}`)
-      .query({ q: 'Колодки тормозные', categoryId })
+      .query({ search: 'Колодки тормозные', categoryId, isActive: true })
       .expect(200);
     expect(
-      withoutInactive.body.items.some(
+      withoutInactive.body.data.some(
         (item: { id: string }) => item.id === firstPartId,
       ),
     ).toBe(false);
@@ -182,7 +180,7 @@ describe('Part catalog normalization (e2e)', () => {
     });
 
     const list = await request(app.getHttpServer())
-      .get('/part-catalog')
+      .get('/part-catalog/search')
       .set('Authorization', `Bearer ${adminToken}`)
       .query({ categoryId, side: PartSide.LEFT, position: PartPosition.FRONT })
       .expect(200);
@@ -208,4 +206,74 @@ describe('Part catalog normalization (e2e)', () => {
       result.body.data.some((item: { id: string }) => item.id === firstPartId),
     ).toBe(true);
   });
+
+  it.each([
+    'Главные платы BMS',
+    'Главные платы',
+    'платы',
+    'BMS',
+    'главные платы bms',
+    '  Главные    платы   BMS  ',
+  ])('finds the same BMS catalog item for "%s"', async (search) => {
+    let bmsPart = await prisma.partCatalogItem.findFirst({
+      where: { slug: `${prefix}-main-bms-board` },
+    });
+    if (!bmsPart) {
+      bmsPart = await prisma.partCatalogItem.create({
+        data: {
+          internalCode: `E2E-BMS-${Date.now()}`,
+          name: 'Главные платы BMS',
+          normalizedName: 'главные платы bms',
+          searchTokens: 'bms главные платы',
+          slug: `${prefix}-main-bms-board`,
+          categoryId,
+        },
+      });
+      createdPartIds.push(bmsPart.id);
+    }
+
+    const result = await request(app.getHttpServer())
+      .get('/part-catalog/search')
+      .set('Authorization', `Bearer ${adminToken}`)
+      .query({ search, isActive: true, limit: 10 })
+      .expect(200);
+
+    expect(
+      result.body.data.some((item: { id: string }) => item.id === bmsPart.id),
+    ).toBe(true);
+  });
+
+  it.each([
+    ['Блоки управления батареей BMS', 'battery-control-bms'],
+    ['Система управления батареей', 'battery-management-system'],
+  ])(
+    'finds a catalog item at the requested catalog level: %s',
+    async (name, suffix) => {
+      const part = await prisma.partCatalogItem.create({
+        data: {
+          internalCode: `E2E-${suffix}-${Date.now()}`,
+          name,
+          normalizedName: name.toLocaleLowerCase('ru-RU'),
+          searchTokens: name
+            .toLocaleLowerCase('ru-RU')
+            .split(/\s+/)
+            .sort()
+            .join(' '),
+          slug: `${prefix}-${suffix}`,
+          categoryId,
+        },
+      });
+      createdPartIds.push(part.id);
+
+      const result = await request(app.getHttpServer())
+        .get('/part-catalog/search')
+        .set('Authorization', `Bearer ${adminToken}`)
+        .query({ search: name, isActive: true, limit: 10 })
+        .expect(200);
+
+      expect(result.body.data.map((item: { id: string }) => item.id)).toContain(
+        part.id,
+      );
+    },
+  );
 });

@@ -11,15 +11,17 @@ describe('Legacy PartNumber response (e2e)', () => {
   let app: INestApplication;
   const service = {
     findAll: jest.fn().mockResolvedValue({
-      data: [{
-        id: 'legacy-number',
-        catalogItemId: 'catalog-item',
-        manufacturer: null,
-        number: '90915-YZZE1',
-        normalizedNumber: '90915YZZE1',
-        type: 'OEM',
-        isPrimary: true,
-      }],
+      data: [
+        {
+          id: 'legacy-number',
+          catalogItemId: 'catalog-item',
+          manufacturer: null,
+          number: '90915-YZZE1',
+          normalizedNumber: '90915YZZE1',
+          type: 'OEM',
+          isPrimary: true,
+        },
+      ],
       meta: { page: 1, limit: 20, total: 1, totalPages: 1 },
     }),
   };
@@ -29,9 +31,12 @@ describe('Legacy PartNumber response (e2e)', () => {
       controllers: [PartNumbersController],
       providers: [{ provide: PartNumbersService, useValue: service }],
     })
-      .overrideGuard(JwtAuthGuard).useValue({ canActivate: () => true })
-      .overrideGuard(RolesGuard).useValue({ canActivate: () => true })
-      .overrideGuard(PermissionsGuard).useValue({ canActivate: () => true })
+      .overrideGuard(JwtAuthGuard)
+      .useValue({ canActivate: () => true })
+      .overrideGuard(RolesGuard)
+      .useValue({ canActivate: () => true })
+      .overrideGuard(PermissionsGuard)
+      .useValue({ canActivate: () => true })
       .compile();
     app = module.createNestApplication();
     await app.init();

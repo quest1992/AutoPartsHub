@@ -23,9 +23,14 @@ describe('VehicleFitmentsService (unit)', () => {
 
   it('returns only active brands in alphabetical order', async () => {
     prisma.manufacturer.findMany.mockResolvedValue([{ id: '1', name: 'Audi' }]);
-    await expect(service.findBrands()).resolves.toEqual([{ id: '1', name: 'Audi' }]);
+    await expect(service.findBrands()).resolves.toEqual([
+      { id: '1', name: 'Audi' },
+    ]);
     expect(prisma.manufacturer.findMany).toHaveBeenCalledWith(
-      expect.objectContaining({ where: { isActive: true }, orderBy: { name: 'asc' } }),
+      expect.objectContaining({
+        where: { isActive: true },
+        orderBy: { name: 'asc' },
+      }),
     );
   });
 

@@ -6,15 +6,23 @@ import request from 'supertest';
 import * as XLSX from 'xlsx';
 import { AppModule } from '../src/app.module';
 import { createPartCatalogItem } from './helpers/create-part-catalog-item';
+import { createShopInventoryItem } from './helpers/create-shop-inventory-item';
 
-type ColumnMapping = {
-  categoryColumn: string;
-  nameColumn: string;
-  priceColumn: string;
-  quantityColumn: string;
-  partNumberColumn?: string;
-  storageLocationColumn?: string;
+type PreviewRow = {
+  rowNumber: number;
+  source: {
+    quantity: number;
+    salePrice: number;
+    purchasePrice?: number;
+    article?: string;
+    oem?: string;
+    manufacturer?: string;
+    note?: string;
+  };
+  normalized: { warehouseId?: string };
+  match: { catalogItemId?: string };
 };
+type PreviewBody = { importSessionId: string; rows: PreviewRow[] };
 
 describe('Inventory import confirm (e2e)', () => {
   let app: INestApplication;
@@ -31,14 +39,6 @@ describe('Inventory import confirm (e2e)', () => {
 
   const prefix = `e2e-import-${Date.now()}`;
   const categoryName = `${prefix}-category`;
-  const standardMapping: ColumnMapping = {
-    categoryColumn: 'Category',
-    nameColumn: 'Name',
-    priceColumn: 'Price',
-    quantityColumn: 'Quantity',
-    storageLocationColumn: 'Location',
-  };
-
   const workbook = (rows: Array<Array<string | number>>) => {
     const book = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(
@@ -49,33 +49,40 @@ describe('Inventory import confirm (e2e)', () => {
     return XLSX.write(book, { type: 'buffer', bookType: 'xlsx' }) as Buffer;
   };
 
-  const upload = (
-    endpoint: 'preview' | 'confirm',
-    token: string,
-    targetShopId: string,
-    file: Buffer,
-    mapping: ColumnMapping,
-  ) => {
-    let call = request(app.getHttpServer())
-      .post(`/inventory-import/${endpoint}`)
+  const preview = (token: string, targetShopId: string, file: Buffer) =>
+    request(app.getHttpServer())
+      .post('/inventory-import/preview')
       .set('Authorization', `Bearer ${token}`)
       .field('shopId', targetShopId)
-      .field('nameColumn', mapping.nameColumn)
-      .field('priceColumn', mapping.priceColumn)
-      .field('quantityColumn', mapping.quantityColumn);
+      .attach('file', file, 'inventory.xlsx');
 
-    if (mapping.partNumberColumn) {
-      call = call.field('partNumberColumn', mapping.partNumberColumn);
-    }
-    if (mapping.storageLocationColumn) {
-      call = call.field(
-        'storageLocationColumn',
-        mapping.storageLocationColumn,
-      );
-    }
-
-    return call.attach('file', file, 'inventory.xlsx');
-  };
+  const confirm = (
+    token: string,
+    body: PreviewBody,
+    options: {
+      include?: boolean;
+      mode?: 'ADD_QUANTITY' | 'REPLACE_QUANTITY';
+    } = {},
+  ) =>
+    request(app.getHttpServer())
+      .post(`/inventory-import/${body.importSessionId}/confirm`)
+      .set('Authorization', `Bearer ${token}`)
+      .send({
+        mode: options.mode ?? 'REPLACE_QUANTITY',
+        rows: body.rows.map((row) => ({
+          rowNumber: row.rowNumber,
+          include: options.include ?? true,
+          catalogItemId: row.match.catalogItemId,
+          quantity: row.source.quantity,
+          salePrice: row.source.salePrice,
+          purchasePrice: row.source.purchasePrice,
+          warehouseId: row.normalized.warehouseId,
+          article: row.source.article,
+          oem: row.source.oem,
+          manufacturer: row.source.manufacturer,
+          note: row.source.note,
+        })),
+      });
 
   beforeAll(async () => {
     prisma = new PrismaClient();
@@ -131,14 +138,12 @@ describe('Inventory import confirm (e2e)', () => {
     ]);
     manualPartId = manualPart.id;
     existingItemId = (
-      await prisma.shopInventoryItem.create({
-        data: {
-          shopId,
-          partCatalogItemId: exactPart.id,
-          price: 10,
-          quantity: 7,
-          location: 'Old location',
-        },
+      await createShopInventoryItem(prisma, {
+        shopId,
+        partCatalogItemId: exactPart.id,
+        price: 10,
+        quantity: 7,
+        location: 'Old location',
       })
     ).id;
 
@@ -188,6 +193,9 @@ describe('Inventory import confirm (e2e)', () => {
     await prisma.inventoryImportJob.deleteMany({
       where: { shopId: { in: shopIds } },
     });
+    await prisma.inventoryImportSession.deleteMany({
+      where: { shopId: { in: shopIds } },
+    });
     await prisma.shopInventoryItem.deleteMany({
       where: { shopId: { in: shopIds } },
     });
@@ -212,26 +220,19 @@ describe('Inventory import confirm (e2e)', () => {
       },
     });
     const file = workbook([
-      ['Category', 'Name', 'Price', 'Quantity', 'Location'],
-      [categoryName, 'Created part', 120, 3, 'Row A'],
+      ['Категория', 'Наименование', 'Цена продажи', 'Количество', 'Склад'],
+      [categoryName, 'Created part', 120, 3, 'Основной склад'],
     ]);
 
-    await upload(
-      'preview',
+    const previewResponse = await preview(adminToken, shopId, file).expect(201);
+    const confirmed = await confirm(
       adminToken,
-      shopId,
-      file,
-      standardMapping,
-    ).expect(201);
-    const confirmed = await upload(
-      'confirm',
-      adminToken,
-      shopId,
-      file,
-      standardMapping,
+      previewResponse.body as PreviewBody,
     ).expect(201);
 
-    expect((confirmed.body as { imported: number }).imported).toBe(1);
+    expect(
+      (confirmed.body as { summary: { imported: number } }).summary.imported,
+    ).toBe(1);
     const item = await prisma.shopInventoryItem.findFirstOrThrow({
       where: {
         shopId,
@@ -247,27 +248,20 @@ describe('Inventory import confirm (e2e)', () => {
   });
 
   it('creates an inventory item with explicitly mapped columns', async () => {
-    const mapping: ColumnMapping = {
-      categoryColumn: 'Category',
-      nameColumn: 'Product label',
-      priceColumn: 'Retail cost',
-      quantityColumn: 'Stock count',
-    };
     const file = workbook([
-      ['Category', 'Product label', 'Retail cost', 'Stock count'],
+      ['Категория', 'Наименование', 'Цена продажи', 'Количество'],
       [categoryName, 'Manual part', 55, 2],
     ]);
 
-    await upload('preview', adminToken, shopId, file, mapping).expect(201);
-    const confirmed = await upload(
-      'confirm',
+    const previewResponse = await preview(adminToken, shopId, file).expect(201);
+    const confirmed = await confirm(
       adminToken,
-      shopId,
-      file,
-      mapping,
+      previewResponse.body as PreviewBody,
     ).expect(201);
 
-    expect((confirmed.body as { imported: number }).imported).toBe(1);
+    expect(
+      (confirmed.body as { summary: { imported: number } }).summary.imported,
+    ).toBe(1);
     expect(
       await prisma.shopInventoryItem.count({
         where: { shopId, partCatalogItemId: manualPartId },
@@ -277,24 +271,24 @@ describe('Inventory import confirm (e2e)', () => {
 
   it('updates only price and location when quantity is unchanged', async () => {
     const file = workbook([
-      ['Category', 'Name', 'Price', 'Quantity', 'Location'],
-      [categoryName, 'Exact part', 99, 7, 'New location'],
+      ['Категория', 'Наименование', 'Цена продажи', 'Количество', 'Склад'],
+      [categoryName, 'Exact part', 99, 7, 'Основной склад'],
     ]);
 
-    const confirmed = await upload(
-      'confirm',
+    const previewResponse = await preview(adminToken, shopId, file).expect(201);
+    const confirmed = await confirm(
       adminToken,
-      shopId,
-      file,
-      standardMapping,
+      previewResponse.body as PreviewBody,
     ).expect(201);
 
-    expect((confirmed.body as { updated: number }).updated).toBe(1);
+    expect(
+      (confirmed.body as { summary: { updated: number } }).summary.updated,
+    ).toBe(1);
     const item = await prisma.shopInventoryItem.findUniqueOrThrow({
       where: { id: existingItemId },
     });
     expect(item.price.toString()).toBe('99');
-    expect(item.location).toBe('New location');
+    expect(item.warehouseId).toBeTruthy();
     expect(item.quantity).toBe(7);
     expect(
       await prisma.inventoryMovement.count({
@@ -305,39 +299,24 @@ describe('Inventory import confirm (e2e)', () => {
 
   it('skips rows reported as invalid by preview', async () => {
     const file = workbook([
-      ['Category', 'Name', 'Price', 'Quantity'],
+      ['Категория', 'Наименование', 'Цена продажи', 'Количество'],
       [categoryName, '', 25, 1],
     ]);
-    const mapping = {
-      ...standardMapping,
-      storageLocationColumn: undefined,
+    const previewResponse = await preview(adminToken, shopId, file).expect(201);
+    expect((previewResponse.body as { errorRows: number }).errorRows).toBe(1);
+
+    const confirmed = await confirm(
+      adminToken,
+      previewResponse.body as PreviewBody,
+    ).expect(201);
+    const body = confirmed.body as {
+      summary: { imported: number; skipped: number };
     };
-
-    const preview = await upload(
-      'preview',
-      adminToken,
-      shopId,
-      file,
-      mapping,
-    ).expect(201);
-    expect(
-      (preview.body as { summary: { invalidRows: number } }).summary
-        .invalidRows,
-    ).toBe(1);
-
-    const confirmed = await upload(
-      'confirm',
-      adminToken,
-      shopId,
-      file,
-      mapping,
-    ).expect(201);
-    const body = confirmed.body as { imported: number; skipped: number };
-    expect(body.imported).toBe(0);
-    expect(body.skipped).toBe(1);
+    expect(body.summary.imported).toBe(0);
+    expect(body.summary.skipped).toBe(1);
   });
 
-  it('reports the remaining batch rows as failed after a database error', async () => {
+  it('does not import rows rejected during preview validation', async () => {
     await Promise.all([
       createPartCatalogItem(prisma, {
         data: {
@@ -359,29 +338,20 @@ describe('Inventory import confirm (e2e)', () => {
       }),
     ]);
     const file = workbook([
-      ['Category', 'Name', 'Price', 'Quantity'],
+      ['Категория', 'Наименование', 'Цена продажи', 'Количество'],
       [categoryName, 'Partial failing', '99999999999999999999999999999999', 1],
       [categoryName, 'Partial good', 44, 2],
     ]);
-    const mapping = {
-      ...standardMapping,
-      storageLocationColumn: undefined,
-    };
-
-    const confirmed = await upload(
-      'confirm',
+    const previewResponse = await preview(adminToken, shopId, file).expect(201);
+    const confirmed = await confirm(
       adminToken,
-      shopId,
-      file,
-      mapping,
+      previewResponse.body as PreviewBody,
     ).expect(201);
     const body = confirmed.body as {
-      imported: number;
-      failed: number;
-      errors: Array<{ rowNumber: number; message: string }>;
+      summary: { imported: number; failed: number };
     };
-    expect(body.errors).toHaveLength(2);
-    expect(body).toMatchObject({ imported: 0, failed: 2 });
+    expect(body.summary.imported).toBe(0);
+    expect(body.summary.failed).toBe(2);
     expect(
       await prisma.shopInventoryItem.count({
         where: {
@@ -394,39 +364,23 @@ describe('Inventory import confirm (e2e)', () => {
 
   it('forbids another shop and handles repeated confirmation without duplicates', async () => {
     const file = workbook([
-      ['Category', 'Name', 'Price', 'Quantity'],
+      ['Категория', 'Наименование', 'Цена продажи', 'Количество'],
       [categoryName, 'Exact part', 10, 7],
     ]);
-    const mapping = {
-      ...standardMapping,
-      storageLocationColumn: undefined,
-    };
+    const previewResponse = await preview(adminToken, shopId, file).expect(201);
+    await confirm(otherShopToken, previewResponse.body as PreviewBody).expect(
+      403,
+    );
 
-    await upload(
-      'confirm',
-      otherShopToken,
-      shopId,
-      file,
-      mapping,
-    ).expect(403);
-
-    const first = await upload(
-      'confirm',
+    const first = await confirm(
       adminToken,
-      shopId,
-      file,
-      mapping,
+      previewResponse.body as PreviewBody,
     ).expect(201);
-    const repeated = await upload(
-      'confirm',
-      adminToken,
-      shopId,
-      file,
-      mapping,
-    ).expect(201);
+    await confirm(adminToken, previewResponse.body as PreviewBody).expect(400);
 
-    expect((first.body as { updated: number }).updated).toBe(1);
-    expect((repeated.body as { updated: number }).updated).toBe(1);
+    expect(
+      (first.body as { summary: { updated: number } }).summary.updated,
+    ).toBe(1);
     expect(
       await prisma.shopInventoryItem.count({
         where: { id: existingItemId },

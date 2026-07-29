@@ -1,8 +1,11 @@
 import {
   Body,
   Controller,
+  Get,
+  Param,
   Post,
   Req,
+  Res,
   UploadedFile,
   UseGuards,
   UseInterceptors,
@@ -13,15 +16,16 @@ import {
   ApiBody,
   ApiConsumes,
   ApiOperation,
-  ApiResponse,
+  ApiProduces,
   ApiTags,
 } from '@nestjs/swagger';
 import { UserRole } from '@prisma/client';
+import type { Response } from 'express';
 import { Roles } from '../../common/decorators/roles.decorator';
-import { RequirePermissions } from '../../common/permissions/require-permissions.decorator';
+import { RolesGuard } from '../../common/guards/roles.guard';
 import { Permission } from '../../common/permissions/permission.enum';
 import { PermissionsGuard } from '../../common/permissions/permissions.guard';
-import { RolesGuard } from '../../common/guards/roles.guard';
+import { RequirePermissions } from '../../common/permissions/require-permissions.decorator';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { InventoryActor } from '../inventory-items/inventory-items.service';
 import {
@@ -33,20 +37,33 @@ import { InventoryImportService } from './inventory-import.service';
 @ApiTags('Inventory Import')
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard, RolesGuard, PermissionsGuard)
-@Roles(
-  UserRole.SUPER_ADMIN,
-  UserRole.SHOP_ADMIN,
-  UserRole.MANAGER,
-  UserRole.SELLER,
-)
+@Roles(UserRole.SUPER_ADMIN, UserRole.SHOP_ADMIN, UserRole.MANAGER)
+@RequirePermissions(Permission.INVENTORY_IMPORT)
 @Controller('inventory-import')
 export class InventoryImportController {
   constructor(private readonly service: InventoryImportService) {}
 
+  @Get('template')
+  @ApiOperation({ summary: 'Скачать XLSX-шаблон импорта остатков' })
+  @ApiProduces(
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+  )
+  template(@Res() response: Response) {
+    const file = this.service.template();
+    response.setHeader(
+      'Content-Type',
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    );
+    response.setHeader(
+      'Content-Disposition',
+      'attachment; filename="inventory-import-template.xlsx"',
+    );
+    response.send(file);
+  }
+
   @Post('preview')
-  @RequirePermissions(Permission.INVENTORY_IMPORT)
   @ApiOperation({
-    summary: 'Предпросмотр Excel-импорта без записи в базу данных',
+    summary: 'Загрузить XLSX, сопоставить каталог и создать preview-сессию',
   })
   @ApiConsumes('multipart/form-data')
   @ApiBody({
@@ -55,77 +72,30 @@ export class InventoryImportController {
       required: ['file'],
       properties: {
         file: { type: 'string', format: 'binary' },
-        shopId: {
-          type: 'string',
-          format: 'uuid',
-          description: 'Обязателен для SUPER_ADMIN',
-        },
-        partNumberColumn: { type: 'string' },
-        nameColumn: { type: 'string' },
-        compatibilityColumn: { type: 'string' },
-        storageLocationColumn: { type: 'string' },
-        priceColumn: { type: 'string' },
-        quantityColumn: { type: 'string' },
+        shopId: { type: 'string', format: 'uuid' },
       },
     },
   })
-  @ApiResponse({ status: 201, description: 'Результат предпросмотра' })
   @UseInterceptors(
     FileInterceptor('file', { limits: { fileSize: 10 * 1024 * 1024 } }),
   )
   preview(
     @UploadedFile() file: { buffer: Buffer; originalname: string },
     @Body() dto: PreviewInventoryImportDto,
-    @Req() req: { user: InventoryActor },
+    @Req() request: { user: InventoryActor },
   ) {
-    return this.service.preview(file, req.user, dto.shopId, {
-      partNumberColumn: dto.partNumberColumn,
-      nameColumn: dto.nameColumn,
-      compatibilityColumn: dto.compatibilityColumn,
-      storageLocationColumn: dto.storageLocationColumn,
-      priceColumn: dto.priceColumn,
-      quantityColumn: dto.quantityColumn,
-    });
+    return this.service.preview(file, request.user, dto.shopId);
   }
 
-  @Post('confirm')
-  @RequirePermissions(Permission.INVENTORY_IMPORT)
+  @Post(':sessionId/confirm')
   @ApiOperation({
-    summary: 'Подтвердить импорт Excel с выбранным сопоставлением колонок',
+    summary: 'Подтвердить отредактированные строки import-сессии',
   })
-  @ApiConsumes('multipart/form-data')
-  @ApiBody({
-    schema: {
-      type: 'object',
-      required: ['file', 'nameColumn', 'priceColumn', 'quantityColumn'],
-      properties: {
-        file: { type: 'string', format: 'binary' },
-        shopId: { type: 'string', format: 'uuid' },
-        partNumberColumn: { type: 'string' },
-        nameColumn: { type: 'string' },
-        compatibilityColumn: { type: 'string' },
-        storageLocationColumn: { type: 'string' },
-        priceColumn: { type: 'string' },
-        quantityColumn: { type: 'string' },
-      },
-    },
-  })
-  @ApiResponse({ status: 201, description: 'Статистика импорта' })
-  @UseInterceptors(
-    FileInterceptor('file', { limits: { fileSize: 10 * 1024 * 1024 } }),
-  )
   confirm(
-    @UploadedFile() file: { buffer: Buffer; originalname: string },
+    @Param('sessionId') sessionId: string,
     @Body() dto: ConfirmInventoryImportDto,
-    @Req() req: { user: InventoryActor },
+    @Req() request: { user: InventoryActor },
   ) {
-    return this.service.confirm(file, req.user, dto.shopId, {
-      partNumberColumn: dto.partNumberColumn,
-      nameColumn: dto.nameColumn,
-      compatibilityColumn: dto.compatibilityColumn,
-      storageLocationColumn: dto.storageLocationColumn,
-      priceColumn: dto.priceColumn,
-      quantityColumn: dto.quantityColumn,
-    });
+    return this.service.confirm(sessionId, dto, request.user);
   }
 }

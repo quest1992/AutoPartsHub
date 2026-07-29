@@ -15,6 +15,10 @@ import { SalesModule } from './modules/sales/sales.module';
 import { PurchasesModule } from './modules/purchases/purchases.module';
 import { InventorySearchModule } from './modules/inventory-search/inventory-search.module';
 import { InventoryImportModule } from './modules/inventory-import/inventory-import.module';
+import { ShopWarehousesModule } from './modules/shop-warehouses/shop-warehouses.module';
+import { InventoryTransfersModule } from './modules/inventory-transfers/inventory-transfers.module';
+import { InventoryAuditModule } from './modules/inventory-audit/inventory-audit.module';
+import { StocktakesModule } from './modules/stocktakes/stocktakes.module';
 import { DashboardModule } from './modules/dashboard/dashboard.module';
 import { PermissionsModule } from './common/permissions/permissions.module';
 import { EmployeesModule } from './modules/employees/employees.module';
@@ -23,7 +27,15 @@ import { PartNumbersModule } from './modules/part-numbers/part-numbers.module';
 import { VehicleFitmentsModule } from './modules/vehicle-fitments/vehicle-fitments.module';
 import { VinModule } from './modules/vin/vin.module';
 import { MarketplaceSearchModule } from './modules/marketplace-search/marketplace-search.module';
-
+import { PartCatalogSuggestionsModule } from './modules/part-catalog-suggestions/part-catalog-suggestions.module';
+import { CatalogBootstrapModule } from './modules/catalog-bootstrap/catalog-bootstrap.module';
+import { CustomersModule } from './modules/customers/customers.module';
+import { CustomerOrdersModule } from './modules/customer-orders/customer-orders.module';
+import { OrderPaymentsModule } from './modules/order-payments/order-payments.module';
+import { ShopSettlementsModule } from './modules/shop-settlements/shop-settlements.module';
+import { FinanceAuditModule } from './modules/finance-audit/finance-audit.module';
+import { VehicleDatabaseModule } from './modules/vehicle-database/vehicle-database.module';
+import { PartTaxonomyModule } from './modules/part-taxonomy/part-taxonomy.module';
 
 @Module({
   imports: [
@@ -43,12 +55,25 @@ import { MarketplaceSearchModule } from './modules/marketplace-search/marketplac
     VehicleFitmentsModule,
     VinModule,
     MarketplaceSearchModule,
+    PartCatalogSuggestionsModule,
+    CatalogBootstrapModule,
+    CustomersModule,
+    CustomerOrdersModule,
+    OrderPaymentsModule,
+    ShopSettlementsModule,
+    FinanceAuditModule,
+    VehicleDatabaseModule,
+    PartTaxonomyModule,
     InventoryItemsModule,
     InventoryMovementsModule,
     SalesModule,
     PurchasesModule,
     InventorySearchModule,
     InventoryImportModule,
+    ShopWarehousesModule,
+    InventoryTransfersModule,
+    InventoryAuditModule,
+    StocktakesModule,
     DashboardModule,
     CloudinaryModule,
   ],

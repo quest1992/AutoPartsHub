@@ -10,18 +10,31 @@ describe('VinService (integration)', () => {
     vinDecodeCache: {
       findUnique: jest.fn(({ where }) => cache.get(where.vin) ?? null),
       create: jest.fn(({ data }) => {
-        const value = { id: 'cache-id', createdAt: new Date(), updatedAt: new Date(), ...data };
+        const value = {
+          id: 'cache-id',
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          ...data,
+        };
         cache.set(data.vin, value);
         return value;
       }),
     },
-    manufacturer: { findFirst: jest.fn().mockResolvedValue({ id: 'brand-id' }) },
-    vehicleModel: { findFirst: jest.fn().mockResolvedValue({ id: 'model-id' }) },
-    vehicleGeneration: { findFirst: jest.fn().mockResolvedValue({ id: 'generation-id' }) },
+    manufacturer: {
+      findFirst: jest.fn().mockResolvedValue({ id: 'brand-id' }),
+    },
+    vehicleModel: {
+      findFirst: jest.fn().mockResolvedValue({ id: 'model-id' }),
+    },
+    vehicleGeneration: {
+      findFirst: jest.fn().mockResolvedValue({ id: 'generation-id' }),
+    },
     engine: { findFirst: jest.fn().mockResolvedValue({ id: 'engine-id' }) },
     vehicleFitment: {
       findMany: jest.fn().mockResolvedValue([
-        { catalogItem: { id: 'part-id', internalCode: 'P-1', name: 'Filter' } },
+        {
+          catalogItem: { id: 'part-id', internalCode: 'P-1', name: 'Filter' },
+        },
       ]),
     },
   };

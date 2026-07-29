@@ -23,6 +23,10 @@ export const rolePermissions: Record<string, readonly Permission[]> = {
     Permission.PURCHASES_CREATE,
     Permission.PURCHASES_CANCEL,
     Permission.CATALOG_VIEW,
+    Permission.ORDER_MANAGE,
+    Permission.ORDER_PAYMENT_MANAGE,
+    Permission.SHOP_PAYOUT_MANAGE,
+    Permission.FINANCE_VIEW,
   ],
   SELLER: [
     Permission.DASHBOARD_VIEW,
@@ -30,6 +34,7 @@ export const rolePermissions: Record<string, readonly Permission[]> = {
     Permission.SALES_VIEW,
     Permission.SALES_CREATE,
     Permission.CATALOG_VIEW,
+    Permission.ORDER_MANAGE,
   ],
   VIEWER: [
     Permission.DASHBOARD_VIEW,
@@ -45,5 +50,7 @@ export function hasPermissions(
   requiredPermissions: readonly Permission[],
 ): boolean {
   const granted = rolePermissions[role] ?? [];
-  return requiredPermissions.every((permission) => granted.includes(permission));
+  return requiredPermissions.every((permission) =>
+    granted.includes(permission),
+  );
 }

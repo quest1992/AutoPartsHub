@@ -12,15 +12,11 @@ describe('PartCatalogService normalization', () => {
       },
       partCatalogItem: {
         findFirst: jest.fn().mockResolvedValue(null),
-        findMany: jest.fn().mockResolvedValue([]),
         create: jest.fn(),
-        findUnique: jest.fn(),
-        update: jest.fn(),
       },
       $transaction: jest.fn(),
       ...overrides,
     } as unknown as PrismaService;
-
     return { prisma, service: new PartCatalogService(prisma) };
   }
 
@@ -77,81 +73,6 @@ describe('PartCatalogService normalization', () => {
           side: PartSide.NONE,
           position: PartPosition.NONE,
           OR: expect.arrayContaining([{ normalizedName: 'колодки тормозные' }]),
-        }),
-      }),
-    );
-  });
-
-  it('ranks exact names before same-token candidates', async () => {
-    const findMany = jest.fn().mockResolvedValue([
-      {
-        id: 'same-tokens',
-        internalCode: 'PRT-2',
-        name: 'Тормозные колодки',
-        slug: 'brake-pads-two',
-        categoryId: 'category-id',
-        category: { id: 'category-id', name: 'Тормоза' },
-        side: PartSide.NONE,
-        position: PartPosition.NONE,
-        normalizedName: 'тормозные колодки',
-        searchTokens: 'колодки тормозные',
-      },
-      {
-        id: 'exact',
-        internalCode: 'PRT-1',
-        name: 'Колодки тормозные',
-        slug: 'brake-pads-one',
-        categoryId: 'category-id',
-        category: { id: 'category-id', name: 'Тормоза' },
-        side: PartSide.NONE,
-        position: PartPosition.NONE,
-        normalizedName: 'колодки тормозные',
-        searchTokens: 'колодки тормозные',
-      },
-    ]);
-    const { prisma, service } = createService({
-      partCatalogItem: { findMany },
-    });
-
-    const result = await service.findCandidates({ q: 'Колодки тормозные' });
-
-    expect(result.items.map((item) => item.id)).toEqual([
-      'exact',
-      'same-tokens',
-    ]);
-    expect(result.items[0].matchType).toBe('EXACT_NORMALIZED_NAME');
-    expect(result.items[1].matchType).toBe('SAME_TOKENS');
-    expect(findMany).toHaveBeenCalledWith(
-      expect.objectContaining({
-        where: expect.objectContaining({ isActive: true }),
-        take: 100,
-      }),
-    );
-    expect(prisma).toBeDefined();
-  });
-
-  it('includes approved aliases in case-insensitive catalog search', async () => {
-    const findMany = jest.fn().mockResolvedValue([]);
-    const count = jest.fn().mockResolvedValue(0);
-    const { service } = createService({
-      partCatalogItem: { findMany, count },
-    });
-
-    await service.findAll({ search: 'Brake Pad', page: 1, limit: 20 });
-
-    expect(findMany).toHaveBeenCalledWith(
-      expect.objectContaining({
-        where: expect.objectContaining({
-          OR: expect.arrayContaining([
-            {
-              aliases: {
-                some: {
-                  isApproved: true,
-                  normalizedAlias: { contains: 'brake pad' },
-                },
-              },
-            },
-          ]),
         }),
       }),
     );

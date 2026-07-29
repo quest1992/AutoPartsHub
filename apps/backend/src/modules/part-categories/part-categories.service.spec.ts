@@ -31,13 +31,13 @@ describe('PartCategoriesService search', () => {
 
     expect(findMany).toHaveBeenCalledWith(
       expect.objectContaining({
-        where: {
+        where: expect.objectContaining({
           isActive: true,
           OR: [
             { name: { contains: 'фильтр', mode: 'insensitive' } },
             { slug: { contains: 'фильтр', mode: 'insensitive' } },
           ],
-        },
+        }),
       }),
     );
   });

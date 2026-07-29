@@ -24,14 +24,22 @@ import { VinService } from './vin.service';
 @ApiTags('VIN Decoder')
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard, RolesGuard, PermissionsGuard)
-@Roles(UserRole.SUPER_ADMIN, UserRole.SHOP_ADMIN, UserRole.MANAGER, UserRole.SELLER, UserRole.VIEWER)
+@Roles(
+  UserRole.SUPER_ADMIN,
+  UserRole.SHOP_ADMIN,
+  UserRole.MANAGER,
+  UserRole.SELLER,
+  UserRole.VIEWER,
+)
 @Controller('vin')
 export class VinController {
   constructor(private readonly service: VinService) {}
 
   @Post('decode')
   @RequirePermissions(Permission.CATALOG_VIEW)
-  @ApiOperation({ summary: 'Декодировать VIN и сопоставить с внутренним справочником' })
+  @ApiOperation({
+    summary: 'Декодировать VIN и сопоставить с внутренним справочником',
+  })
   decode(@Body() dto: DecodeVinDto) {
     return this.service.decode(dto.vin);
   }

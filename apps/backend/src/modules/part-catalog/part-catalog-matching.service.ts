@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { normalizePartName } from '../../common/utils/part-name-normalizer';
 import { normalizePartNumber } from '../../common/utils/part-number-normalizer';
 import { PrismaService } from '../../prisma/prisma.service';
+import { CatalogSearchService } from './catalog-search.service';
 import {
   MatchPartInput,
   PartMatchMethod,
@@ -18,7 +19,10 @@ const notFound = (requiresReview = false): PartMatchResult => ({
 
 @Injectable()
 export class PartCatalogMatchingService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly catalogSearch: CatalogSearchService,
+  ) {}
 
   async findByPartNumber(partNumber: string): Promise<string[]> {
     const normalizedNumber = normalizePartNumber(partNumber);
@@ -53,11 +57,18 @@ export class PartCatalogMatchingService {
     const normalizedName = normalizePartName(name);
     if (!normalizedName) return [];
 
-    const matches = await this.prisma.partCatalogItem.findMany({
-      where: { normalizedName, isActive: true },
-      select: { id: true },
+    const matches = await this.catalogSearch.findMatches({
+      search: name,
+      isActive: true,
+      limit: 100,
     });
-    return [...new Set(matches.map((match) => match.id))];
+    return [
+      ...new Set(
+        matches
+          .filter((match) => match.normalizedName === normalizedName)
+          .map((match) => match.id),
+      ),
+    ];
   }
 
   async match(input: MatchPartInput): Promise<PartMatchResult> {

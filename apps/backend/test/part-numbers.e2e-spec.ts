@@ -70,7 +70,9 @@ describe('Part numbers (e2e)', () => {
   });
 
   afterAll(async () => {
-    await prisma.partNumber.deleteMany({ where: { partCatalogItemId: catalogItemId } });
+    await prisma.partNumber.deleteMany({
+      where: { partCatalogItemId: catalogItemId },
+    });
     await prisma.partCatalogItem.delete({ where: { id: catalogItemId } });
     await prisma.partCategory.delete({ where: { id: categoryId } });
     await prisma.user.delete({ where: { id: userId } });

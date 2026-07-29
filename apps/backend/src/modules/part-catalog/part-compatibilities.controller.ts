@@ -35,7 +35,13 @@ import { PartCatalogService } from './part-catalog.service';
 @ApiTags('Part Compatibilities')
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard, RolesGuard, PermissionsGuard)
-@Roles(UserRole.SUPER_ADMIN, UserRole.SHOP_ADMIN, UserRole.MANAGER, UserRole.SELLER, UserRole.VIEWER)
+@Roles(
+  UserRole.SUPER_ADMIN,
+  UserRole.SHOP_ADMIN,
+  UserRole.MANAGER,
+  UserRole.SELLER,
+  UserRole.VIEWER,
+)
 @ApiUnauthorizedResponse({ description: 'Требуется действующий JWT' })
 @ApiForbiddenResponse({ description: 'Доступно только SUPER_ADMIN' })
 @Controller('part-catalog/:partId/compatibilities')

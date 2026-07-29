@@ -14,7 +14,9 @@ describe('PartCatalogMatchingService', () => {
 
     return {
       prisma,
-      service: new PartCatalogMatchingService(prisma),
+      service: new PartCatalogMatchingService(prisma, {
+        findMatches: jest.fn().mockResolvedValue([]),
+      } as never),
       findPartAlias,
     };
   }

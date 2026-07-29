@@ -16,17 +16,14 @@ import {
 import { PrismaService } from '../../prisma/prisma.service';
 import {
   getPartNameSearchTokens,
-  getPartNameTokens,
   normalizePartName,
 } from '../../common/utils/part-name-normalizer';
 
 import { normalizePartNumber } from '../../common/utils/part-number-normalizer';
 import { CreatePartAliasDto } from './dto/create-part-alias.dto';
-import { PartCatalogCandidatesQueryDto } from './dto/part-catalog-candidates-query.dto';
 import { CreatePartCatalogItemDto } from './dto/create-part-catalog-item.dto';
 import { CreatePartCompatibilityDto } from './dto/create-part-compatibility.dto';
 import { CreatePartNumberDto } from './dto/create-part-number.dto';
-import { PartCatalogItemQueryDto } from './dto/part-catalog-item-query.dto';
 import { UpdatePartCatalogItemDto } from './dto/update-part-catalog-item.dto';
 import { UpdatePartCompatibilityDto } from './dto/update-part-compatibility.dto';
 
@@ -125,89 +122,6 @@ export class PartCatalogService {
     );
   }
 
-  async findAll(query: PartCatalogItemQueryDto) {
-    const page = query.page ?? 1;
-    const limit = query.limit ?? 20;
-    const categoryIds = query.rootCategoryId
-      ? await this.getCategorySubtreeIds(query.rootCategoryId)
-      : undefined;
-    const search = query.search?.trim();
-    const normalizedSearch = search ? normalizePartName(search) : '';
-    const where: Prisma.PartCatalogItemWhereInput = {
-      ...(query.categoryId && { categoryId: query.categoryId }),
-      ...(categoryIds && { categoryId: { in: categoryIds } }),
-      ...(query.side && { side: query.side }),
-      ...(query.position && { position: query.position }),
-      ...(query.isUniversal !== undefined && {
-        isUniversal: query.isUniversal,
-      }),
-      ...(query.isActive !== undefined && { isActive: query.isActive }),
-      ...(query.internalCode && {
-        internalCode: { equals: query.internalCode, mode: 'insensitive' },
-      }),
-      ...(search && {
-        OR: [
-          { name: { contains: search, mode: 'insensitive' } },
-          { normalizedName: { contains: normalizedSearch } },
-          { searchTokens: { contains: getPartNameSearchTokens(search) } },
-          {
-            aliases: {
-              some: {
-                isApproved: true,
-                normalizedAlias: { contains: normalizedSearch },
-              },
-            },
-          },
-          { slug: { contains: search, mode: 'insensitive' } },
-          {
-            internalCode: {
-              contains: search,
-              mode: 'insensitive',
-            },
-          },
-        ],
-      }),
-    };
-
-    const compatibilityFilter: Prisma.PartCompatibilityWhereInput = {
-      ...(query.vehicleGenerationId && {
-        vehicleGenerationId: query.vehicleGenerationId,
-      }),
-      ...(query.vehicleModelId && {
-        vehicleGeneration: { vehicleModelId: query.vehicleModelId },
-      }),
-      ...(query.manufacturerId && {
-        vehicleGeneration: {
-          vehicleModel: { manufacturerId: query.manufacturerId },
-        },
-      }),
-    };
-    if (Object.keys(compatibilityFilter).length > 0)
-      where.compatibilities = { some: compatibilityFilter };
-
-    const [data, total] = await Promise.all([
-      this.prisma.partCatalogItem.findMany({
-        where,
-        include: {
-          category: { select: categorySelect },
-          compatibilities: {
-            include: { vehicleGeneration: { select: vehicleGenerationSelect } },
-            take: 1,
-          },
-          _count: { select: { compatibilities: true } },
-        },
-        orderBy: { createdAt: 'desc' },
-        skip: (page - 1) * limit,
-        take: limit,
-      }),
-      this.prisma.partCatalogItem.count({ where }),
-    ]);
-    return {
-      data,
-      meta: { page, limit, total, totalPages: Math.ceil(total / limit) },
-    };
-  }
-
   async findOne(id: string) {
     const item = await this.prisma.partCatalogItem.findUnique({
       where: { id },
@@ -222,85 +136,6 @@ export class PartCatalogService {
     });
     if (!item) throw new NotFoundException('Деталь каталога не найдена');
     return item;
-  }
-
-  async findCandidates(query: PartCatalogCandidatesQueryDto) {
-    const normalizedQuery = normalizePartName(query.q);
-    const queryTokens = getPartNameTokens(query.q);
-    const querySearchTokens = queryTokens.join(' ');
-    const tokenSearches = queryTokens
-      .slice(0, 6)
-      .flatMap((token) => [
-        { normalizedName: { contains: token } },
-        { searchTokens: { contains: token } },
-      ]);
-    const candidates = await this.prisma.partCatalogItem.findMany({
-      where: {
-        isActive: true,
-        ...(query.categoryId && { categoryId: query.categoryId }),
-        ...(query.side && { side: query.side }),
-        ...(query.position && { position: query.position }),
-        OR: [
-          { normalizedName: { contains: normalizedQuery } },
-          { normalizedName: { equals: normalizedQuery } },
-          { searchTokens: { contains: querySearchTokens } },
-          ...tokenSearches,
-        ],
-      },
-      select: {
-        id: true,
-        internalCode: true,
-        name: true,
-        slug: true,
-        categoryId: true,
-        side: true,
-        position: true,
-        normalizedName: true,
-        searchTokens: true,
-        category: { select: { id: true, name: true } },
-      },
-      take: 100,
-    });
-
-    const ranked = candidates.map((candidate) => {
-      const candidateTokens = candidate.searchTokens.split(' ').filter(Boolean);
-      const matchedTokens = queryTokens.filter((token) =>
-        candidateTokens.includes(token),
-      );
-      const matchType =
-        candidate.normalizedName === normalizedQuery
-          ? 'EXACT_NORMALIZED_NAME'
-          : candidate.searchTokens === querySearchTokens
-            ? 'SAME_TOKENS'
-            : matchedTokens.length > 0
-              ? 'PARTIAL_TOKENS'
-              : 'NAME_CONTAINS';
-      const rank =
-        matchType === 'EXACT_NORMALIZED_NAME'
-          ? 0
-          : matchType === 'SAME_TOKENS'
-            ? 1
-            : matchType === 'PARTIAL_TOKENS'
-              ? 2
-              : 3;
-
-      return { ...candidate, matchType, matchedTokens, rank };
-    });
-
-    return {
-      items: ranked
-        .sort(
-          (left, right) =>
-            left.rank - right.rank ||
-            right.matchedTokens.length - left.matchedTokens.length ||
-            left.name.localeCompare(right.name, 'ru'),
-        )
-        .slice(0, query.limit ?? 10)
-        .map(
-          ({ searchTokens: _searchTokens, rank: _rank, ...candidate }) =>
-            candidate,
-        ),
-    };
   }
 
   async update(id: string, dto: UpdatePartCatalogItemDto) {
@@ -688,26 +523,6 @@ export class PartCatalogService {
       throw new ConflictException(
         'Деталь с таким названием или slug, стороной и позицией уже существует в этой категории',
       );
-  }
-
-  private async getCategorySubtreeIds(rootCategoryId: string) {
-    const categories = await this.prisma.partCategory.findMany({
-      select: { id: true, parentId: true },
-    });
-    const children = new Map<string, string[]>();
-    for (const category of categories)
-      if (category.parentId)
-        children.set(category.parentId, [
-          ...(children.get(category.parentId) ?? []),
-          category.id,
-        ]);
-    const result: string[] = [];
-    const visit = (id: string) => {
-      result.push(id);
-      for (const childId of children.get(id) ?? []) visit(childId);
-    };
-    visit(rootCategoryId);
-    return result;
   }
 
   private async ensureActiveCompatiblePart(partId: string) {

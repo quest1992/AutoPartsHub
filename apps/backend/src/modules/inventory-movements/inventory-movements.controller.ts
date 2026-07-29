@@ -40,13 +40,17 @@ export class InventoryMovementsController {
   ) {
     return this.s.findAll(q, r.user);
   }
-  @Get('inventory-movements/:id') @RequirePermissions(Permission.INVENTORY_VIEW) one(
+  @Get('inventory-movements/:id')
+  @RequirePermissions(Permission.INVENTORY_VIEW)
+  one(
     @Param('id', ParseUUIDPipe) id: string,
     @Req() r: { user: InventoryActor },
   ) {
     return this.s.findOne(id, r.user);
   }
-  @Get('inventory-items/:inventoryItemId/movements') @RequirePermissions(Permission.INVENTORY_VIEW) byItem(
+  @Get('inventory-items/:inventoryItemId/movements')
+  @RequirePermissions(Permission.INVENTORY_VIEW)
+  byItem(
     @Param('inventoryItemId', ParseUUIDPipe) id: string,
     @Req() r: { user: InventoryActor },
   ) {

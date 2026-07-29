@@ -8,7 +8,6 @@ import {
   Patch,
   Post,
   Query,
-  Optional,
   UseGuards,
 } from '@nestjs/common';
 import { UserRole } from '@prisma/client';
@@ -35,7 +34,6 @@ import { CatalogSearchService } from './catalog-search.service';
 import { CreatePartCatalogItemDto } from './dto/create-part-catalog-item.dto';
 import { CreatePartAliasDto } from './dto/create-part-alias.dto';
 import { CreatePartNumberDto } from './dto/create-part-number.dto';
-import { PartCatalogCandidatesQueryDto } from './dto/part-catalog-candidates-query.dto';
 import { PartCatalogItemQueryDto } from './dto/part-catalog-item-query.dto';
 import { UpdatePartCatalogItemDto } from './dto/update-part-catalog-item.dto';
 import { PartCatalogService } from './part-catalog.service';
@@ -50,7 +48,7 @@ import { PartCatalogService } from './part-catalog.service';
 export class PartCatalogController {
   constructor(
     private readonly partCatalogService: PartCatalogService,
-    @Optional() private readonly catalogSearchService?: CatalogSearchService,
+    private readonly catalogSearchService: CatalogSearchService,
   ) {}
 
   @Post()
@@ -72,20 +70,6 @@ export class PartCatalogController {
     return this.partCatalogService.create(dto);
   }
 
-  @Get()
-  @RequirePermissions(Permission.CATALOG_VIEW)
-  @Roles(
-    UserRole.SUPER_ADMIN,
-    UserRole.SHOP_ADMIN,
-    UserRole.MANAGER,
-    UserRole.SELLER,
-  )
-  @ApiOperation({ summary: 'Получить центральный каталог деталей' })
-  @ApiOkResponse({ description: 'Список с фильтрами и пагинацией' })
-  findAll(@Query() query: PartCatalogItemQueryDto) {
-    return this.partCatalogService.findAll(query);
-  }
-
   @Get('search')
   @RequirePermissions(Permission.CATALOG_VIEW)
   @Roles(
@@ -100,30 +84,7 @@ export class PartCatalogController {
       'Поиск по названию, нормализованному названию и подтверждённым синонимам',
   })
   search(@Query() query: PartCatalogItemQueryDto) {
-    return (
-      this.catalogSearchService?.search(query) ??
-      this.partCatalogService.findAll(query)
-    );
-  }
-
-  @Get('candidates')
-  @RequirePermissions(Permission.CATALOG_VIEW)
-  @Roles(
-    UserRole.SUPER_ADMIN,
-    UserRole.SHOP_ADMIN,
-    UserRole.MANAGER,
-    UserRole.SELLER,
-    UserRole.VIEWER,
-  )
-  @ApiOperation({
-    summary: 'Найти возможные совпадения канонической детали',
-    description:
-      'Возвращает кандидатов для ручной проверки; записи не объединяются автоматически',
-  })
-  @ApiOkResponse({ description: 'Кандидаты с причиной совпадения' })
-  @ApiBadRequestResponse({ description: 'Некорректный поисковый запрос' })
-  findCandidates(@Query() query: PartCatalogCandidatesQueryDto) {
-    return this.partCatalogService.findCandidates(query);
+    return this.catalogSearchService.search(query);
   }
 
   @Get(':partCatalogItemId/numbers')

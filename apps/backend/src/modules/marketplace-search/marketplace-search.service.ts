@@ -2,6 +2,7 @@ import { ForbiddenException, Injectable } from '@nestjs/common';
 import { PartNumberType, Prisma, UserRole } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
 import { InventoryActor } from '../inventory-items/inventory-items.service';
+import { CatalogSearchService } from '../part-catalog/catalog-search.service';
 import { VinService } from '../vin/vin.service';
 import { MarketplaceSearchQueryDto } from './dto/marketplace-search-query.dto';
 
@@ -12,6 +13,7 @@ export class MarketplaceSearchService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly vinService: VinService,
+    private readonly catalogSearch: CatalogSearchService,
   ) {}
 
   async search(query: MarketplaceSearchQueryDto, actor: InventoryActor) {
@@ -20,6 +22,16 @@ export class MarketplaceSearchService {
     const vehicle = isVin ? await this.vinService.decode(text) : null;
     const vinCatalogIds = vehicle?.catalogItems.map((item) => item.id) ?? [];
     const normalizedNumber = text.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+    const catalogNameIds =
+      text && !isVin
+        ? (
+            await this.catalogSearch.findMatches({
+              search: text,
+              isActive: true,
+              limit: 100,
+            })
+          ).map((item) => item.id)
+        : [];
     const shopId = this.resolveShop(actor, query.shopId);
 
     const numberTypes = this.numberTypes(query);
@@ -43,30 +55,20 @@ export class MarketplaceSearchService {
         : text
           ? {
               OR: [
-                { name: { contains: text, mode: 'insensitive' } },
-                { normalizedName: { contains: text.toLowerCase() } },
-                { searchTokens: { contains: text.toLowerCase() } },
-                { internalCode: { contains: text, mode: 'insensitive' } },
-                {
-                  aliases: {
-                    some: {
-                      normalizedAlias: {
-                        contains: text.toLowerCase(),
-                      },
-                    },
-                  },
-                },
+                { id: { in: catalogNameIds } },
                 ...(normalizedNumber
-                  ? [{
-                      partNumbers: {
-                        some: {
-                          normalizedNumber: {
-                            contains: normalizedNumber,
-                            mode: 'insensitive' as const,
+                  ? [
+                      {
+                        partNumbers: {
+                          some: {
+                            normalizedNumber: {
+                              contains: normalizedNumber,
+                              mode: 'insensitive' as const,
+                            },
                           },
                         },
                       },
-                    }]
+                    ]
                   : []),
               ],
             }
@@ -86,6 +88,7 @@ export class MarketplaceSearchService {
       this.prisma.shopInventoryItem.findMany({
         where,
         include: {
+          warehouse: { select: { id: true, name: true } },
           shop: {
             select: { id: true, name: true, city: true, address: true },
           },
@@ -181,8 +184,9 @@ export class MarketplaceSearchService {
         return `${generation.vehicleModel.manufacturer.name} ${generation.vehicleModel.name} ${generation.name}`;
       }),
     ].filter((value, index, values) => values.indexOf(value) === index);
-    const primaryManufacturer = numbers.find((number) => number.isPrimary)?.manufacturer
-      ?? numbers.find((number) => number.manufacturer)?.manufacturer;
+    const primaryManufacturer =
+      numbers.find((number) => number.isPrimary)?.manufacturer ??
+      numbers.find((number) => number.manufacturer)?.manufacturer;
 
     return {
       inventoryItemId: item.id,
@@ -200,7 +204,7 @@ export class MarketplaceSearchService {
       quantity: item.quantity,
       price: item.price.toFixed(2),
       currency: item.currency,
-      warehouse: item.location,
+      warehouse: item.warehouse?.name ?? item.location,
       manufacturer: item.brand
         ? { id: null, name: item.brand }
         : primaryManufacturer,

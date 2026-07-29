@@ -44,6 +44,7 @@ export class DashboardService {
       recentSales,
       recentPurchases,
       grouped,
+      warehouseInventory,
     ] = await Promise.all([
       this.prisma.sale.aggregate({
         where: saleWhere,
@@ -111,7 +112,37 @@ export class DashboardService {
         orderBy: { _sum: { quantity: 'desc' } },
         take: 10,
       }),
+      this.prisma.shopInventoryItem.findMany({
+        where: inventoryWhere,
+        select: {
+          quantity: true,
+          price: true,
+          warehouseId: true,
+          warehouse: { select: { name: true } },
+        },
+      }),
     ]);
+    const warehouseMap = new Map<
+      string,
+      {
+        warehouseId: string | null;
+        name: string;
+        quantity: number;
+        value: Prisma.Decimal;
+      }
+    >();
+    for (const item of warehouseInventory) {
+      const key = item.warehouseId ?? 'legacy';
+      const current = warehouseMap.get(key) ?? {
+        warehouseId: item.warehouseId,
+        name: item.warehouse?.name ?? 'Без склада',
+        quantity: 0,
+        value: new Prisma.Decimal(0),
+      };
+      current.quantity += item.quantity;
+      current.value = current.value.plus(item.price.mul(item.quantity));
+      warehouseMap.set(key, current);
+    }
     const inventoryIds = grouped.map((item) => item.inventoryItemId);
     const items = inventoryIds.length
       ? await this.prisma.shopInventoryItem.findMany({
@@ -124,6 +155,65 @@ export class DashboardService {
         })
       : [];
     const itemById = new Map(items.map((item) => [item.id, item]));
+    const orderWhere: Prisma.CustomerOrderWhereInput = {
+      createdAt: { gte: dateFrom, lte: dateTo },
+      ...(shopId && { items: { some: { shopId } } }),
+    };
+    const [ordersByStatus, orderMoney, reservedInventory] = await Promise.all([
+      this.prisma.customerOrder.groupBy({
+        by: ['status'],
+        where: orderWhere,
+        _count: { id: true },
+      }),
+      this.prisma.customerOrder.aggregate({
+        where: {
+          ...orderWhere,
+          status: { in: ['CONFIRMED', 'READY', 'COMPLETED'] },
+        },
+        _count: { id: true },
+        _sum: { total: true },
+        _avg: { total: true },
+      }),
+      this.prisma.shopInventoryItem.aggregate({
+        where: inventoryWhere,
+        _sum: { reservedQuantity: true },
+      }),
+    ]);
+    const orderCount = (status: string) =>
+      ordersByStatus.find((row) => row.status === status)?._count.id ?? 0;
+    const [
+      paymentCompleted,
+      paymentRefunded,
+      payableTotals,
+      payoutTotals,
+      platformOrders,
+    ] = await Promise.all([
+      this.prisma.customerOrderPayment.aggregate({
+        where: { status: 'COMPLETED', order: orderWhere },
+        _sum: { amount: true },
+      }),
+      this.prisma.customerOrderPayment.aggregate({
+        where: { status: 'REFUNDED', order: orderWhere },
+        _sum: { amount: true },
+      }),
+      this.prisma.shopPayable.aggregate({
+        where: { ...(shopId && { shopId }), status: { not: 'CANCELLED' } },
+        _sum: { payableAmount: true, paidAmount: true },
+      }),
+      this.prisma.shopPayout.aggregate({
+        where: { ...(shopId && { shopId }), status: 'COMPLETED' },
+        _sum: { amount: true },
+      }),
+      this.prisma.customerOrder.aggregate({
+        where: orderWhere,
+        _sum: {
+          total: true,
+          paidAmount: true,
+          platformProductRevenue: true,
+          platformDeliveryRevenue: true,
+        },
+      }),
+    ]);
     return {
       period: {
         dateFrom: dateFrom.toISOString(),
@@ -144,6 +234,10 @@ export class DashboardService {
         totalQuantity: inventory._sum.quantity ?? 0,
         lowStockItems,
         outOfStockItems,
+        byWarehouse: [...warehouseMap.values()].map((item) => ({
+          ...item,
+          value: item.value.toString(),
+        })),
       },
       recentSales: recentSales.map((sale) => ({
         ...sale,
@@ -165,6 +259,47 @@ export class DashboardService {
           total: group._sum.lineTotal?.toString() ?? '0',
         };
       }),
+      orders: {
+        draft: orderCount('DRAFT'),
+        reserved: orderCount('RESERVED'),
+        expired: orderCount('EXPIRED'),
+        confirmed: orderCount('CONFIRMED'),
+        completed: orderCount('COMPLETED'),
+        cancelled: orderCount('CANCELLED'),
+        revenueOrderCount: orderMoney._count.id,
+        total: orderMoney._sum.total?.toString() ?? '0',
+        average: orderMoney._avg.total?.toString() ?? '0',
+        reservedItems: reservedInventory._sum.reservedQuantity ?? 0,
+      },
+      finance: {
+        customerPayments: paymentCompleted._sum.amount?.toString() ?? '0',
+        customerRefunds: paymentRefunded._sum.amount?.toString() ?? '0',
+        accruedToShops: payableTotals._sum.payableAmount?.toString() ?? '0',
+        paidToShops:
+          payoutTotals._sum.amount?.toString() ??
+          payableTotals._sum.paidAmount?.toString() ??
+          '0',
+        shopOutstanding: (
+          payableTotals._sum.payableAmount?.minus(
+            payableTotals._sum.paidAmount ?? 0,
+          ) ?? new Prisma.Decimal(0)
+        ).toString(),
+        customerReceivables: (
+          platformOrders._sum.total?.minus(
+            platformOrders._sum.paidAmount ?? 0,
+          ) ?? new Prisma.Decimal(0)
+        ).toString(),
+        ...(actor.role === UserRole.SUPER_ADMIN && {
+          platformProductRevenue:
+            platformOrders._sum.platformProductRevenue?.toString() ?? '0',
+          platformDeliveryRevenue:
+            platformOrders._sum.platformDeliveryRevenue?.toString() ?? '0',
+          platformRevenue:
+            platformOrders._sum.platformProductRevenue
+              ?.plus(platformOrders._sum.platformDeliveryRevenue ?? 0)
+              .toString() ?? '0',
+        }),
+      },
     };
   }
 

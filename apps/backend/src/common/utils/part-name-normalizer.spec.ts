@@ -1,5 +1,6 @@
 import {
   getPartNameSearchTokens,
+  getPartNameTokenSearchVariants,
   getPartNameTokens,
   normalizePartName,
 } from './part-name-normalizer';
@@ -27,5 +28,20 @@ describe('part name normalizer', () => {
     expect(getPartNameSearchTokens('передние колодки тормозные')).toBe(
       'колодки передние тормозные',
     );
+  });
+
+  it.each([
+    ['радиатор', ['радиатор']],
+    ['радиаторы', ['радиаторы', 'радиатор']],
+    ['колодка', ['колодка', 'колодк']],
+    ['колодки', ['колодки', 'колодк']],
+    ['фара', ['фара', 'фар']],
+    ['фары', ['фары', 'фар']],
+    ['дверь', ['дверь', 'двер']],
+    ['двери', ['двери', 'двер']],
+    ['подшипники', ['подшипники', 'подшипник']],
+    ['амортизаторы', ['амортизаторы', 'амортизатор']],
+  ])('builds Russian search variants for %p', (input, expected) => {
+    expect(getPartNameTokenSearchVariants(input)).toEqual(expected);
   });
 });

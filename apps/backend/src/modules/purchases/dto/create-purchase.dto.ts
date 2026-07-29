@@ -13,6 +13,12 @@ import {
 } from 'class-validator';
 
 export class PurchaseLineDto {
+  @ApiPropertyOptional({
+    description: 'Если не указан, используется основной склад',
+  })
+  @IsOptional()
+  @IsUUID()
+  warehouseId?: string;
   @ApiPropertyOptional() @IsOptional() @IsUUID() inventoryItemId?: string;
   @ApiPropertyOptional() @IsOptional() @IsUUID() catalogItemId?: string;
   @ApiProperty({ minimum: 1 })

@@ -28,6 +28,14 @@ export class PartCatalogItemQueryDto {
   search?: string;
 
   @ApiPropertyOptional({
+    description: 'Короткий alias параметра search для autocomplete-клиентов',
+  })
+  @IsOptional()
+  @IsString()
+  @Length(1, 200)
+  q?: string;
+
+  @ApiPropertyOptional({
     example: 'AUT-000001',
     description: 'Точный внутренний код',
   })

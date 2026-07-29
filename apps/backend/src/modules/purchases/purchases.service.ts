@@ -12,13 +12,18 @@ import {
   UserRole,
 } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
+import { buildInventoryKey } from '../../common/utils/inventory-key';
 import { InventoryActor } from '../inventory-items/inventory-items.service';
+import { ShopWarehousesService } from '../shop-warehouses/shop-warehouses.service';
 import { CancelPurchaseDto } from './dto/cancel-purchase.dto';
 import { CreatePurchaseDto } from './dto/create-purchase.dto';
 import { QueryPurchasesDto } from './dto/query-purchases.dto';
 @Injectable()
 export class PurchasesService {
-  constructor(private p: PrismaService) {}
+  constructor(
+    private p: PrismaService,
+    private warehouses: ShopWarehousesService,
+  ) {}
   private shop(a: InventoryActor, id?: string) {
     if (a.role === UserRole.SUPER_ADMIN) {
       if (!id) throw new BadRequestException('Необходимо указать shopId');
@@ -90,17 +95,17 @@ export class PurchasesService {
       const resolved: Array<{
         line: CreatePurchaseDto['items'][number];
         item: Prisma.ShopInventoryItemGetPayload<{
-          include: { partCatalogItem: true };
+          include: { partCatalogItem: true; warehouse: true };
         }>;
       }> = [];
       for (const line of d.items) {
         let item: Prisma.ShopInventoryItemGetPayload<{
-          include: { partCatalogItem: true };
+          include: { partCatalogItem: true; warehouse: true };
         }>;
         if (line.inventoryItemId) {
           const existingItem = await tx.shopInventoryItem.findUnique({
             where: { id: line.inventoryItemId },
-            include: { partCatalogItem: true },
+            include: { partCatalogItem: true, warehouse: true },
           });
           if (!existingItem)
             throw new NotFoundException('Складская позиция не найдена');
@@ -124,15 +129,22 @@ export class PurchasesService {
           const salePrice = new Prisma.Decimal(
             line.salePrice ?? line.purchasePrice,
           );
+          const warehouse = await this.warehouses.resolve(
+            tx,
+            shopId,
+            line.warehouseId,
+          );
+          const inventoryKey = buildInventoryKey({
+            shopId,
+            warehouseId: warehouse.id,
+            partCatalogItemId: catalogItem.id,
+          });
           item = await tx.shopInventoryItem.upsert({
-            where: {
-              shopId_partCatalogItemId: {
-                shopId,
-                partCatalogItemId: catalogItem.id,
-              },
-            },
+            where: { inventoryKey },
             create: {
               shopId,
+              warehouseId: warehouse.id,
+              inventoryKey,
               partCatalogItemId: catalogItem.id,
               quantity: 0,
               price: salePrice,
@@ -140,7 +152,7 @@ export class PurchasesService {
               isActive: true,
             },
             update: { isActive: true },
-            include: { partCatalogItem: true },
+            include: { partCatalogItem: true, warehouse: true },
           });
         }
         resolved.push({ line, item });
@@ -212,12 +224,21 @@ export class PurchasesService {
             purchasePrice: price,
             salePrice,
             lineTotal: price.mul(line.quantity),
+            warehouseId: i.warehouseId,
+            warehouseName: i.warehouse?.name ?? null,
           },
         });
         await tx.inventoryMovement.create({
           data: {
             shopId,
             inventoryItemId: i.id,
+            warehouseId: i.warehouseId,
+            warehouseNameSnapshot: i.warehouse?.name ?? null,
+            partCatalogItemId: i.partCatalogItemId,
+            partCatalogItemNameSnapshot: i.partCatalogItem.name,
+            documentType: 'PURCHASE',
+            documentId: purchase.id,
+            documentNumber: number,
             userId: a.id,
             type: InventoryMovementType.PURCHASE,
             change: line.quantity,
@@ -320,6 +341,13 @@ export class PurchasesService {
           data: {
             shopId: purchase.shopId,
             inventoryItemId: x.inventoryItemId,
+            warehouseId: x.warehouseId,
+            warehouseNameSnapshot: x.warehouseName,
+            partCatalogItemId: x.partCatalogItemId,
+            partCatalogItemNameSnapshot: x.itemName,
+            documentType: 'PURCHASE',
+            documentId: purchase.id,
+            documentNumber: purchase.number,
             userId: a.id,
             type: InventoryMovementType.PURCHASE_CANCEL,
             change: -x.quantity,

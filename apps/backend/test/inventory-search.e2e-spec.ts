@@ -5,6 +5,7 @@ import * as bcrypt from 'bcryptjs';
 import request from 'supertest';
 import { AppModule } from '../src/app.module';
 import { createPartCatalogItem } from './helpers/create-part-catalog-item';
+import { createManyShopInventoryItems } from './helpers/create-shop-inventory-item';
 
 describe('Inventory search (e2e)', () => {
   let app: INestApplication,
@@ -74,40 +75,38 @@ describe('Inventory search (e2e)', () => {
         }),
       ),
     );
-    await prisma.shopInventoryItem.createMany({
-      data: [
-        {
-          shopId: shopA,
-          partCatalogItemId: partA.id,
-          brand: 'A',
-          oemNumber: `OEM-${prefix}`,
-          price: 100,
-          quantity: 5,
-        },
-        {
-          shopId: shopA,
-          partCatalogItemId: partZero.id,
-          brand: 'ZERO',
-          price: 50,
-          quantity: 0,
-        },
-        {
-          shopId: shopB,
-          partCatalogItemId: partB.id,
-          brand: 'B',
-          price: 200,
-          quantity: 3,
-        },
-        {
-          shopId: shopB,
-          partCatalogItemId: partOff.id,
-          brand: 'OFF',
-          price: 300,
-          quantity: 2,
-          isActive: false,
-        },
-      ],
-    });
+    await createManyShopInventoryItems(prisma, [
+      {
+        shopId: shopA,
+        partCatalogItemId: partA.id,
+        brand: 'A',
+        oemNumber: `OEM-${prefix}`,
+        price: 100,
+        quantity: 5,
+      },
+      {
+        shopId: shopA,
+        partCatalogItemId: partZero.id,
+        brand: 'ZERO',
+        price: 50,
+        quantity: 0,
+      },
+      {
+        shopId: shopB,
+        partCatalogItemId: partB.id,
+        brand: 'B',
+        price: 200,
+        quantity: 3,
+      },
+      {
+        shopId: shopB,
+        partCatalogItemId: partOff.id,
+        brand: 'OFF',
+        price: 300,
+        quantity: 2,
+        isActive: false,
+      },
+    ]);
     const login = async (phone: string) =>
       (
         await request(app.getHttpServer())

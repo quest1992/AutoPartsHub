@@ -1,18 +1,9 @@
-import {
-  Inject,
-  Injectable,
-  Logger,
-  NotFoundException,
-} from '@nestjs/common';
+import { Inject, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
 import { VinCacheQueryDto } from './dto/vin-cache-query.dto';
 import type { VinProvider } from './providers/vin-provider.interface';
-import {
-  VIN_PROVIDER,
-  VinDecodedVehicle,
-  VinMatchStatus,
-} from './vin.types';
+import { VIN_PROVIDER, VinDecodedVehicle, VinMatchStatus } from './vin.types';
 
 @Injectable()
 export class VinService {
@@ -26,7 +17,9 @@ export class VinService {
   async decode(vinInput: string) {
     const startedAt = Date.now();
     const vin = vinInput.trim().toUpperCase();
-    const cached = await this.prisma.vinDecodeCache.findUnique({ where: { vin } });
+    const cached = await this.prisma.vinDecodeCache.findUnique({
+      where: { vin },
+    });
     const cacheHit = Boolean(cached);
 
     const decoded: VinDecodedVehicle = cached
@@ -127,7 +120,9 @@ export class VinService {
   }
 
   async findCacheOne(id: string) {
-    const entry = await this.prisma.vinDecodeCache.findUnique({ where: { id } });
+    const entry = await this.prisma.vinDecodeCache.findUnique({
+      where: { id },
+    });
     if (!entry) throw new NotFoundException('VIN cache entry не найдена');
     return entry;
   }
@@ -141,48 +136,64 @@ export class VinService {
   private async matchVehicle(vehicle: VinDecodedVehicle) {
     const brand = vehicle.manufacturer
       ? await this.prisma.manufacturer.findFirst({
-          where: { name: { equals: vehicle.manufacturer, mode: 'insensitive' }, isActive: true },
-          select: { id: true },
-        })
-      : null;
-    const model = brand && vehicle.model
-      ? await this.prisma.vehicleModel.findFirst({
           where: {
-            manufacturerId: brand.id,
-            name: { equals: vehicle.model, mode: 'insensitive' },
+            name: { equals: vehicle.manufacturer, mode: 'insensitive' },
             isActive: true,
           },
           select: { id: true },
         })
       : null;
-    const generation = model && vehicle.generation
-      ? await this.prisma.vehicleGeneration.findFirst({
-          where: {
-            vehicleModelId: model.id,
-            name: { equals: vehicle.generation, mode: 'insensitive' },
-            isActive: true,
-            ...(vehicle.year
-              ? {
-                  AND: [
-                    { OR: [{ startYear: null }, { startYear: { lte: vehicle.year } }] },
-                    { OR: [{ endYear: null }, { endYear: { gte: vehicle.year } }] },
-                  ],
-                }
-              : {}),
-          },
-          select: { id: true },
-        })
-      : null;
-    const engine = generation && vehicle.engineCode
-      ? await this.prisma.engine.findFirst({
-          where: {
-            generationId: generation.id,
-            code: { equals: vehicle.engineCode, mode: 'insensitive' },
-            isActive: true,
-          },
-          select: { id: true },
-        })
-      : null;
+    const model =
+      brand && vehicle.model
+        ? await this.prisma.vehicleModel.findFirst({
+            where: {
+              manufacturerId: brand.id,
+              name: { equals: vehicle.model, mode: 'insensitive' },
+              isActive: true,
+            },
+            select: { id: true },
+          })
+        : null;
+    const generation =
+      model && vehicle.generation
+        ? await this.prisma.vehicleGeneration.findFirst({
+            where: {
+              vehicleModelId: model.id,
+              name: { equals: vehicle.generation, mode: 'insensitive' },
+              isActive: true,
+              ...(vehicle.year
+                ? {
+                    AND: [
+                      {
+                        OR: [
+                          { startYear: null },
+                          { startYear: { lte: vehicle.year } },
+                        ],
+                      },
+                      {
+                        OR: [
+                          { endYear: null },
+                          { endYear: { gte: vehicle.year } },
+                        ],
+                      },
+                    ],
+                  }
+                : {}),
+            },
+            select: { id: true },
+          })
+        : null;
+    const engine =
+      generation && vehicle.engineCode
+        ? await this.prisma.engine.findFirst({
+            where: {
+              generationId: generation.id,
+              code: { equals: vehicle.engineCode, mode: 'insensitive' },
+              isActive: true,
+            },
+            select: { id: true },
+          })
+        : null;
 
     let matchStatus: VinMatchStatus = 'NOT_FOUND';
     if (engine) matchStatus = 'FOUND';

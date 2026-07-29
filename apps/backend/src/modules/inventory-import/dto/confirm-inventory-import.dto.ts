@@ -1,5 +1,21 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsOptional, IsString, IsUUID, Length } from 'class-validator';
+import { Type } from 'class-transformer';
+import {
+  IsArray,
+  IsBoolean,
+  IsEnum,
+  IsInt,
+  IsNumber,
+  IsOptional,
+  IsString,
+  IsUUID,
+  Min,
+  ValidateNested,
+} from 'class-validator';
+import type {
+  DuplicateAction,
+  ImportMode,
+} from '../types/inventory-import.types';
 
 export class PreviewInventoryImportDto {
   @ApiPropertyOptional({
@@ -9,110 +25,81 @@ export class PreviewInventoryImportDto {
   @IsOptional()
   @IsUUID()
   shopId?: string;
+}
 
-  @ApiPropertyOptional({
-    description: 'Колонка с артикулом / OEM / SKU',
-    example: 'Артикул',
-  })
+export class ConfirmInventoryImportRowDto {
+  @ApiProperty()
+  @IsInt()
+  @Min(2)
+  rowNumber!: number;
+
+  @ApiProperty()
+  @IsBoolean()
+  include!: boolean;
+
+  @ApiPropertyOptional({ format: 'uuid' })
+  @IsOptional()
+  @IsUUID()
+  catalogItemId?: string;
+
+  @ApiProperty()
+  @IsInt()
+  @Min(0)
+  quantity!: number;
+
+  @ApiProperty()
+  @IsNumber()
+  @Min(0)
+  salePrice!: number;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsNumber()
+  @Min(0)
+  purchasePrice?: number;
+
+  @ApiPropertyOptional()
   @IsOptional()
   @IsString()
-  @Length(1, 200)
-  partNumberColumn?: string;
+  warehouseId?: string;
 
-  @ApiPropertyOptional({
-    description: 'Колонка с наименованием товара',
-    example: 'Наименование',
-  })
+  @ApiPropertyOptional()
   @IsOptional()
   @IsString()
-  @Length(1, 200)
-  nameColumn?: string;
+  article?: string;
 
-  @ApiPropertyOptional({
-    description: 'Колонка с совместимостью с автомобилями',
-    example: 'Совместимость',
-  })
+  @ApiPropertyOptional()
   @IsOptional()
   @IsString()
-  @Length(1, 200)
-  compatibilityColumn?: string;
+  oem?: string;
 
-  @ApiPropertyOptional({
-    description: 'Колонка с местом хранения товара',
-    example: 'Место хранения',
-  })
+  @ApiPropertyOptional()
   @IsOptional()
   @IsString()
-  @Length(1, 200)
-  storageLocationColumn?: string;
+  manufacturer?: string;
 
-  @ApiPropertyOptional({ description: 'Колонка с ценой', example: 'Цена' })
+  @ApiPropertyOptional()
   @IsOptional()
   @IsString()
-  @Length(1, 200)
-  priceColumn?: string;
+  note?: string;
 
-  @ApiPropertyOptional({
-    description: 'Колонка с количеством',
-    example: 'Остаток',
-  })
+  @ApiPropertyOptional({ enum: ['MERGE_QUANTITY', 'KEEP_FIRST', 'KEEP_ALL'] })
   @IsOptional()
-  @IsString()
-  @Length(1, 200)
-  quantityColumn?: string;
+  @IsEnum(['MERGE_QUANTITY', 'KEEP_FIRST', 'KEEP_ALL'])
+  duplicateAction?: DuplicateAction;
 }
 
 export class ConfirmInventoryImportDto {
-  @ApiPropertyOptional({
-    format: 'uuid',
-    description: 'Обязателен для SUPER_ADMIN',
-  })
-  @IsOptional()
-  @IsUUID()
-  shopId?: string;
-
-  @ApiPropertyOptional({
-    description: 'Колонка с артикулом / OEM / SKU',
-    example: 'Артикул',
-  })
-  @IsOptional()
-  @IsString()
-  @Length(1, 200)
-  partNumberColumn?: string;
-
   @ApiProperty({
-    description: 'Колонка с наименованием товара',
-    example: 'Наименование',
+    enum: ['ADD_QUANTITY', 'REPLACE_QUANTITY'],
+    default: 'ADD_QUANTITY',
   })
-  @IsString()
-  @Length(1, 200)
-  nameColumn!: string;
+  @IsEnum(['ADD_QUANTITY', 'REPLACE_QUANTITY'])
+  mode: ImportMode = 'ADD_QUANTITY';
 
-  @ApiPropertyOptional({
-    description: 'Колонка с совместимостью с автомобилями',
-    example: 'Совместимость',
-  })
-  @IsOptional()
-  @IsString()
-  @Length(1, 200)
-  compatibilityColumn?: string;
-
-  @ApiPropertyOptional({
-    description: 'Колонка с местом хранения товара',
-    example: 'Место хранения',
-  })
-  @IsOptional()
-  @IsString()
-  @Length(1, 200)
-  storageLocationColumn?: string;
-
-  @ApiProperty({ description: 'Колонка с ценой', example: 'Цена' })
-  @IsString()
-  @Length(1, 200)
-  priceColumn!: string;
-
-  @ApiProperty({ description: 'Колонка с количеством', example: 'Остаток' })
-  @IsString()
-  @Length(1, 200)
-  quantityColumn!: string;
+  @ApiProperty({ type: [ConfirmInventoryImportRowDto] })
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => ConfirmInventoryImportRowDto)
+  rows!: ConfirmInventoryImportRowDto[];
 }

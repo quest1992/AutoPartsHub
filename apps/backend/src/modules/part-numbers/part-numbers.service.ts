@@ -56,7 +56,11 @@ export class PartNumbersService {
 
   async create(dto: CreatePartNumberDto) {
     const normalizedNumber = this.requireNormalized(dto.number);
-    await this.assertReferences(this.prisma, dto.catalogItemId, dto.manufacturerId);
+    await this.assertReferences(
+      this.prisma,
+      dto.catalogItemId,
+      dto.manufacturerId,
+    );
 
     try {
       const item = await this.prisma.$transaction(async (tx) => {

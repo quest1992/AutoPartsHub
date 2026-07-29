@@ -25,6 +25,10 @@ export class ShopInventoryItemQueryDto {
   @ApiPropertyOptional({ format: 'uuid' })
   @IsOptional()
   @IsUUID()
+  warehouseId?: string;
+  @ApiPropertyOptional({ format: 'uuid' })
+  @IsOptional()
+  @IsUUID()
   partCatalogItemId?: string;
   @ApiPropertyOptional({ format: 'uuid' })
   @IsOptional()
@@ -75,6 +79,11 @@ export class ShopInventoryItemQueryDto {
   @Transform(bool)
   @IsBoolean()
   lowStock?: boolean;
+  @ApiPropertyOptional()
+  @IsOptional()
+  @Transform(bool)
+  @IsBoolean()
+  hasReservation?: boolean;
   @ApiPropertyOptional()
   @IsOptional()
   @Transform(bool)

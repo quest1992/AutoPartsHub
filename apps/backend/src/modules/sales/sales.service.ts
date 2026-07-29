@@ -28,8 +28,9 @@ export class SalesService {
           isolationLevel: Prisma.TransactionIsolationLevel.Serializable,
         });
       } catch (error) {
-        if ((error as { code?: string }).code !== 'P2034' || attempt >= 3)
+        if ((error as { code?: string }).code !== 'P2034' || attempt >= 5)
           throw error;
+        await new Promise((resolve) => setTimeout(resolve, attempt * 10));
       }
     }
   }
@@ -56,7 +57,7 @@ export class SalesService {
       });
       const items = await tx.shopInventoryItem.findMany({
         where: { id: { in: d.items.map((x) => x.inventoryItemId) } },
-        include: { partCatalogItem: true },
+        include: { partCatalogItem: true, warehouse: true },
       });
       if (items.length !== d.items.length)
         throw new NotFoundException('Складская позиция не найдена');
@@ -104,7 +105,7 @@ export class SalesService {
           where: {
             id: i.id,
             shopId,
-            quantity: { gte: l.quantity },
+            quantity: { gte: i.reservedQuantity + l.quantity },
             isActive: true,
           },
           data: { quantity: { decrement: l.quantity } },
@@ -115,7 +116,7 @@ export class SalesService {
             select: { quantity: true },
           });
           throw new ConflictException(
-            `Недостаточно товара “${i.partCatalogItem.name}”. Доступно: ${current?.quantity ?? 0}, запрошено: ${l.quantity}`,
+            `Недостаточно доступного товара “${i.partCatalogItem.name}”. Запрошено: ${l.quantity}`,
           );
         }
         await tx.saleItem.create({
@@ -130,12 +131,21 @@ export class SalesService {
             quantity: l.quantity,
             unitPrice: i.price,
             lineTotal: i.price.mul(l.quantity),
+            warehouseId: i.warehouseId,
+            warehouseName: i.warehouse?.name ?? null,
           },
         });
         await tx.inventoryMovement.create({
           data: {
             shopId,
             inventoryItemId: i.id,
+            warehouseId: i.warehouseId,
+            warehouseNameSnapshot: i.warehouse?.name ?? null,
+            partCatalogItemId: i.partCatalogItemId,
+            partCatalogItemNameSnapshot: i.partCatalogItem.name,
+            documentType: 'SALE',
+            documentId: sale.id,
+            documentNumber: number,
             userId: a.id,
             type: InventoryMovementType.SALE,
             change: -l.quantity,
@@ -289,12 +299,16 @@ export class SalesService {
     return this.serializable(async (tx) => {
       const s = await tx.sale.findUnique({
         where: { id },
-        include: { items: true },
+        include: { items: true, payable: true },
       });
       if (!s || (a.role !== UserRole.SUPER_ADMIN && s.shopId !== this.shop(a)))
         throw new NotFoundException('Продажа не найдена');
       if (s.status === SaleStatus.CANCELLED)
         throw new ConflictException('Продажа уже отменена');
+      if (s.payable?.paidAmount.gt(0))
+        throw new ConflictException(
+          'По этой продаже уже была выплата магазину. Сначала оформите финансовый возврат',
+        );
       for (const x of s.items) {
         const i = await tx.shopInventoryItem.findUniqueOrThrow({
           where: { id: x.inventoryItemId },
@@ -307,6 +321,13 @@ export class SalesService {
           data: {
             shopId: s.shopId,
             inventoryItemId: i.id,
+            warehouseId: x.warehouseId,
+            warehouseNameSnapshot: x.warehouseName,
+            partCatalogItemId: x.partCatalogItemId,
+            partCatalogItemNameSnapshot: x.itemName,
+            documentType: 'SALE',
+            documentId: s.id,
+            documentNumber: s.number,
             userId: a.id,
             type: InventoryMovementType.SALE_CANCEL,
             change: x.quantity,
@@ -317,6 +338,11 @@ export class SalesService {
           },
         });
       }
+      if (s.payable)
+        await tx.shopPayable.update({
+          where: { id: s.payable.id },
+          data: { status: 'CANCELLED' },
+        });
       return tx.sale.update({
         where: { id },
         data: {

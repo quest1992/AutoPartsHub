@@ -20,6 +20,13 @@ export class CreateShopInventoryItemDto {
   @IsUUID()
   shopId?: string;
   @ApiProperty({ format: 'uuid' }) @IsUUID() partCatalogItemId!: string;
+  @ApiPropertyOptional({
+    format: 'uuid',
+    description: 'Если не указан, используется основной склад',
+  })
+  @IsOptional()
+  @IsUUID()
+  warehouseId?: string;
   @ApiPropertyOptional()
   @IsOptional()
   @IsString()

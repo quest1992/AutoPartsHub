@@ -52,6 +52,11 @@ export class PartCategoriesService {
 
     const where: Prisma.PartCategoryWhereInput = {
       ...(isActive !== undefined && { isActive }),
+      ...(isActive === true && {
+        catalogItemMappings: {
+          none: { classification: { in: ['CATALOG_ITEM', 'INVALID'] } },
+        },
+      }),
       ...(rootOnly ? { parentId: null } : parentId ? { parentId } : {}),
       ...(leafOnly === true && { children: { none: {} } }),
 

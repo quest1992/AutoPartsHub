@@ -11,10 +11,19 @@ describe('VIN API (e2e)', () => {
   let app: INestApplication;
   const service = {
     decode: jest.fn().mockResolvedValue({
-      vehicle: { vin: '4T1G11AK0MU001001', manufacturer: 'Toyota', model: 'Camry' },
+      vehicle: {
+        vin: '4T1G11AK0MU001001',
+        manufacturer: 'Toyota',
+        model: 'Camry',
+      },
       cacheHit: false,
       matchStatus: 'FOUND',
-      matchedIds: { brandId: 'brand', modelId: 'model', generationId: 'generation', engineId: 'engine' },
+      matchedIds: {
+        brandId: 'brand',
+        modelId: 'model',
+        generationId: 'generation',
+        engineId: 'engine',
+      },
       catalogItems: [{ id: 'part', name: 'Oil filter' }],
     }),
     findCache: jest.fn(),
@@ -27,12 +36,17 @@ describe('VIN API (e2e)', () => {
       controllers: [VinController],
       providers: [{ provide: VinService, useValue: service }],
     })
-      .overrideGuard(JwtAuthGuard).useValue({ canActivate: () => true })
-      .overrideGuard(RolesGuard).useValue({ canActivate: () => true })
-      .overrideGuard(PermissionsGuard).useValue({ canActivate: () => true })
+      .overrideGuard(JwtAuthGuard)
+      .useValue({ canActivate: () => true })
+      .overrideGuard(RolesGuard)
+      .useValue({ canActivate: () => true })
+      .overrideGuard(PermissionsGuard)
+      .useValue({ canActivate: () => true })
       .compile();
     app = module.createNestApplication();
-    app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
+    app.useGlobalPipes(
+      new ValidationPipe({ whitelist: true, transform: true }),
+    );
     await app.init();
   });
 

@@ -14,14 +14,22 @@ import { MarketplaceSearchService } from './marketplace-search.service';
 @ApiTags('Marketplace Search')
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard, RolesGuard, PermissionsGuard)
-@Roles(UserRole.SUPER_ADMIN, UserRole.SHOP_ADMIN, UserRole.MANAGER, UserRole.SELLER, UserRole.VIEWER)
+@Roles(
+  UserRole.SUPER_ADMIN,
+  UserRole.SHOP_ADMIN,
+  UserRole.MANAGER,
+  UserRole.SELLER,
+  UserRole.VIEWER,
+)
 @Controller('marketplace-search')
 export class MarketplaceSearchController {
   constructor(private readonly service: MarketplaceSearchService) {}
 
   @Get()
   @RequirePermissions(Permission.INVENTORY_VIEW)
-  @ApiOperation({ summary: 'Единый поиск по VIN, OEM, Cross и названию детали' })
+  @ApiOperation({
+    summary: 'Единый поиск по VIN, OEM, Cross и названию детали',
+  })
   search(
     @Query() query: MarketplaceSearchQueryDto,
     @Req() request: { user: InventoryActor },

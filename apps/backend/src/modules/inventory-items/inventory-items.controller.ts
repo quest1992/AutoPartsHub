@@ -47,6 +47,7 @@ import {
   INVENTORY_IMAGE_MIME_TYPES,
 } from './inventory-image.service';
 import type { InventoryImageFile } from './inventory-image.service';
+import { AdjustInventoryDto } from './dto/adjust-inventory.dto';
 @ApiTags('Inventory Items')
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard, RolesGuard, PermissionsGuard)
@@ -90,6 +91,23 @@ export class InventoryItemsController {
     @Req() req: { user: InventoryActor },
   ) {
     return this.service.findAll(q, req.user);
+  }
+  @Get(':id/history')
+  @RequirePermissions(Permission.INVENTORY_VIEW)
+  history(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Req() req: { user: InventoryActor },
+  ) {
+    return this.service.history(id, req.user);
+  }
+  @Post(':id/adjust')
+  @RequirePermissions(Permission.INVENTORY_QUANTITY_UPDATE)
+  adjust(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() dto: AdjustInventoryDto,
+    @Req() req: { user: InventoryActor },
+  ) {
+    return this.service.adjust(id, dto, req.user);
   }
   @Get(':id')
   @RequirePermissions(Permission.INVENTORY_VIEW)

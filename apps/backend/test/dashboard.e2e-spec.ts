@@ -10,6 +10,7 @@ import * as bcrypt from 'bcryptjs';
 import request from 'supertest';
 import { AppModule } from '../src/app.module';
 import { createPartCatalogItem } from './helpers/create-part-catalog-item';
+import { createShopInventoryItem } from './helpers/create-shop-inventory-item';
 
 describe('Dashboard (e2e)', () => {
   let app: INestApplication;
@@ -87,41 +88,33 @@ describe('Dashboard (e2e)', () => {
       ),
     );
     const [itemA, , itemC] = await Promise.all([
-      prisma.shopInventoryItem.create({
-        data: {
-          shopId,
-          partCatalogItemId: partA.id,
-          price: 100,
-          quantity: 3,
-          isActive: true,
-        },
+      createShopInventoryItem(prisma, {
+        shopId,
+        partCatalogItemId: partA.id,
+        price: 100,
+        quantity: 3,
+        isActive: true,
       }),
-      prisma.shopInventoryItem.create({
-        data: {
-          shopId,
-          partCatalogItemId: partB.id,
-          price: 200,
-          quantity: 0,
-          isActive: true,
-        },
+      createShopInventoryItem(prisma, {
+        shopId,
+        partCatalogItemId: partB.id,
+        price: 200,
+        quantity: 0,
+        isActive: true,
       }),
-      prisma.shopInventoryItem.create({
-        data: {
-          shopId,
-          partCatalogItemId: partC.id,
-          price: 50,
-          quantity: 10,
-          isActive: true,
-        },
+      createShopInventoryItem(prisma, {
+        shopId,
+        partCatalogItemId: partC.id,
+        price: 50,
+        quantity: 10,
+        isActive: true,
       }),
-      prisma.shopInventoryItem.create({
-        data: {
-          shopId: otherShopId,
-          partCatalogItemId: otherPart.id,
-          price: 300,
-          quantity: 8,
-          isActive: true,
-        },
+      createShopInventoryItem(prisma, {
+        shopId: otherShopId,
+        partCatalogItemId: otherPart.id,
+        price: 300,
+        quantity: 8,
+        isActive: true,
       }),
     ]);
     const sale = await prisma.sale.create({
@@ -258,6 +251,14 @@ describe('Dashboard (e2e)', () => {
       totalQuantity: 13,
       lowStockItems: 1,
       outOfStockItems: 1,
+      byWarehouse: [
+        {
+          warehouseId: expect.any(String),
+          name: 'Основной склад',
+          quantity: 13,
+          value: '800',
+        },
+      ],
     });
   });
   it('lets SUPER_ADMIN aggregate all shops or select one shop', async () => {

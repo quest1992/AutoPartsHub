@@ -38,7 +38,13 @@ import { VehicleModelsService } from './vehicle-models.service';
 @ApiTags('Модели автомобилей')
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard, RolesGuard, PermissionsGuard)
-@Roles(UserRole.SUPER_ADMIN, UserRole.SHOP_ADMIN, UserRole.MANAGER, UserRole.SELLER, UserRole.VIEWER)
+@Roles(
+  UserRole.SUPER_ADMIN,
+  UserRole.SHOP_ADMIN,
+  UserRole.MANAGER,
+  UserRole.SELLER,
+  UserRole.VIEWER,
+)
 @ApiUnauthorizedResponse({ description: 'Требуется действующий JWT' })
 @ApiForbiddenResponse({ description: 'Доступен только SUPER_ADMIN' })
 @Controller('vehicle-models')

@@ -5,6 +5,7 @@ import * as bcrypt from 'bcryptjs';
 import request from 'supertest';
 import { AppModule } from '../src/app.module';
 import { createPartCatalogItem } from './helpers/create-part-catalog-item';
+import { createShopInventoryItem } from './helpers/create-shop-inventory-item';
 
 describe('Purchases (e2e)', () => {
   let app: INestApplication;
@@ -68,8 +69,11 @@ describe('Purchases (e2e)', () => {
       })
     ).id;
     itemId = (
-      await prisma.shopInventoryItem.create({
-        data: { shopId, partCatalogItemId: part.id, price: 100, quantity: 2 },
+      await createShopInventoryItem(prisma, {
+        shopId,
+        partCatalogItemId: part.id,
+        price: 100,
+        quantity: 2,
       })
     ).id;
     const login = await request(app.getHttpServer())
