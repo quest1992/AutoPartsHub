@@ -7,11 +7,15 @@ import {
   deleteInventory,
   inventoryList,
   InventoryList,
+  getWarehouses,ShopWarehouse,
 } from '../../lib/api';
 
 export default function InventoryPage() {
+  const[warehouseId,setWarehouseId]=useState('');
+  const[warehouses,setWarehouses]=useState<ShopWarehouse[]>([]);
   const [q, setQ] = useState('');
   const [active, setActive] = useState('true');
+  const [hasReservation, setHasReservation] = useState(false);
   const [data, setData] = useState<InventoryList | null>(null);
   const [page, setPage] = useState(1);
   const [error, setError] = useState('');
@@ -23,6 +27,8 @@ export default function InventoryPage() {
         const result = await inventoryList({
           search: q.trim() || undefined,
           isActive: active === '' ? undefined : active,
+          warehouseId,
+          hasReservation: hasReservation || undefined,
           page: nextPage,
           limit: 20,
         });
@@ -34,7 +40,7 @@ export default function InventoryPage() {
         );
       }
     },
-    [q, active],
+    [q, active,warehouseId,hasReservation],
   );
 
   useEffect(() => {
@@ -44,6 +50,7 @@ export default function InventoryPage() {
 
     return () => window.clearTimeout(timer);
   }, [load]);
+  useEffect(()=>{getWarehouses().then(setWarehouses).catch(()=>undefined)},[]);
 
   async function remove(id: string) {
     if (confirm('Отключить этот товар?')) {
@@ -90,7 +97,7 @@ export default function InventoryPage() {
             </p>
           </div>
 
-          <div className="grid gap-3 lg:grid-cols-[minmax(280px,1fr)_220px_auto]">
+          <div className="grid gap-3 lg:grid-cols-[minmax(280px,1fr)_220px_220px_auto]">
             <div className="relative">
               <span
                 aria-hidden="true"
@@ -118,6 +125,8 @@ export default function InventoryPage() {
               <option value="false">Отключённые</option>
               <option value="">Все товары</option>
             </select>
+            <select value={warehouseId} onChange={event=>setWarehouseId(event.target.value)} className="h-11 rounded-xl border border-slate-200 px-3"><option value="">Все склады</option>{warehouses.map(warehouse=><option key={warehouse.id} value={warehouse.id}>{warehouse.name}</option>)}</select>
+            <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={hasReservation} onChange={event=>setHasReservation(event.target.checked)}/>Есть резерв</label>
 
             <button
               type="button"
@@ -158,7 +167,7 @@ export default function InventoryPage() {
                   <th className="px-5 py-3.5">Товар</th>
                   <th className="px-5 py-3.5">Категория / автомобиль</th>
                   <th className="px-5 py-3.5">Цена</th>
-                  <th className="px-5 py-3.5">Остаток</th>
+                  <th className="px-5 py-3.5">Остаток / резерв / доступно</th>
                   <th className="px-5 py-3.5 text-right">Действия</th>
                 </tr>
               </thead>
@@ -221,13 +230,13 @@ export default function InventoryPage() {
                         </p>
                         <p
                           className={`mt-1.5 text-xs ${
-                            item.location ? 'text-slate-600' : 'text-slate-400'
+                            item.warehouse ? 'text-slate-600' : 'text-slate-400'
                           }`}
-                          title={item.location ?? undefined}
+                          title={item.warehouse?.name}
                         >
-                          {item.location
-                            ? `Место: ${item.location}`
-                            : 'Место не указано'}
+                          {item.warehouse
+                            ? `Склад: ${item.warehouse.name}`
+                            : 'Склад не указан'}
                         </p>
                       </td>
 
@@ -252,6 +261,7 @@ export default function InventoryPage() {
                         >
                           {item.quantity}
                         </span>
+                        <div className="mt-1 text-xs text-slate-500">В резерве: {item.reservedQuantity}<br/>Доступно: {item.availableQuantity}</div>
                       </td>
 
                       <td className="px-5 py-5 align-middle">
@@ -262,6 +272,7 @@ export default function InventoryPage() {
                           >
                             Изменить
                           </Link>
+                          <Link href={`/inventory/${item.id}/history`} className="text-blue-700">История / корректировка</Link>
                           <button
                             type="button"
                             onClick={() => void remove(item.id)}

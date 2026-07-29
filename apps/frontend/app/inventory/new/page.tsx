@@ -11,6 +11,7 @@ export default function NewInventoryPage() {
   async function save(v: InventoryValues, image: File | null) {
     const item = await createInventory({
       partCatalogItemId: v.partCatalogItemId,
+      warehouseId: v.warehouseId,
       brand: v.brand || undefined,
       sku: v.sku || undefined,
       oemNumber: v.oemNumber || undefined,

@@ -7,22 +7,78 @@ export const login = (phone:string,password:string) => request<LoginResponse>('/
 export type UserRole='SUPER_ADMIN'|'SHOP_ADMIN'|'MANAGER'|'SELLER'|'VIEWER'; export type CurrentUser={id:string;firstName:string;lastName:string|null;phone:string;role:UserRole;shopId:string|null;isActive:boolean;shop:{id:string;name:string;isActive:boolean}|null;permissions:string[]}; export const getCurrentUser=()=>request<{user:CurrentUser}>('/auth/me');
 export type SearchResponse={items:Array<{inventoryItemId:string;partCatalogItemId:string;internalCode:string;name:string;slug:string;oemNumber:string|null;category:{id:string;name:string};manufacturer:{id:string;name:string}|null;shop:{id:string;name:string};price:string;quantity:number;availableQuantity:number;isActive:boolean}>;pagination:{page:number;limit:number;total:number;totalPages:number}};
 export function searchInventory(params:Record<string,string|number|boolean|undefined>) { const query=new URLSearchParams(); Object.entries(params).forEach(([key,value])=>value!==undefined&&query.set(key,String(value))); return request<SearchResponse>(`/inventory-search?${query}`); }
-export type InventoryItem={id:string;partCatalogItemId:string;brand:string|null;sku:string|null;oemNumber:string|null;compatibility:string|null;condition:string;price:string;currency:string;quantity:number;minQuantity:number;location:string|null;notes:string|null;imageUrl:string|null;imagePublicId:string|null;isActive:boolean;shop:{id:string;name:string};partCatalogItem:{name:string;internalCode:string;category:{name:string};compatibilities:Array<{vehicleGeneration:{name:string;vehicleModel:{name:string;manufacturer:{name:string}}}}>}};
+export type InventoryItem={id:string;warehouseId:string|null;warehouse:ShopWarehouse|null;partCatalogItemId:string;brand:string|null;sku:string|null;oemNumber:string|null;compatibility:string|null;condition:string;price:string;currency:string;quantity:number;reservedQuantity:number;availableQuantity:number;minQuantity:number;location:string|null;notes:string|null;imageUrl:string|null;imagePublicId:string|null;isActive:boolean;shop:{id:string;name:string};partCatalogItem:{name:string;internalCode:string;category:{name:string};compatibilities:Array<{vehicleGeneration:{name:string;vehicleModel:{name:string;manufacturer:{name:string}}}}>}};
 export type InventoryList={data:InventoryItem[];meta:{page:number;limit:number;total:number;totalPages:number}};
 export function inventoryList(params:Record<string,string|number|boolean|undefined>){const q=new URLSearchParams();Object.entries(params).forEach(([k,v])=>v!==undefined&&q.set(k,String(v)));return request<InventoryList>(`/inventory-items?${q}`)}
 export const inventoryOne=(id:string)=>request<InventoryItem>(`/inventory-items/${id}`);
-export type InventoryPayload={partCatalogItemId?:string;brand?:string;sku?:string;oemNumber?:string;compatibility?:string|null;condition?:string;price?:number;currency?:string;quantity?:number;minQuantity?:number;location?:string|null;notes?:string;isActive?:boolean};
+export type InventoryPayload={partCatalogItemId?:string;warehouseId?:string;brand?:string;sku?:string;oemNumber?:string;compatibility?:string|null;condition?:string;price?:number;currency?:string;quantity?:number;minQuantity?:number;location?:string|null;notes?:string;isActive?:boolean};
 export const createInventory=(data:InventoryPayload)=>request<InventoryItem>('/inventory-items',{method:'POST',body:JSON.stringify(data)});
 export const updateInventory=(id:string,data:InventoryPayload)=>request<InventoryItem>(`/inventory-items/${id}`,{method:'PATCH',body:JSON.stringify(data)});
 export const deleteInventory=(id:string)=>request<InventoryItem>(`/inventory-items/${id}`,{method:'DELETE'});
 export async function uploadInventoryImage(id:string,image:File){if(!baseUrl)throw new ApiError(0,'Не задан NEXT_PUBLIC_API_URL');const form=new FormData();form.append('image',image);const token=getToken();const response=await fetch(`${baseUrl}/inventory-items/${id}/image`,{method:'POST',headers:{...(token?{Authorization:`Bearer ${token}`}:{})},body:form});const body=await response.json().catch(()=>null);if(!response.ok)throw new ApiError(response.status,body?.message??'Не удалось загрузить фото');return body as InventoryItem}
 export const deleteInventoryImage=(id:string)=>request<InventoryItem>(`/inventory-items/${id}/image`,{method:'DELETE'});
 export type CatalogItem={id:string;name:string;internalCode:string;slug:string;category:{name:string};compatibilities:Array<{vehicleGeneration:{name:string;vehicleModel:{name:string;manufacturer:{name:string}}}}>};
-export type CatalogList={data:CatalogItem[];meta:{page:number;limit:number;total:number;totalPages:number}};
-export function catalogSearch(search:string){return request<CatalogList>(`/part-catalog?${new URLSearchParams({search,isActive:'true',limit:'10'})}`)}
+export type CatalogCategoryMatch={
+  categoryId:string;name:string;path:string;catalogItemCount:number;
+  isLegacyCatalogItemCategory:boolean;
+  mappedCatalogItemId:string|null;mappedCatalogItemName:string|null;
+};
+export type CatalogList={data:CatalogItem[];categoryMatches:CatalogCategoryMatch[];meta:{page:number;limit:number;total:number;totalPages:number}};
+export function catalogSearch(search: string, params:Record<string,string|number|boolean|undefined>={}) {
+  return request<CatalogList>(
+    `/part-catalog/search?${new URLSearchParams({
+      search,
+      isActive: 'true',
+      limit: '10',
+      ...Object.fromEntries(Object.entries(params).filter(([,value])=>value!==undefined).map(([key,value])=>[key,String(value)])),
+    })}`,
+  );
+}
+export type CatalogBootstrapRow={
+  categoryId:string;categoryName:string;parentCategory:string|null;rootCategory:string;path:string;
+  suggestedName:string;suggestedSide:'NONE'|'LEFT'|'RIGHT';suggestedPosition:'NONE'|'FRONT'|'REAR';
+  existsInCatalog:boolean;existingCatalogItemId:string|null;warning:string|null;
+};
+export type CatalogBootstrapResponse={
+  items:CatalogBootstrapRow[];
+  summary:{categoriesFound:number;alreadyExisted:number;newCandidates:number;warnings:number};
+};
+export type CatalogBootstrapCreateResponse={
+  results:Array<{categoryId:string;status:'CREATED'|'EXISTING'|'SKIPPED';catalogItemId:string|null;message:string|null}>;
+  summary:{requested:number;created:number;alreadyExisted:number;skipped:number};
+};
+export const getCatalogBootstrap=()=>request<CatalogBootstrapResponse>('/admin/catalog-bootstrap');
+export const createCatalogBootstrapItems=(items:Array<{categoryId:string;name:string;side:CatalogBootstrapRow['suggestedSide'];position:CatalogBootstrapRow['suggestedPosition']}>)=>
+  request<CatalogBootstrapCreateResponse>('/admin/catalog-bootstrap/create',{method:'POST',body:JSON.stringify({items})});
+export type CatalogBootstrapAutoCreateResponse={
+  created:number;skippedExisting:number;skippedUnsafe:number;failed:number;
+  categoriesFound:number;safeRecognized:number;deferred:number;
+  log:Array<{category:string;position:string|null;status:'CREATED'|'EXISTING'|'UNSAFE'|'FAILED'|'DEFERRED';reason:string}>;
+};
+export const autoCreateSafeCatalog=()=>request<CatalogBootstrapAutoCreateResponse>('/admin/catalog-bootstrap/auto-create-safe',{method:'POST'});
+export type CatalogSuggestionStatus='PENDING'|'APPROVED'|'REJECTED'|'MERGED';
+export type CatalogSuggestion={
+  id:string;shopId:string;name:string;normalizedName:string;description:string|null;oemNumber:string|null;
+  suggestedCategoryId:string|null;status:CatalogSuggestionStatus;resolvedAt:string|null;rejectionReason:string|null;
+  createdAt:string;updatedAt:string;
+  shop:{id:string;name:string};createdBy:{id:string;firstName:string;lastName:string|null;phone:string};
+  suggestedCategory:{id:string;name:string}|null;resolvedBy:{id:string;firstName:string;lastName:string|null;phone:string}|null;
+  mergedInto:{id:string;internalCode:string;name:string;slug:string}|null;
+};
+export type CatalogSuggestionList={data:CatalogSuggestion[];meta:Pagination};
+export const createCatalogSuggestion=(data:{name:string;description?:string;oemNumber?:string;suggestedCategoryId?:string})=>
+  request<CatalogSuggestion>('/part-catalog-suggestions',{method:'POST',body:JSON.stringify(data)});
+export const getCatalogSuggestions=(params:{status?:CatalogSuggestionStatus;shopId?:string;search?:string;categoryId?:string;page?:number;limit?:number}={})=>
+  request<CatalogSuggestionList>(`/part-catalog-suggestions?${documentQuery(params)}`);
+export const getCatalogSuggestion=(id:string)=>request<CatalogSuggestion>(`/part-catalog-suggestions/${id}`);
+export const getSimilarCatalogItems=(search:string)=>catalogSearch(search).then(result=>result.data as unknown as PartCatalogEntry[]);
+export const approveCatalogSuggestion=(id:string,data:{name?:string;categoryId:string;description?:string;side?:PartCatalogEntry['side'];position?:PartCatalogEntry['position'];isUniversal?:boolean})=>
+  request<CatalogSuggestion>(`/part-catalog-suggestions/${id}/approve`,{method:'POST',body:JSON.stringify(data)});
+export const mergeCatalogSuggestion=(id:string,partCatalogItemId:string)=>
+  request<CatalogSuggestion>(`/part-catalog-suggestions/${id}/merge`,{method:'POST',body:JSON.stringify({partCatalogItemId})});
+export const rejectCatalogSuggestion=(id:string,reason:string)=>
+  request<CatalogSuggestion>(`/part-catalog-suggestions/${id}/reject`,{method:'POST',body:JSON.stringify({reason})});
 export type PartCatalogCandidateMatchType='EXACT_NORMALIZED_NAME'|'SAME_TOKENS'|'PARTIAL_TOKENS'|'NAME_CONTAINS';
-export type PartCatalogCandidate={id:string;internalCode:string;name:string;slug:string;categoryId:string;category:{id:string;name:string};side:string;position:string;normalizedName:string;matchType:PartCatalogCandidateMatchType;matchedTokens:string[]};
-export function getPartCatalogCandidates(params:{q:string;categoryId?:string;side?:string;position?:string;limit?:number}){const query=new URLSearchParams();Object.entries(params).forEach(([key,value])=>value!==undefined&&query.set(key,String(value)));return request<{items:PartCatalogCandidate[]}>(`/part-catalog/candidates?${query}`)}
 export type PartCatalogEntry={id:string;internalCode:string;name:string;slug:string;description:string|null;categoryId:string;category:{id:string;name:string};side:'NONE'|'LEFT'|'RIGHT';position:'NONE'|'FRONT'|'REAR';isUniversal:boolean;isActive:boolean;normalizedName:string;searchTokens:string};
 export type PartCatalogResponse={data:PartCatalogEntry[];meta:Pagination};
 export type PartCatalogPayload={name:string;slug:string;description?:string;categoryId:string;side?:PartCatalogEntry['side'];position?:PartCatalogEntry['position'];isUniversal?:boolean;isActive?:boolean};
@@ -74,6 +130,41 @@ export const createPartCategory=(data:PartCategoryPayload)=>request<PartCategory
 export const updatePartCategory=(id:string,data:Partial<PartCategoryPayload>)=>request<PartCategoryOption>(`/part-categories/${id}`,{method:'PATCH',body:JSON.stringify(data)});
 export const deactivatePartCategory=(id:string)=>request<PartCategoryOption>(`/part-categories/${id}`,{method:'DELETE'});
 export const deletePartCategory=(id:string)=>request<PartCategoryOption>(`/part-categories/${id}/permanent`,{method:'DELETE'});
+export type TaxonomyClassification='CATEGORY'|'CATALOG_ITEM'|'INVALID'|'REVIEW';
+export type TaxonomyStatus='DRAFT'|'READY'|'APPROVED'|'APPLYING'|'APPLIED'|'FAILED'|'CANCELLED';
+export type TaxonomyRisk='LOW'|'MEDIUM'|'HIGH'|'CRITICAL';
+export type TaxonomyCategoryRow={
+  id:string;name:string;slug:string;path:string;level:number;rootCategoryId:string;isActive:boolean;needsReview:boolean;
+  isLeaf:boolean;childrenCount:number;directItemsCount:number;subtreeItemsCount:number;mappingCount:number;
+  duplicateCount:number;suspicious:boolean;currentClassification:TaxonomyClassification|null;
+  decision:TaxonomyDecision|null;requiresDecision:boolean;
+  recommendation:{recommendation:TaxonomyClassification;confidence:number;reasons:string[];warnings:string[];riskLevel:TaxonomyRisk};
+};
+export type TaxonomyDecision={
+  id:string;sourceCategoryId:string;classification:TaxonomyClassification;targetCategoryId:string|null;
+  targetCatalogItemId:string|null;canonicalName:string|null;aliases:string[]|null;duplicateStrategy:string|null;
+  status:TaxonomyStatus;riskLevel:TaxonomyRisk;notes:string|null;errorMessage:string|null;
+};
+export type TaxonomyStats={total:number;requiresDecision:number;categories:number;catalogItems:number;invalid:number;review:number;duplicateGroups:number;highRisk:number;processed:number;statuses:Record<TaxonomyStatus,number>};
+export type TaxonomyCategoryList={data:TaxonomyCategoryRow[];meta:Pagination;stats:TaxonomyStats};
+export type TaxonomyCategoryDetail=PartCategoryOption & {
+  slug:string;needsReview:boolean;children:PartCategoryOption[];partCatalogItems:Array<{id:string;name:string;internalCode:string;aliases:PartAlias[]}>;
+  catalogItemMappings:Array<{id:string;classification:TaxonomyClassification;targetCatalogItem:{id:string;name:string}|null}>;
+  taxonomySourceDecisions:TaxonomyDecision[];duplicates:Array<{id:string;name:string;slug:string}>;
+  recommendation:TaxonomyCategoryRow['recommendation'];
+};
+export function getTaxonomyCategories(params:Record<string,string|number|boolean|undefined>={}) {
+  return request<TaxonomyCategoryList>(`/admin/part-taxonomy/categories?${documentQuery(params)}`);
+}
+export const getTaxonomyCategory=(id:string)=>request<TaxonomyCategoryDetail>(`/admin/part-taxonomy/categories/${id}`);
+export const createTaxonomyDecision=(data:Partial<TaxonomyDecision>&{sourceCategoryId:string;classification:TaxonomyClassification})=>
+  request<TaxonomyDecision>('/admin/part-taxonomy/decisions',{method:'POST',body:JSON.stringify(data)});
+export const updateTaxonomyDecision=(id:string,data:Partial<TaxonomyDecision>)=>
+  request<TaxonomyDecision>(`/admin/part-taxonomy/decisions/${id}`,{method:'PATCH',body:JSON.stringify(data)});
+export const taxonomyDecisionAction=(id:string,action:'validate'|'ready'|'approve'|'cancel'|'preview'|'apply')=>
+  request<unknown>(`/admin/part-taxonomy/decisions/${id}/${action}`,{method:'POST'});
+export const taxonomyBatchAction=(decisionIds:string[],action:'preview'|'ready'|'approve'|'apply')=>
+  request<unknown>(`/admin/part-taxonomy/batches/${action}`,{method:'POST',body:JSON.stringify({decisionIds})});
 export type Movement={id:string;type:string;change:number;quantityAfter:number;reference:string|null;notes:string|null;createdAt:string};
 export const inventoryMovements=(id:string)=>request<{data:Movement[];meta:{page:number;total:number} }>(`/inventory-items/${id}/movements`);
 export type CreateSalePayload={shopId?:string;customerName?:string;customerPhone?:string;notes?:string;soldAt?:string;discount?:number;items:Array<{inventoryItemId:string;quantity:number}>};
@@ -196,6 +287,42 @@ export async function confirmInventoryImport(file: File, options: { shopId?: str
   }
   return body as InventoryImportConfirmResponse;
 }
+export type SmartImportValidationStatus='VALID'|'NEEDS_REVIEW'|'ERROR'|'DUPLICATE';
+export type SmartImportMatchStatus='EXACT'|'ALIAS'|'FUZZY'|'MULTIPLE'|'CATEGORY_MATCH'|'NOT_FOUND';
+export type SmartInventoryImportRow={
+  rowNumber:number;
+  source:{name:string;article?:string;oem?:string;quantity:number;salePrice:number;purchasePrice?:number;manufacturer?:string;warehouse?:string;note?:string};
+  normalized:{name:string;normalizedName:string;side:'NONE'|'LEFT'|'RIGHT';position:'NONE'|'FRONT'|'REAR';warehouseId?:string;warehouseName?:string};
+  match:{status:SmartImportMatchStatus;catalogItemId?:string;catalogItemName?:string;score?:number;alternatives?:Array<{catalogItemId:string;name:string;side:string;position:string;score:number}>};
+  validation:{status:SmartImportValidationStatus;errors:string[];warnings:string[]};
+};
+export type SmartInventoryImportPreview={
+  importSessionId:string;totalRows:number;validRows:number;matchedRows:number;reviewRows:number;errorRows:number;duplicateRows:number;
+  rows:SmartInventoryImportRow[];
+};
+export type SmartInventoryImportConfirmRow={
+  rowNumber:number;include:boolean;catalogItemId?:string;quantity:number;salePrice:number;purchasePrice?:number;
+  warehouseId?:string;article?:string;oem?:string;manufacturer?:string;note?:string;
+  duplicateAction?:'MERGE_QUANTITY'|'KEEP_FIRST'|'KEEP_ALL';
+};
+export type SmartInventoryImportResult={
+  sessionId:string;status:'COMPLETED';
+  summary:{total:number;imported:number;updated:number;skipped:number;failed:number;mergedDuplicates:number};
+  rows:Array<{rowNumber:number;status:'CREATED'|'UPDATED'|'SKIPPED'|'FAILED';inventoryItemId?:string;message:string}>;
+};
+export async function smartImportPreview(file:File,shopId?:string){
+  const token=getToken();const form=new FormData();form.append('file',file);if(shopId)form.append('shopId',shopId);
+  const response=await fetch(`${baseUrl}/inventory-import/preview`,{method:'POST',headers:token?{Authorization:`Bearer ${token}`}:{},body:form});
+  const body=await response.json().catch(()=>null);
+  if(!response.ok)throw new ApiError(response.status,Array.isArray(body?.message)?body.message.join('. '):body?.message??'Ошибка проверки файла');
+  return body as SmartInventoryImportPreview;
+}
+export const smartConfirmInventoryImport=(sessionId:string,data:{mode:'ADD_QUANTITY'|'REPLACE_QUANTITY';rows:SmartInventoryImportConfirmRow[]})=>
+  request<SmartInventoryImportResult>(`/inventory-import/${sessionId}/confirm`,{method:'POST',body:JSON.stringify(data)});
+export async function downloadInventoryImportTemplate(){
+  const token=getToken();const response=await fetch(`${baseUrl}/inventory-import/template`,{headers:token?{Authorization:`Bearer ${token}`}:{}});if(!response.ok)throw new ApiError(response.status,'Не удалось скачать шаблон');
+  const blob=await response.blob();const url=URL.createObjectURL(blob);const link=document.createElement('a');link.href=url;link.download='inventory-import-template.xlsx';link.click();URL.revokeObjectURL(url);
+}
 export type SaleStatus='COMPLETED'|'CANCELLED';
 export type PurchaseStatus='COMPLETED'|'CANCELLED';
 export type DocumentShop={id:string;name:string};
@@ -223,7 +350,7 @@ export const cancelPurchase=(id:string,reason:string)=>request<PurchaseDetails>(
 export type DashboardPeriod={dateFrom:string;dateTo:string};
 export type DashboardSalesSummary={count:number;revenue:string;itemsSold:number};
 export type DashboardPurchasesSummary={count:number;total:string;itemsPurchased:number};
-export type DashboardInventorySummary={activeItems:number;totalQuantity:number;lowStockItems:number;outOfStockItems:number};
+export type DashboardInventorySummary={activeItems:number;totalQuantity:number;lowStockItems:number;outOfStockItems:number;byWarehouse:Array<{warehouseId:string|null;name:string;quantity:number;value:string}>};
 export type DashboardRecentSale={id:string;number:string;createdAt:string;totalAmount:string;currency:string;shop:DocumentShop};
 export type DashboardRecentPurchase={id:string;number:string;purchasedAt:string;supplierName:string|null;totalAmount:string;currency:string;shop:DocumentShop};
 export type DashboardTopSellingItem={inventoryItemId:string;partCatalogItemId:string;name:string;internalCode:string|null;oemNumber:string|null;quantity:number;total:string};
@@ -337,3 +464,79 @@ export type MarketplaceSearchParams={
 };
 export const marketplaceSearch=(params:MarketplaceSearchParams)=>
   request<MarketplaceSearchResponse>(`/marketplace-search?${documentQuery(params)}`);
+
+export type ShopWarehouse={id:string;shopId:string;name:string;code:string|null;address:string|null;note:string|null;isDefault:boolean;isActive:boolean;createdAt:string;updatedAt:string;_count:{inventoryItems:number};totalQuantity:number};
+export const getWarehouses=(shopId?:string)=>request<ShopWarehouse[]>(`/shop-warehouses${shopId?`?shopId=${shopId}`:''}`);
+export const createWarehouse=(data:{shopId?:string;name:string;code?:string;address?:string;note?:string;isDefault?:boolean})=>request<ShopWarehouse>('/shop-warehouses',{method:'POST',body:JSON.stringify(data)});
+export const updateWarehouse=(id:string,data:Partial<{name:string;code:string;address:string;note:string;isDefault:boolean}>)=>request<ShopWarehouse>(`/shop-warehouses/${id}`,{method:'PATCH',body:JSON.stringify(data)});
+export const setDefaultWarehouse=(id:string)=>request<ShopWarehouse>(`/shop-warehouses/${id}/set-default`,{method:'POST'});
+export const deactivateWarehouse=(id:string)=>request<ShopWarehouse>(`/shop-warehouses/${id}/deactivate`,{method:'POST'});
+export const activateWarehouse=(id:string)=>request<ShopWarehouse>(`/shop-warehouses/${id}/activate`,{method:'POST'});
+export const deleteWarehouse=(id:string)=>request<ShopWarehouse>(`/shop-warehouses/${id}`,{method:'DELETE'});
+export type InventoryTransfer={id:string;shopId:string;number:string;status:'DRAFT'|'COMPLETED'|'CANCELLED';note:string|null;createdAt:string;completedAt:string|null;fromWarehouse:ShopWarehouse;toWarehouse:ShopWarehouse;items:Array<{id:string;sourceInventoryItemId:string;catalogItemName:string;quantity:number;article:string|null;oem:string|null}>};
+export const getInventoryTransfers=(shopId?:string)=>request<InventoryTransfer[]>(`/inventory-transfers${shopId?`?shopId=${shopId}`:''}`);
+export const createInventoryTransfer=(data:{shopId?:string;fromWarehouseId:string;toWarehouseId:string;note?:string;items:Array<{sourceInventoryItemId:string;quantity:number}>})=>request<InventoryTransfer>('/inventory-transfers',{method:'POST',body:JSON.stringify(data)});
+export const completeInventoryTransfer=(id:string)=>request<InventoryTransfer>(`/inventory-transfers/${id}/complete`,{method:'POST'});
+export const cancelInventoryTransfer=(id:string)=>request<InventoryTransfer>(`/inventory-transfers/${id}/cancel`,{method:'POST'});
+export type InventoryHistory={inventoryItem:{id:string;name:string;warehouse:string;quantity:number};movements:Array<{id:string;type:string;quantityDelta:number;quantityBefore:number;quantityAfter:number;documentType:string|null;documentId:string|null;documentNumber:string|null;reason:string|null;createdBy:string|null;createdAt:string}>};
+export const getInventoryHistory=(id:string)=>request<InventoryHistory>(`/inventory-items/${id}/history`);
+export const adjustInventory=(id:string,data:{type:'INCREASE'|'DECREASE'|'SET';quantity:number;reason:string})=>request<InventoryItem>(`/inventory-items/${id}/adjust`,{method:'POST',body:JSON.stringify(data)});
+export type Stocktake={id:string;shopId:string;warehouseId:string;number:string;status:'DRAFT'|'COMPLETED'|'CANCELLED';note:string|null;createdAt:string;completedAt:string|null;warehouse:ShopWarehouse;items:Array<{id:string;inventoryItemId:string;expectedQuantity:number;actualQuantity:number|null;difference:number|null;inventoryItem:InventoryItem}>};
+export const getStocktakes=(shopId?:string)=>request<Stocktake[]>(`/stocktakes${shopId?`?shopId=${shopId}`:''}`);
+export const createStocktake=(data:{shopId?:string;warehouseId:string;note?:string})=>request<Stocktake>('/stocktakes',{method:'POST',body:JSON.stringify(data)});
+export const updateStocktakeItems=(id:string,items:Array<{inventoryItemId:string;actualQuantity:number}>)=>request<Stocktake>(`/stocktakes/${id}/items`,{method:'PATCH',body:JSON.stringify({items})});
+export const completeStocktake=(id:string)=>request<Stocktake>(`/stocktakes/${id}/complete`,{method:'POST'});
+export const cancelStocktake=(id:string)=>request<Stocktake>(`/stocktakes/${id}/cancel`,{method:'POST'});
+export type InventoryAuditResponse={summary:{inventoryItems:number;matched:number;mismatched:number;orphanMovements:number;movementsWithoutWarehouse:number;negativeInventory:number};reservationSummary:{inventoryItemsWithReservations:number;reservationMismatches:number;reservedGreaterThanQuantity:number;expiredReservationsNotReleased:number};rows:Array<{inventoryItemId:string;shopId:string;warehouseId:string|null;catalogItemName:string;warehouseName:string|null;currentQuantity:number;reservedQuantity:number;availableQuantity:number;activeReservationQuantity:number;reservationDifference:number;calculatedQuantity:number;difference:number;movementCount:number;status:'OK'|'MISMATCH'}>;meta:Pagination};
+export const getInventoryAudit=(params:{shopId?:string;warehouseId?:string;inventoryItemId?:string;onlyMismatches?:boolean;page?:number;limit?:number}={})=>request<InventoryAuditResponse>(`/admin/inventory-audit?${documentQuery(params)}`);
+
+export type Customer={id:string;fullName:string;phone:string;phoneNormalized:string|null;email:string|null;address:string|null;note:string|null;isActive:boolean};
+export const getCustomers=(search='')=>request<Customer[]>(`/customers?${new URLSearchParams({search})}`);
+export const createCustomer=(data:{fullName:string;phone:string;email?:string;address?:string;note?:string})=>request<Customer>('/customers',{method:'POST',body:JSON.stringify(data)});
+export type CustomerOrderStatus='DRAFT'|'RESERVED'|'CONFIRMED'|'READY'|'COMPLETED'|'CANCELLED'|'EXPIRED';
+export type CustomerOrderItem={id:string;inventoryItemId:string;shopId:string;warehouseId:string;catalogItemId:string;quantity:number;unitPrice:string;total:string;catalogItemName:string;shopName:string;warehouseName:string;article:string|null;oem:string|null;brand:string|null;reservationStatus:string};
+export type CustomerOrder={id:string;number:string;status:CustomerOrderStatus;customerId:string|null;customerNameSnapshot:string;customerPhoneSnapshot:string|null;deliveryType:'PICKUP'|'DELIVERY';deliveryAddress:string|null;paymentStatus:string;subtotal:string;discount:string;deliveryFee:string;total:string;note:string|null;reservationExpiresAt:string|null;createdAt:string;items:CustomerOrderItem[];sales:Array<{id:string;number:string;shopId:string;totalAmount:string;status:string;shop:{id:string;name:string}}> ;statusHistory:Array<{id:string;status:string;note:string|null;createdAt:string;user:{firstName:string;lastName:string|null}|null}>};
+export type OrderInventorySearchItem={inventoryItemId:string;catalogItemId:string;catalogItemName:string;shopId:string;shopName:string;warehouseId:string;warehouseName:string;article:string|null;oem:string|null;brand:string|null;quantity:number;reservedQuantity:number;availableQuantity:number;salePrice:string};
+export const searchOrderInventory=(params:{query?:string;shopId?:string;warehouseId?:string;catalogItemId?:string;onlyAvailable?:boolean;page?:number;limit?:number}={})=>request<{data:OrderInventorySearchItem[];meta:Pagination}>(`/customer-orders/inventory-search?${documentQuery(params)}`);
+export const getCustomerOrders=(params:{status?:string;paymentStatus?:string;search?:string;shopId?:string;expired?:boolean;page?:number;limit?:number}={})=>request<{data:Array<Omit<CustomerOrder,'items'|'sales'|'statusHistory'>&{_count:{items:number}}>;meta:Pagination}>(`/customer-orders?${documentQuery(params)}`);
+export const getCustomerOrder=(id:string)=>request<CustomerOrder>(`/customer-orders/${id}`);
+export const createCustomerOrder=(data:{customerId?:string;customer:{fullName:string;phone?:string};deliveryType:'PICKUP'|'DELIVERY';deliveryAddress?:string;deliveryFee?:number;discount?:number;note?:string;items:Array<{inventoryItemId:string;quantity:number;unitPrice:number}>})=>request<CustomerOrder>('/customer-orders',{method:'POST',body:JSON.stringify(data)});
+export const reserveCustomerOrder=(id:string,expiresInMinutes=120)=>request<CustomerOrder>(`/customer-orders/${id}/reserve`,{method:'POST',body:JSON.stringify({expiresInMinutes})});
+export const confirmCustomerOrder=(id:string)=>request<CustomerOrder>(`/customer-orders/${id}/confirm`,{method:'POST'});
+export const readyCustomerOrder=(id:string)=>request<CustomerOrder>(`/customer-orders/${id}/ready`,{method:'POST'});
+export const completeCustomerOrder=(id:string)=>request<CustomerOrder>(`/customer-orders/${id}/complete`,{method:'POST'});
+export const cancelCustomerOrder=(id:string,reason:string)=>request<CustomerOrder>(`/customer-orders/${id}/cancel`,{method:'POST',body:JSON.stringify({reason})});
+export const extendCustomerOrder=(id:string,expiresInMinutes:number)=>request<CustomerOrder>(`/customer-orders/${id}/extend-reservation`,{method:'POST',body:JSON.stringify({expiresInMinutes})});
+export const releaseExpiredCustomerOrders=()=>request<{found:number;released:number}>('/admin/customer-orders/release-expired',{method:'POST'});
+export type PaymentMethod='CASH'|'CARD'|'BANK_TRANSFER'|'MOBILE_WALLET'|'OTHER';
+export type OrderPayment={id:string;orderId:string;amount:string;method:PaymentMethod;status:'COMPLETED'|'CANCELLED'|'REFUNDED';transactionReference:string|null;note:string|null;receivedAt:string};
+export type OrderFinance={order:{number:string;total:string;paidAmount:string;dueAmount:string;paymentStatus:string};platform:{productRevenue:string;deliveryRevenue:string;totalRevenue:string};shops:Array<{shopId:string;shopName:string;salesTotal:string;payableAmount:string;paidToShop:string;outstandingToShop:string;payableId:string;saleId:string}>;payments:OrderPayment[]};
+export const getOrderFinance=(id:string)=>request<OrderFinance>(`/customer-orders/${id}/finance`);
+export const getOrderPayments=(id:string)=>request<OrderPayment[]>(`/customer-orders/${id}/payments`);
+export const createOrderPayment=(id:string,data:{amount:number;method:PaymentMethod;transactionReference?:string;note?:string;receivedAt?:string})=>request<OrderPayment>(`/customer-orders/${id}/payments`,{method:'POST',body:JSON.stringify(data)});
+export const cancelOrderPayment=(orderId:string,paymentId:string,reason:string)=>request<OrderPayment>(`/customer-orders/${orderId}/payments/${paymentId}/cancel`,{method:'POST',body:JSON.stringify({reason})});
+export const refundOrderPayment=(id:string,data:{amount:number;method?:PaymentMethod;reason:string;originalPaymentId?:string})=>request<OrderPayment>(`/customer-orders/${id}/refunds`,{method:'POST',body:JSON.stringify(data)});
+export type ShopPayable={id:string;shopId:string;customerOrderId:string;saleId:string;grossShopAmount:string;payableAmount:string;paidAmount:string;outstandingAmount:string;status:string;shop:{id:string;name:string};sale:{id:string;number:string};customerOrder:{id:string;number:string}};
+export type ShopPayout={id:string;number:string;shopId:string;amount:string;method:string;status:string;paidAt:string|null;createdAt:string;shop:{id:string;name:string};allocations:Array<{id:string;payableId:string;amount:string}>};
+export const getShopPayables=(params:{shopId?:string;status?:string;onlyOutstanding?:boolean;page?:number;limit?:number}={})=>request<{data:ShopPayable[];meta:Pagination}>(`/shop-payables?${documentQuery(params)}`);
+export const getShopPayouts=(shopId?:string)=>request<ShopPayout[]>(`/shop-payouts?${documentQuery({shopId})}`);
+export const createShopPayout=(data:{shopId:string;method:'CASH'|'BANK_TRANSFER'|'CARD'|'OTHER';transactionReference?:string;note?:string;allocations:Array<{payableId:string;amount:number}>})=>request<ShopPayout>('/shop-payouts',{method:'POST',body:JSON.stringify(data)});
+export const completeShopPayout=(id:string)=>request<ShopPayout>(`/shop-payouts/${id}/complete`,{method:'POST'});
+export const cancelShopPayout=(id:string,reason:string)=>request<ShopPayout>(`/shop-payouts/${id}/cancel`,{method:'POST',body:JSON.stringify({reason})});
+export type ShopFinancialBalance={totalSalesAmount:string;totalPayableAmount:string;totalPaidAmount:string;outstandingAmount:string;pendingCount:number;partiallyPaidCount:number;paidCount:number};
+export const getShopFinancialBalance=(id:string)=>request<ShopFinancialBalance>(`/shops/${id}/financial-balance`);
+export type FinanceAudit={summary:{ordersChecked:number;orderAmountMismatches:number;paymentMismatches:number;payableMismatches:number;payoutMismatches:number;negativePlatformRevenue:number};rows:Array<{entityType:string;entityId:string;number?:string;expected:string;actual:string;difference:string;message:string}>};
+export const getFinanceAudit=()=>request<FinanceAudit>('/admin/finance-audit');
+
+export type VehicleRegistryItem={id:string;name:string;slug:string;description:string|null;isActive:boolean;createdAt:string;updatedAt:string};
+export type VehicleRegistryPage={data:VehicleRegistryItem[];meta:Pagination};
+export const getVehicleRegistry=(resource:string,params:{search?:string;isActive?:boolean;page?:number;limit?:number;sort?:string;order?:string}={})=>
+  request<VehicleRegistryPage>(`/vehicle-database/${resource}?${documentQuery(params)}`);
+export const createVehicleRegistryItem=(resource:string,data:{name:string;slug:string;description?:string})=>
+  request<VehicleRegistryItem>(`/vehicle-database/${resource}`,{method:'POST',body:JSON.stringify(data)});
+export const updateVehicleRegistryItem=(resource:string,id:string,data:Partial<{name:string;slug:string;description:string}>)=>
+  request<VehicleRegistryItem>(`/vehicle-database/${resource}/${id}`,{method:'PATCH',body:JSON.stringify(data)});
+export const deactivateVehicleRegistryItem=(resource:string,id:string)=>
+  request<VehicleRegistryItem>(`/vehicle-database/${resource}/${id}`,{method:'DELETE'});
+export const restoreVehicleRegistryItem=(resource:string,id:string)=>
+  request<VehicleRegistryItem>(`/vehicle-database/${resource}/${id}/restore`,{method:'POST'});

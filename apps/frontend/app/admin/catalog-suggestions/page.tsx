@@ -1,0 +1,6 @@
+'use client';
+import Link from 'next/link';
+import { useEffect, useState } from 'react';
+import { CatalogSuggestion, getCatalogSuggestions } from '../../../lib/api';
+const labels={PENDING:'На проверке',APPROVED:'Одобрено',REJECTED:'Отклонено',MERGED:'Объединено'};
+export default function SuggestionsAdminPage(){const[items,setItems]=useState<CatalogSuggestion[]>([]);const[error,setError]=useState('');useEffect(()=>{getCatalogSuggestions().then(r=>setItems(r.data)).catch(e=>setError(e.message))},[]);return <section><h1 className="text-2xl font-bold">Предложения каталога</h1>{error&&<p className="mt-4 text-red-700">{error}</p>}<div className="mt-5 overflow-hidden rounded-xl bg-white shadow"><table className="w-full text-left text-sm"><thead className="bg-slate-100"><tr><th className="p-3">Название</th><th>Магазин</th><th>Категория</th><th>OEM</th><th>Дата</th><th>Статус</th></tr></thead><tbody>{items.map(i=><tr key={i.id} className="border-t"><td className="p-3"><Link className="text-blue-700" href={`/admin/catalog-suggestions/${i.id}`}>{i.name}</Link></td><td>{i.shop.name}</td><td>{i.suggestedCategory?.name||'—'}</td><td>{i.oemNumber||'—'}</td><td>{new Date(i.createdAt).toLocaleDateString('ru-RU')}</td><td>{labels[i.status]}</td></tr>)}</tbody></table></div></section>}

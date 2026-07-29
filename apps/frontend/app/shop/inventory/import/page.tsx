@@ -1,0 +1,55 @@
+'use client';
+
+import { useMemo, useState } from 'react';
+import { CatalogPicker } from '../../../../components/catalog-picker';
+import { ProtectedLayout } from '../../../../components/protected-layout';
+import { useAuth } from '../../../../components/auth-provider';
+import {
+  ApiError, downloadInventoryImportTemplate, shops, Shop,
+  SmartInventoryImportPreview, SmartInventoryImportResult,
+  smartConfirmInventoryImport, smartImportPreview,getWarehouses,ShopWarehouse,
+} from '../../../../lib/api';
+
+type Row=SmartInventoryImportPreview['rows'][number]&{include:boolean;catalogItemId?:string;catalogItemName?:string;duplicateAction:'MERGE_QUANTITY'|'KEEP_FIRST'|'KEEP_ALL'};
+const label:Record<string,string>={EXACT:'Точное совпадение',ALIAS:'Найдено по синониму',FUZZY:'Возможное совпадение',MULTIPLE:'Несколько вариантов',CATEGORY_MATCH:'Совпадение с категорией',NOT_FOUND:'Не найдено',VALID:'Готово',NEEDS_REVIEW:'Требует проверки',ERROR:'Ошибка',DUPLICATE:'Дубль'};
+
+export default function ShopInventoryImportPage(){
+  const{user}=useAuth();const[file,setFile]=useState<File|null>(null);const[preview,setPreview]=useState<SmartInventoryImportPreview|null>(null);
+  const[rows,setRows]=useState<Row[]>([]);const[result,setResult]=useState<SmartInventoryImportResult|null>(null);
+  const[filter,setFilter]=useState('ALL');const[query,setQuery]=useState('');const[mode,setMode]=useState<'ADD_QUANTITY'|'REPLACE_QUANTITY'>('ADD_QUANTITY');
+  const[shopId,setShopId]=useState('');const[shopList,setShopList]=useState<Shop[]>([]);const[busy,setBusy]=useState(false);const[error,setError]=useState('');
+  const[warehouses,setWarehouses]=useState<ShopWarehouse[]>([]);const[massWarehouse,setMassWarehouse]=useState('');
+  const patch=(n:number,data:Partial<Row>)=>setRows(all=>all.map(row=>row.rowNumber===n?{...row,...data}:row));
+  const visible=useMemo(()=>rows.filter(row=>{
+    const text=`${row.source.name} ${row.source.article??''} ${row.source.oem??''}`.toLowerCase();
+    const matches=filter==='ALL'||(filter==='EXACT'&&row.match.status==='EXACT')||(filter==='REVIEW'&&row.validation.status==='NEEDS_REVIEW')||(filter==='NOT_FOUND'&&row.match.status==='NOT_FOUND')||(filter==='ERROR'&&row.validation.status==='ERROR')||(filter==='DUPLICATE'&&row.validation.status==='DUPLICATE');
+    return matches&&text.includes(query.toLowerCase());
+  }),[filter,query,rows]);
+  async function upload(){if(!file)return;setBusy(true);setError('');try{const[data,list]=await Promise.all([smartImportPreview(file,shopId||undefined),getWarehouses(shopId||undefined)]);setWarehouses(list.filter(w=>w.isActive));setPreview(data);setRows(data.rows.map(row=>({...row,include:row.validation.status!=='ERROR',catalogItemId:row.match.catalogItemId,catalogItemName:row.match.catalogItemName,duplicateAction:'MERGE_QUANTITY'})));}catch(e){setError(e instanceof ApiError?e.message:'Не удалось обработать файл');}finally{setBusy(false)}}
+  async function confirm(){if(!preview)return;setBusy(true);try{setResult(await smartConfirmInventoryImport(preview.importSessionId,{mode,rows:rows.map(row=>({rowNumber:row.rowNumber,include:row.include,catalogItemId:row.catalogItemId,quantity:row.source.quantity,salePrice:row.source.salePrice,purchasePrice:row.source.purchasePrice,warehouseId:row.normalized.warehouseId,article:row.source.article,oem:row.source.oem,manufacturer:row.source.manufacturer,note:row.source.note,duplicateAction:row.duplicateAction}))}));}catch(e){setError(e instanceof Error?e.message:'Ошибка импорта');}finally{setBusy(false)}}
+  return <ProtectedLayout><div className="space-y-5">
+    <header><h1 className="text-2xl font-bold">Импорт товаров из Excel</h1><p className="text-slate-500">Загрузка → предпросмотр → проверка совпадений → подтверждение → результат</p></header>
+    {!preview&&!result&&<section className="rounded-xl bg-white p-6 ring-1 ring-slate-200">
+      <button onClick={()=>void downloadInventoryImportTemplate()} className="rounded border px-4 py-2">Скачать шаблон Excel</button>
+      <input type="file" accept=".xlsx" onChange={e=>setFile(e.target.files?.[0]??null)} className="ml-4"/>
+      {user?.role==='SUPER_ADMIN'&&<select value={shopId} onFocus={()=>{if(!shopList.length)void shops().then(setShopList)}} onChange={e=>setShopId(e.target.value)} className="ml-4 rounded border p-2"><option value="">Выберите магазин</option>{shopList.map(shop=><option key={shop.id} value={shop.id}>{shop.name}</option>)}</select>}
+      <button disabled={!file||busy||(user?.role==='SUPER_ADMIN'&&!shopId)} onClick={()=>void upload()} className="ml-4 rounded bg-blue-600 px-4 py-2 text-white disabled:opacity-40">{busy?'Обработка…':'Загрузить и проверить'}</button>
+      <p className="mt-3 text-sm text-slate-500">Только .xlsx, до 10 МБ и 10 000 строк. Неизвестные позиции автоматически не создаются.</p>
+    </section>}
+    {error&&<p className="rounded bg-red-50 p-3 text-red-700">{error}</p>}
+    {preview&&!result&&<>
+      <div className="grid grid-cols-2 gap-2 md:grid-cols-6">{[['Всего',preview.totalRows],['Готово',preview.validRows],['Совпало',preview.matchedRows],['Проверить',preview.reviewRows],['Ошибки',preview.errorRows],['Дубли',preview.duplicateRows]].map(([text,value])=><div key={text} className="rounded bg-white p-3 ring-1 ring-slate-200"><small>{text}</small><b className="block text-xl">{value}</b></div>)}</div>
+      <div className="flex flex-wrap gap-2"><input value={query} onChange={e=>setQuery(e.target.value)} placeholder="Название, артикул или OEM" className="rounded border p-2"/>{[['ALL','Все'],['EXACT','Точные'],['REVIEW','Проверить'],['NOT_FOUND','Не найдены'],['ERROR','Ошибки'],['DUPLICATE','Дубли']].map(([value,text])=><button key={value} onClick={()=>setFilter(value)} className={`rounded px-3 py-2 ${filter===value?'bg-blue-600 text-white':'border bg-white'}`}>{text}</button>)}</div>
+      <div className="flex gap-2"><button onClick={()=>setRows(all=>all.map(row=>({...row,include:['EXACT','ALIAS'].includes(row.match.status)})))} className="rounded border px-3 py-2">Выбрать точные</button><button onClick={()=>setRows(all=>all.map(row=>row.validation.status==='ERROR'?{...row,include:false}:row))} className="rounded border px-3 py-2">Исключить ошибки</button><button onClick={()=>setRows(all=>all.map(row=>row.validation.status==='DUPLICATE'?{...row,duplicateAction:'MERGE_QUANTITY'}:row))} className="rounded border px-3 py-2">Объединить дубли</button><select value={massWarehouse} onChange={e=>setMassWarehouse(e.target.value)} className="rounded border p-2"><option value="">Склад для выбранных</option>{warehouses.map(w=><option key={w.id} value={w.id}>{w.name}</option>)}</select><button disabled={!massWarehouse} onClick={()=>setRows(all=>all.map(row=>row.include?{...row,normalized:{...row.normalized,warehouseId:massWarehouse,warehouseName:warehouses.find(w=>w.id===massWarehouse)?.name}}:row))} className="rounded border px-3 py-2">Назначить склад</button></div>
+      <div className="overflow-x-auto rounded-xl bg-white ring-1 ring-slate-200"><table className="w-full min-w-[1200px] text-sm"><thead><tr className="text-left text-slate-500"><th className="p-3">✓</th><th>Строка</th><th>Наименование</th><th>Позиция каталога</th><th>Сторона</th><th>Позиция</th><th>Кол-во</th><th>Цена</th><th>Склад</th><th>Статус</th></tr></thead><tbody>{visible.map(row=><tr key={row.rowNumber} className="border-t align-top">
+        <td className="p-3"><input type="checkbox" checked={row.include} onChange={e=>patch(row.rowNumber,{include:e.target.checked})}/></td><td>{row.rowNumber}</td><td className="max-w-52 py-3">{row.source.name}<small className="block">{row.source.article||row.source.oem}</small></td>
+        <td className="w-72 py-2"><select value={row.catalogItemId??''} onChange={e=>{const alt=row.match.alternatives?.find(a=>a.catalogItemId===e.target.value);patch(row.rowNumber,{catalogItemId:e.target.value||undefined,catalogItemName:alt?.name})}} className="w-full rounded border p-1"><option value="">{row.catalogItemName??'Выберите позицию'}</option>{row.match.alternatives?.map(a=><option key={a.catalogItemId} value={a.catalogItemId}>{a.name} ({Math.round(a.score*100)}%)</option>)}</select><details><summary className="cursor-pointer text-xs text-blue-700">Ручной поиск</summary><CatalogPicker value={null} onChange={item=>item&&patch(row.rowNumber,{catalogItemId:item.id,catalogItemName:item.name})}/></details></td>
+        <td><select value={row.normalized.side} onChange={e=>patch(row.rowNumber,{normalized:{...row.normalized,side:e.target.value as Row['normalized']['side']}})} className="rounded border p-1">{['NONE','LEFT','RIGHT'].map(x=><option key={x}>{x}</option>)}</select></td><td><select value={row.normalized.position} onChange={e=>patch(row.rowNumber,{normalized:{...row.normalized,position:e.target.value as Row['normalized']['position']}})} className="rounded border p-1">{['NONE','FRONT','REAR'].map(x=><option key={x}>{x}</option>)}</select></td>
+        <td><input type="number" min="0" value={row.source.quantity} onChange={e=>patch(row.rowNumber,{source:{...row.source,quantity:Number(e.target.value)}})} className="w-20 rounded border p-1"/></td><td><input type="number" min="0" step=".01" value={row.source.salePrice} onChange={e=>patch(row.rowNumber,{source:{...row.source,salePrice:Number(e.target.value)}})} className="w-24 rounded border p-1"/></td><td><select value={row.normalized.warehouseId??''} onChange={e=>patch(row.rowNumber,{normalized:{...row.normalized,warehouseId:e.target.value,warehouseName:warehouses.find(w=>w.id===e.target.value)?.name}})} className="w-36 rounded border p-1"><option value="">Выберите</option>{warehouses.map(w=><option key={w.id} value={w.id}>{w.name}</option>)}</select></td>
+        <td className="max-w-48 py-3"><b>{label[row.validation.status]}</b><div>{label[row.match.status]}</div><small className="text-amber-700">{[...row.validation.errors,...row.validation.warnings].join('; ')}</small></td>
+      </tr>)}</tbody></table></div>
+      <div className="flex justify-end gap-3"><select value={mode} onChange={e=>setMode(e.target.value as typeof mode)} className="rounded border p-2"><option value="ADD_QUANTITY">Добавить количество</option><option value="REPLACE_QUANTITY">Заменить количество</option></select><button disabled={busy} onClick={()=>window.confirm(`Импортировать ${rows.filter(row=>row.include).length} строк?`)&&void confirm()} className="rounded bg-emerald-600 px-5 py-2 text-white">Подтвердить импорт</button></div>
+    </>}
+    {result&&<section className="rounded-xl bg-white p-6 ring-1 ring-slate-200"><h2 className="text-xl font-semibold">Импорт завершён</h2><div className="mt-4 flex flex-wrap gap-3">{Object.entries(result.summary).map(([key,value])=><span key={key} className="rounded bg-slate-100 p-3">{key}: <b>{value}</b></span>)}</div><table className="mt-5 w-full text-sm"><tbody>{result.rows.map(row=><tr key={row.rowNumber} className="border-t"><td className="py-2">{row.rowNumber}</td><td>{row.status}</td><td>{row.message}</td></tr>)}</tbody></table></section>}
+  </div></ProtectedLayout>
+}

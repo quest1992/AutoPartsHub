@@ -5,7 +5,7 @@ import {
   ApiError,
   createPartCatalogItem,
   getPartCategories,
-  getPartCatalogCandidates,
+  catalogSearch,
   PartCatalogEntry,
   PartCatalogPayload,
   updatePartCatalogItem,
@@ -114,13 +114,16 @@ export function PartCatalogForm({
 
     const timer = window.setTimeout(
       () =>
-        void getPartCatalogCandidates({
-          q: value.name,
+        void catalogSearch(value.name, {
           categoryId: value.categoryId,
           side: value.side,
           position: value.position,
         })
-          .then((result) => setCandidates(result.items))
+          .then((result) => setCandidates(result.data.map((item)=>({
+            name:item.name,
+            internalCode:item.internalCode,
+            matchType:'CATALOG_SEARCH',
+          }))))
           .catch(() => setCandidates([])),
       400,
     );

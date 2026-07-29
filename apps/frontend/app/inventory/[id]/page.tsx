@@ -48,6 +48,7 @@ export default function Detail() {
     removeCurrentImage: boolean,
   ) {
     let updated = await updateInventory(id, {
+      warehouseId: v.warehouseId,
       brand: v.brand || undefined,
       sku: v.sku || undefined,
       oemNumber: v.oemNumber || undefined,
@@ -107,7 +108,7 @@ export default function Detail() {
         <p>
           Доступно: <b>{item.quantity}</b>
         </p>
-        <p>Место: {item.location ?? "—"}</p>
+        <p>Склад: {item.warehouse?.name ?? "—"}</p>
         <p>Статус: {item.isActive ? "Активен" : "Отключён"}</p>
         <p>Магазин: {item.shop.name}</p>
         <p>Категория: {item.partCatalogItem.category.name}</p>

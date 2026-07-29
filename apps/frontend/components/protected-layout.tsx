@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { ReactNode, useEffect } from 'react';
+import { createContext, ReactNode, useContext, useEffect } from 'react';
 import { useAuth } from './auth-provider';
 
 type NavigationItem = {
@@ -10,6 +10,7 @@ type NavigationItem = {
   label: string;
   permissions?: string[];
   icon: string;
+  roles?: string[];
 };
 
 const navigationItems: NavigationItem[] = [
@@ -39,7 +40,7 @@ const navigationItems: NavigationItem[] = [
     icon: '🚚',
   },
   {
-    href: '/dashboard/inventory/import',
+    href: '/shop/inventory/import',
     label: 'Импорт Excel',
     permissions: ['INVENTORY_IMPORT'],
     icon: '📥',
@@ -75,6 +76,24 @@ const navigationItems: NavigationItem[] = [
     icon: '#',
   },
   {
+    href: '/admin/orders',
+    label: 'Заказы клиентов',
+    permissions: ['ORDER_MANAGE'],
+    icon: '🧾',
+  },
+  { href: '/admin/shop-settlements', label: 'Расчёты с магазинами', roles: ['SUPER_ADMIN'], icon: '₽' },
+  { href: '/shop/finance', label: 'Финансы магазина', permissions: ['FINANCE_VIEW'], icon: '¤' },
+  { href: '/admin/finance-audit', label: 'Финансовый аудит', roles: ['SUPER_ADMIN'], icon: 'ƒ' },
+  { href: '/shop/warehouses', label: 'Склады', permissions: ['INVENTORY_UPDATE'], icon: '🏭' },
+  { href: '/shop/inventory/transfers', label: 'Перемещения', permissions: ['INVENTORY_QUANTITY_UPDATE'], icon: '⇄' },
+  { href: '/shop/inventory/stocktakes', label: 'Инвентаризация', permissions: ['INVENTORY_QUANTITY_UPDATE'], icon: '✓' },
+  { href: '/admin/inventory-audit', label: 'Аудит остатков', roles: ['SUPER_ADMIN'], icon: '∑' },
+  { href: '/admin/catalog-bootstrap', label: 'Наполнение каталога', roles: ['SUPER_ADMIN'], icon: '🧰' },
+  { href: '/admin/taxonomy-studio', label: 'Таксономия каталога', roles: ['SUPER_ADMIN'], icon: '🧭' },
+  { href: '/catalog-suggestions', label: 'Мои предложения', permissions: ['CATALOG_VIEW'], icon: '💡' },
+  { href: '/admin/catalog-suggestions', label: 'Предложения каталога', roles: ['SUPER_ADMIN'], icon: '✅' },
+  { href: '/admin/vehicles', label: 'Автомобили', permissions: ['CATALOG_VIEW'], icon: '🚘' },
+  {
     href: '/vin',
     label: 'VIN Decoder',
     permissions: ['CATALOG_VIEW'],
@@ -90,11 +109,14 @@ const roleLabels = {
   VIEWER: 'Наблюдатель',
 };
 
+const ProtectedLayoutContext = createContext(false);
+
 export function ProtectedLayout({
   children,
 }: {
   children: ReactNode;
 }) {
+  const isNested = useContext(ProtectedLayoutContext);
   const pathname = usePathname();
   const router = useRouter();
 
@@ -111,6 +133,10 @@ export function ProtectedLayout({
       router.replace('/login');
     }
   }, [isAuthenticated, isLoading, router, user]);
+
+  if (isNested) {
+    return <>{children}</>;
+  }
 
   if (isLoading) {
     return (
@@ -132,6 +158,8 @@ export function ProtectedLayout({
     (item) =>
       !item.permissions ||
       hasAnyPermission(...item.permissions),
+  ).filter(
+    (item) => !item.roles || item.roles.includes(user.role),
   );
 
   function handleLogout() {
@@ -140,7 +168,8 @@ export function ProtectedLayout({
   }
 
   return (
-    <div className="min-h-screen bg-slate-100 md:flex">
+    <ProtectedLayoutContext.Provider value>
+      <div className="min-h-screen bg-slate-100 md:flex">
 
       <aside className="w-72 bg-slate-950 text-white shadow-2xl">
 
@@ -222,6 +251,7 @@ export function ProtectedLayout({
         {children}
       </main>
 
-    </div>
+      </div>
+    </ProtectedLayoutContext.Provider>
   );
 }
