@@ -21,35 +21,55 @@ freshUrl.searchParams.delete('schema');
 function run(
   command: string,
   args: string[],
-  options: { databaseUrl?: string; allowExitCodeTwo?: boolean } = {},
+  options: {
+    databaseUrl?: string;
+    allowExitCodeTwo?: boolean;
+    retryWindowsEngineLock?: boolean;
+  } = {},
 ) {
-  const result = spawnSync(command, args, {
-    cwd: process.cwd(),
-    encoding: 'utf8',
-    env: {
-      ...process.env,
-      ...(options.databaseUrl ? { DATABASE_URL: options.databaseUrl } : {}),
-    },
-    shell: false,
-  });
-  if (result.stdout) process.stdout.write(result.stdout);
-  if (result.stderr) process.stderr.write(result.stderr);
-  const allowed =
-    result.status === 0 ||
-    (options.allowExitCodeTwo === true && result.status === 2);
-  if (!allowed) {
-    throw new Error(
-      `${command} ${args.join(' ')} failed with exit code ${result.status}`,
+  for (let attempt = 1; attempt <= 3; attempt += 1) {
+    const result = spawnSync(command, args, {
+      cwd: process.cwd(),
+      encoding: 'utf8',
+      env: {
+        ...process.env,
+        ...(options.databaseUrl ? { DATABASE_URL: options.databaseUrl } : {}),
+      },
+      shell: false,
+    });
+    if (result.stdout) process.stdout.write(result.stdout);
+    if (result.stderr) process.stderr.write(result.stderr);
+    const allowed =
+      result.status === 0 ||
+      (options.allowExitCodeTwo === true && result.status === 2);
+    if (allowed) return result.status ?? 1;
+    const retryable =
+      options.retryWindowsEngineLock === true &&
+      attempt < 3 &&
+      `${result.stdout ?? ''}${result.stderr ?? ''}`.includes('EPERM');
+    if (!retryable) {
+      throw new Error(
+        `${command} ${args.join(' ')} failed with exit code ${result.status}`,
+      );
+    }
+    process.stdout.write(
+      `Prisma engine is temporarily locked; retrying generate (${attempt}/3)\n`,
     );
+    Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 500);
   }
-  return result.status ?? 1;
+  throw new Error('Unreachable retry state');
 }
 
 const prismaCli = require.resolve('prisma/build/index.js');
-const prisma = (args: string[], allowExitCodeTwo = false) =>
+const prisma = (
+  args: string[],
+  allowExitCodeTwo = false,
+  retryWindowsEngineLock = false,
+) =>
   run(process.execPath, [prismaCli, ...args], {
     databaseUrl: freshUrl.toString(),
     allowExitCodeTwo,
+    retryWindowsEngineLock,
   });
 
 try {
@@ -60,7 +80,7 @@ try {
   prisma(['migrate', 'deploy', '--config', 'prisma.config.ts']);
   prisma(['migrate', 'status', '--config', 'prisma.config.ts']);
   prisma(['validate', '--config', 'prisma.config.ts']);
-  prisma(['generate', '--config', 'prisma.config.ts']);
+  prisma(['generate', '--config', 'prisma.config.ts'], false, true);
   const driftExit = prisma(
     [
       'migrate',
