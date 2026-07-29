@@ -46,17 +46,14 @@ export class PartCategoriesService {
       parentId,
       rootOnly,
       leafOnly,
-      isActive,
     } = query;
     const normalizedSearch = search?.trim();
 
     const where: Prisma.PartCategoryWhereInput = {
-      ...(isActive !== undefined && { isActive }),
-      ...(isActive === true && {
-        catalogItemMappings: {
-          none: { classification: { in: ['CATALOG_ITEM', 'INVALID'] } },
-        },
-      }),
+      isActive: true,
+      catalogItemMappings: {
+        none: { classification: { in: ['CATALOG_ITEM', 'INVALID'] } },
+      },
       ...(rootOnly ? { parentId: null } : parentId ? { parentId } : {}),
       ...(leafOnly === true && { children: { none: {} } }),
 
@@ -88,9 +85,9 @@ export class PartCategoriesService {
     };
   }
 
-  async findTree(isActive = true) {
+  async findTree(_isActive = true) {
     const categories = await this.prisma.partCategory.findMany({
-      where: { isActive },
+      where: { isActive: true },
       select: {
         id: true,
         name: true,
@@ -130,6 +127,8 @@ export class PartCategoriesService {
         _count: { select: { children: true } },
       },
     });
+    if (category?.isActive === false)
+      throw new NotFoundException('Категория деталей не найдена');
     if (!category) throw new NotFoundException('Категория деталей не найдена');
     return category;
   }

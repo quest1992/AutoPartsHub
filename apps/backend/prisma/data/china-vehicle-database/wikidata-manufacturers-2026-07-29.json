@@ -1,0 +1,5100 @@
+{
+  "head" : {
+    "vars" : [ "manufacturer", "manufacturerLabel", "manufacturerZh", "inception", "website", "parent", "parentLabel" ]
+  },
+  "results" : {
+    "bindings" : [ {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q27423"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "比亚迪汽车"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "2003-01-22T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "https://www.byd.com/cn"
+      },
+      "parent" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q2608329"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "BYD Auto"
+      },
+      "parentLabel" : {
+        "type" : "literal",
+        "value" : "Q2608329"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q27423"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "比亚迪汽车"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "2003-01-22T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "https://www.byd.com/en"
+      },
+      "parent" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q2608329"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "BYD Auto"
+      },
+      "parentLabel" : {
+        "type" : "literal",
+        "value" : "Q2608329"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q27423"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "比亚迪汽车"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "2003-01-22T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "https://www.byd.com/es"
+      },
+      "parent" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q2608329"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "BYD Auto"
+      },
+      "parentLabel" : {
+        "type" : "literal",
+        "value" : "Q2608329"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q27423"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "比亚迪汽车"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "2003-01-22T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "https://byd-automobiles.com/fr/"
+      },
+      "parent" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q2608329"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "BYD Auto"
+      },
+      "parentLabel" : {
+        "type" : "literal",
+        "value" : "Q2608329"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q197541"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "广汽吉奥"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "2003-09-27T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "http://www.gonowauto.com/"
+      },
+      "parent" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q1552770"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Gonow"
+      },
+      "parentLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "GAC Group"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q29366"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "长安汽车"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "1996-01-01T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "http://www.changan.com.cn/"
+      },
+      "parent" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q1022190"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Changan Automobile"
+      },
+      "parentLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "China South Industries Group"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q29366"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "长安汽车"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "1996-01-01T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "http://www.globalchangan.com/"
+      },
+      "parent" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q1022190"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Changan Automobile"
+      },
+      "parentLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "China South Industries Group"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q277172"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "辽宁曙光汽车集团"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "1984-12-08T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "http://en.sgautomotive.com/"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "SG Automotive"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q277172"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "辽宁曙光汽车集团"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "1984-12-08T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "http://www.sgautomotive.com/"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "SG Automotive"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q197544"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "永源汽車"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "2003-01-01T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "http://www.jonwayauto.com/"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Jonway Automobile"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q197544"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "永源汽車"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "2003-01-01T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "https://www.jonway.com/"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Jonway Automobile"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q277172"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "辽宁曙光汽车集团"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "1995-01-01T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "http://en.sgautomotive.com/"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "SG Automotive"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q277172"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "辽宁曙光汽车集团"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "1995-01-01T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "http://www.sgautomotive.com/"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "SG Automotive"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q591001"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "奇瑞汽车"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "1997-01-08T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "http://www.cheryinternational.com/"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Chery Automobile"
+      },
+      "parent" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q130549386"
+      },
+      "parentLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Chery Holding"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q591001"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "奇瑞汽车"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "1997-01-08T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "https://www.chery.cn/"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Chery Automobile"
+      },
+      "parent" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q130549386"
+      },
+      "parentLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Chery Holding"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q391431"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "华普"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "2000-01-01T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "http://www.smcchina.com/"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Shanghai Maple"
+      },
+      "parent" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q739000"
+      },
+      "parentLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Geely"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q545579"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "江汽集团"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "1964-01-01T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "https://www.jac.com.cn/"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "JAC Group"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q814712"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "北汽集团"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "1958-01-01T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "http://www.baicgroup.com.cn/"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "BAIC Group"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q739000"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "吉利控股集团"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "2003-01-01T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "https://www.geely.com/"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Geely"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q739000"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "吉利控股集团"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "1986-11-06T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "https://www.geely.com/"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Geely"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q1062020"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "昌河汽车"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "1970-01-01T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "http://www.changheglobal.com/"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Changhe"
+      },
+      "parent" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q29366"
+      },
+      "parentLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Changan Automobile"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q1062020"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "昌河汽车"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "1970-01-01T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "https://www.changhe.com.ph/"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Changhe"
+      },
+      "parent" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q29366"
+      },
+      "parentLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Changan Automobile"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q910401"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "上海汽车集团"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "1984-01-01T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "https://www.saicmotor.com/"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "SAIC Motor"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q910401"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "上海汽车集团"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "1984-01-01T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "https://www.saicmotor.com/english/index.shtml"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "SAIC Motor"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q913734"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "一汽-大众汽车"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "1991-02-06T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "http://www.faw-vw.com/"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "FAW-Volkswagen"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q917192"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "华晨汽车集团"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "1992-01-01T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "http://www.brilliance-auto.com"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Brilliance Auto"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q1062020"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "昌河汽车"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "1970-01-01T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "http://www.changheauto.com/"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Changhe"
+      },
+      "parent" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q814712"
+      },
+      "parentLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "BAIC Group"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q1062020"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "昌河汽车"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "1970-01-01T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "http://www.changheglobal.com/"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Changhe"
+      },
+      "parent" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q814712"
+      },
+      "parentLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "BAIC Group"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q1062020"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "昌河汽车"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "1970-01-01T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "https://www.changhe.com.ph/"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Changhe"
+      },
+      "parent" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q814712"
+      },
+      "parentLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "BAIC Group"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q1065539"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "江铃汽车"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "1952-01-01T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "http://www.jmc.com.cn"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Jiangling Motors"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q830664"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "奔腾 (汽车)"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "2006-01-01T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "https://benteng.faw.cn/"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Bestune"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q814825"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "北汽福田"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "1996-08-28T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "https://www.foton.com.cn"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Foton Motor"
+      },
+      "parent" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q814712"
+      },
+      "parentLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "BAIC Group"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q842268"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "悦达起亚"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "2002-01-01T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "https://www.kia.cn/"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Jiangsu Yueda Kia Motors"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q905009"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "华泰汽車"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "2000-01-01T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "http://en.hawtaimotor.com/"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Hawtai"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q905009"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "华泰汽車"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "2000-01-01T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "http://hawtaimotor.com/"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Hawtai"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q814713"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "北京奔驰"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "2005-08-08T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "http://www.bbac.com.cn/"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Beijing Benz"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q1117001"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "长城汽车"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "1984-01-01T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "http://www.gwm.com.cn/"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Great Wall Motor"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q1117001"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "长城汽车"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "1984-01-01T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "https://www.gwm-eu.com/"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Great Wall Motor"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q1117001"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "长城汽车"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "1984-01-01T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "https://www.gwm-global.com/"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Great Wall Motor"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q1117001"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "长城汽车"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "1984-01-01T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "https://www.gwm.co.za/"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Great Wall Motor"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q1117001"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "长城汽车"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "1984-01-01T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "https://www.gwm.iq/"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Great Wall Motor"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q1117001"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "长城汽车"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "1984-01-01T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "https://www.gwm.iq/en"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Great Wall Motor"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q1117001"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "长城汽车"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "1984-01-01T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "https://www.gwmanz.com/"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Great Wall Motor"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q1117001"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "长城汽车"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "1984-01-01T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "https://www.gwmanz.com/au/"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Great Wall Motor"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q1117001"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "长城汽车"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "1984-01-01T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "https://www.gwmanz.com/nz/"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Great Wall Motor"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q1117001"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "长城汽车"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "1984-01-01T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "https://www.gwmbrunei.com/"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Great Wall Motor"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q1117001"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "长城汽车"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "1984-01-01T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "https://www.gwmhaval.com.au/"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Great Wall Motor"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q1117001"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "长城汽车"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "1984-01-01T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "https://www.onegwm.co.za/"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Great Wall Motor"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q1124351"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "中国第一汽车集团有限公司"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "1953-07-15T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "http://www.faw.com/"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "FAW Group"
+      },
+      "parent" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q1629075"
+      },
+      "parentLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "State-owned Assets Supervision and Administration Commission of the State Council"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q1138452"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "东风汽车"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "1969-01-01T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "https://www.dfmc.com.cn/"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Dongfeng Motor Corporation"
+      },
+      "parent" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q1629075"
+      },
+      "parentLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "State-owned Assets Supervision and Administration Commission of the State Council"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q1465351"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "力帆汽车"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "1992-01-01T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "http://www.lifan.com/"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Lifan Group"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q1637227"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "荣威"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "2007-01-01T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "http://www.roewe.com.cn"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Roewe"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q1552750"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "广汽本田"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "1997-01-01T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "https://www.ghac.cn/"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "GAC Honda"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q1538336"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "中国兵器工业集团有限公司"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "1980-01-01T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "http://en.norincogroup.com.cn/"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "China North Industries Group Corporation Limited"
+      },
+      "parent" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q1629075"
+      },
+      "parentLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "State-owned Assets Supervision and Administration Commission of the State Council"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q1538336"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "中国兵器工业集团有限公司"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "1980-01-01T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "http://www.norincogroup.com.cn/"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "China North Industries Group Corporation Limited"
+      },
+      "parent" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q1629075"
+      },
+      "parentLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "State-owned Assets Supervision and Administration Commission of the State Council"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q1538336"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "中国兵器工业集团有限公司"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "1980-01-01T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "http://www.norincogroup.com.cn/gtb/index.jsp?url=http://www.norincogroup.com.cn"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "China North Industries Group Corporation Limited"
+      },
+      "parent" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q1629075"
+      },
+      "parentLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "State-owned Assets Supervision and Administration Commission of the State Council"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q1432633"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "上汽大众"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "1984-10-10T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "http://www.csvw.com/"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "SAIC Volkswagen"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q1611731"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "红旗"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "1958-01-01T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "https://hongqi.faw.cn/"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Hongqi"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q1611731"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "红旗"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "1958-01-01T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "https://www.hongqi-auto.com/"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Hongqi"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q1241360"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "神龙汽车"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "1992-01-01T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "http://www.dpca.com.cn/"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Dongfeng Stellantis"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q1397713"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "海马汽车"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "1992-01-01T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "http://www.haima.com/"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Haima Automobile"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q1552750"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "广汽本田"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "1998-05-07T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "https://www.ghac.cn/"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "GAC Honda"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q1855184"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "东南汽车"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "1995-01-01T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "http://www.soueast-motor.com/"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Soueast"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q1552770"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "廣汽集團"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "1997-06-01T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "https://www.gac.com.cn/"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "GAC Group"
+      },
+      "parent" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q15807676"
+      },
+      "parentLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Guangzhou Automobile Industry Group"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q1584295"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "南京汽車集團"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "1947-01-01T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "http://www.nanqi.com.cn/"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Nanjing Automobile"
+      },
+      "parent" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q910401"
+      },
+      "parentLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "SAIC Motor"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q1617677"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "金龙联合汽车工业（苏州）有限公司"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "1998-12-31T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "http://en.higer.com"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Higer"
+      },
+      "parent" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q3273406"
+      },
+      "parentLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "King Long"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q2285090"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "天津一汽夏利汽车"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "1997-01-01T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "http://en.tjfaw.com/index.html"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "FAW Tianjin"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q2381970"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "腾势汽车"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "2010-05-27T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "http://www.denza.com/"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Denza"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q2381970"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "腾势汽车"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "2010-05-27T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "http://www.denzahk.com/"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Denza"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q2381970"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "腾势汽车"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "2010-05-27T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "https://denza.sg/"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Denza"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q2381970"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "腾势汽车"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "2010-05-27T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "https://www.tengshiauto.com/"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Denza"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q2285090"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "天津一汽夏利汽车"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "1997-08-28T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "http://en.tjfaw.com/index.html"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "FAW Tianjin"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q3082637"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "上汽通用五菱"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "1998-01-01T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "https://www.sgmw.com.cn/"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "SAIC-GM-Wuling"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q3082637"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "上汽通用五菱"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "1998-01-01T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "https://www.sgmw.com.cn/en/"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "SAIC-GM-Wuling"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q2883616"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "宝骏"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "2010-01-01T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "https://www.sgmw.com.cn/baojun"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Baojun"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q1855184"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "东南汽车"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "1995-01-01T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "http://en.soueast-motor.com/"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Soueast"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q2598303"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "新凱汽車"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "1981-01-01T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "http://hbxk.com/"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Xinkai"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q2925556"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "金杯汽车"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "1988-01-01T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "http://en.jinbei.com/"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Jinbei"
+      },
+      "parent" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q917192"
+      },
+      "parentLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Brilliance Auto"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q2925556"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "金杯汽车"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "1988-01-01T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "http://www.jinbeicq.com/car/list-11.html"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Jinbei"
+      },
+      "parent" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q917192"
+      },
+      "parentLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Brilliance Auto"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q2608329"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "比亚迪"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "1995-02-10T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "https://www.bydglobal.com/"
+      },
+      "manufacturerLabel" : {
+        "type" : "literal",
+        "value" : "Q2608329"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q5295884"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "东风本田汽车有限公司"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "2003-01-01T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "https://www.dongfeng-honda.com/"
+      },
+      "parent" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q11104175"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Dongfeng Honda"
+      },
+      "parentLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Dongfeng Motor Group Company Limited"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q7488453"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "上汽通用汽車"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "1997-06-12T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "http://www.saic-gm.com/"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "SAIC General Motors"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q25138439"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "长安福特汽车"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "2012-01-01T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "https://www.ford.com.cn/"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Changan Ford Automobile"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q5295884"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "东风本田汽车有限公司"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "2003-01-01T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "https://www.dongfeng-honda.com/"
+      },
+      "parent" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q9584"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Dongfeng Honda"
+      },
+      "parentLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Honda"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q11705500"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "众泰汽车"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "2005-01-01T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "http://www.zotye.com"
+      },
+      "manufacturerLabel" : {
+        "type" : "literal",
+        "value" : "Q11705500"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q11705500"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "众泰汽车"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "2005-01-01T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "http://www.zotyeglobal.com/"
+      },
+      "manufacturerLabel" : {
+        "type" : "literal",
+        "value" : "Q11705500"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q5295889"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "东风汽车有限公司"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "2003-06-09T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "https://www.dongfeng-nissan.com.cn/"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Dongfeng Motor Company Limited"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q5295882"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "东风柳州汽车有限公司"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "1954-01-01T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "http://www.dflzm.com.cn/"
+      },
+      "parent" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q1138452"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Dongfeng Liuzhou Motor Company"
+      },
+      "parentLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Dongfeng Motor Corporation"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q5295889"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "东风汽车有限公司"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "2003-06-09T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "https://www.dfl.com.cn/"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Dongfeng Motor Company Limited"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q17006727"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "康迪汽车"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "2013-04-19T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "http://en.kandivehicle.com/"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Kandi Technologies"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q17006727"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "康迪汽车"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "2013-04-19T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "http://www.kandivehicle.com/"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Kandi Technologies"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q10871170"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "东风日产乘用车公司"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "2003-01-01T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "https://www.dongfeng-nissan.com.cn/"
+      },
+      "parent" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q5295889"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Dongfeng Nissan Passenger Vehicle Company"
+      },
+      "parentLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Dongfeng Motor Company Limited"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q3302845"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "上汽大通"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "2011-03-01T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "http://starcuracao.com/maxus/"
+      },
+      "parent" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q910401"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Maxus"
+      },
+      "parentLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "SAIC Motor"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q3302845"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "上汽大通"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "2011-03-01T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "http://www.maxus.com.gt/"
+      },
+      "parent" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q910401"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Maxus"
+      },
+      "parentLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "SAIC Motor"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q3302845"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "上汽大通"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "2011-03-01T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "http://www.maxus.com.pa/"
+      },
+      "parent" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q910401"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Maxus"
+      },
+      "parentLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "SAIC Motor"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q3302845"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "上汽大通"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "2011-03-01T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "http://www.saicmaxus.com"
+      },
+      "parent" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q910401"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Maxus"
+      },
+      "parentLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "SAIC Motor"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q3302845"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "上汽大通"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "2011-03-01T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "https://en.saicmaxus.com/index.shtml"
+      },
+      "parent" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q910401"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Maxus"
+      },
+      "parentLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "SAIC Motor"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q3302845"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "上汽大通"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "2011-03-01T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "https://imotors.hn/maxus/"
+      },
+      "parent" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q910401"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Maxus"
+      },
+      "parentLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "SAIC Motor"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q3302845"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "上汽大通"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "2011-03-01T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "https://maxus-danmark.dk/"
+      },
+      "parent" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q910401"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Maxus"
+      },
+      "parentLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "SAIC Motor"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q3302845"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "上汽大通"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "2011-03-01T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "https://maxus-motor.gr/"
+      },
+      "parent" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q910401"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Maxus"
+      },
+      "parentLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "SAIC Motor"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q3302845"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "上汽大通"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "2011-03-01T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "https://maxus.autos/"
+      },
+      "parent" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q910401"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Maxus"
+      },
+      "parentLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "SAIC Motor"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q3302845"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "上汽大通"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "2011-03-01T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "https://maxus.cl/"
+      },
+      "parent" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q910401"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Maxus"
+      },
+      "parentLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "SAIC Motor"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q3302845"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "上汽大通"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "2011-03-01T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "https://maxus.co.za/"
+      },
+      "parent" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q910401"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Maxus"
+      },
+      "parentLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "SAIC Motor"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q3302845"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "上汽大通"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "2011-03-01T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "https://maxus.com.bn/"
+      },
+      "parent" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q910401"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Maxus"
+      },
+      "parentLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "SAIC Motor"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q3302845"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "上汽大通"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "2011-03-01T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "https://maxus.com.py/"
+      },
+      "parent" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q910401"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Maxus"
+      },
+      "parentLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "SAIC Motor"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q3302845"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "上汽大通"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "2011-03-01T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "https://maxus.fi/"
+      },
+      "parent" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q910401"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Maxus"
+      },
+      "parentLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "SAIC Motor"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q3302845"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "上汽大通"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "2011-03-01T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "https://maxus.is/"
+      },
+      "parent" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q910401"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Maxus"
+      },
+      "parentLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "SAIC Motor"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q3302845"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "上汽大通"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "2011-03-01T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "https://maxusguatemala.com/"
+      },
+      "parent" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q910401"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Maxus"
+      },
+      "parentLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "SAIC Motor"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q3302845"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "上汽大通"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "2011-03-01T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "https://maxusmotors.it/"
+      },
+      "parent" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q910401"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Maxus"
+      },
+      "parentLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "SAIC Motor"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q3302845"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "上汽大通"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "2011-03-01T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "https://maxusrd.com/"
+      },
+      "parent" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q910401"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Maxus"
+      },
+      "parentLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "SAIC Motor"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q3302845"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "上汽大通"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "2011-03-01T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "https://maxusve.com/"
+      },
+      "parent" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q910401"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Maxus"
+      },
+      "parentLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "SAIC Motor"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q3302845"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "上汽大通"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "2011-03-01T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "https://weststarmaxus.com/"
+      },
+      "parent" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q910401"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Maxus"
+      },
+      "parentLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "SAIC Motor"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q3302845"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "上汽大通"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "2011-03-01T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "https://www.cyclecarriage.com/sg/maxus"
+      },
+      "parent" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q910401"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Maxus"
+      },
+      "parentLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "SAIC Motor"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q3302845"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "上汽大通"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "2011-03-01T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "https://www.maxus-motors.at/"
+      },
+      "parent" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q910401"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Maxus"
+      },
+      "parentLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "SAIC Motor"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q3302845"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "上汽大通"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "2011-03-01T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "https://www.maxus.com.hk/"
+      },
+      "parent" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q910401"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Maxus"
+      },
+      "parentLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "SAIC Motor"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q3302845"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "上汽大通"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "2011-03-01T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "https://www.maxus.hr/"
+      },
+      "parent" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q910401"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Maxus"
+      },
+      "parentLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "SAIC Motor"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q3302845"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "上汽大通"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "2011-03-01T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "https://www.maxus.pe/"
+      },
+      "parent" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q910401"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Maxus"
+      },
+      "parentLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "SAIC Motor"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q3302845"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "上汽大通"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "2011-03-01T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "https://www.maxus.uy/"
+      },
+      "parent" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q910401"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Maxus"
+      },
+      "parentLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "SAIC Motor"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q3302845"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "上汽大通"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "2011-03-01T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "https://www.maxusecuador.com/"
+      },
+      "parent" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q910401"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Maxus"
+      },
+      "parentLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "SAIC Motor"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q3302845"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "上汽大通"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "2011-03-01T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "https://www.maxusmotors.be/"
+      },
+      "parent" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q910401"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Maxus"
+      },
+      "parentLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "SAIC Motor"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q3302845"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "上汽大通"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "2011-03-01T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "https://www.maxusmotors.de/"
+      },
+      "parent" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q910401"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Maxus"
+      },
+      "parentLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "SAIC Motor"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q3302845"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "上汽大通"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "2011-03-01T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "https://www.maxusmotors.fr/"
+      },
+      "parent" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q910401"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Maxus"
+      },
+      "parentLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "SAIC Motor"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q3302845"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "上汽大通"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "2011-03-01T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "https://www.saicmaxus.am/"
+      },
+      "parent" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q910401"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Maxus"
+      },
+      "parentLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "SAIC Motor"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q5295879"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "东风汽车股份有限公司"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "1999-07-21T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "https://www.dfac.com/"
+      },
+      "parent" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q11104175"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Dongfeng Automobile Company Limited"
+      },
+      "parentLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Dongfeng Motor Group Company Limited"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q5295879"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "东风汽车股份有限公司"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "1999-07-21T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "https://www.dfac.com/"
+      },
+      "parent" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q5295889"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Dongfeng Automobile Company Limited"
+      },
+      "parentLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Dongfeng Motor Company Limited"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q3817853"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "五菱汽車"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "1998-01-01T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "https://www.wuling.com/"
+      },
+      "parent" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q11109624"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Wuling Motors"
+      },
+      "parentLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Guangxi Automobile Group"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q4231991"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "观致汽车"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "2007-12-01T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "https://www.qoros.com/"
+      },
+      "parent" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q1674598"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Qoros"
+      },
+      "parentLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "The Israel Corporation Ltd."
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q4231991"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "观致汽车"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "2007-12-01T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "https://www.qoros.com/global/"
+      },
+      "parent" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q1674598"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Qoros"
+      },
+      "parentLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "The Israel Corporation Ltd."
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q4231991"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "观致汽车"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "2007-12-01T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "https://www.qoros.com/"
+      },
+      "parent" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q591001"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Qoros"
+      },
+      "parentLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Chery Automobile"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q4231991"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "观致汽车"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "2007-12-01T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "https://www.qoros.com/global/"
+      },
+      "parent" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q591001"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Qoros"
+      },
+      "parentLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Chery Automobile"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q56290373"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "斯威汽车"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "2016-07-27T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "http://www.swmmotors.com.cn/"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "SWM"
+      },
+      "parent" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q10371083"
+      },
+      "parentLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Shineray Group"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q63035278"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "小鹏汽车"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "2014-08-15T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "https://www.xpeng-auto.es/"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "XPeng"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q55608782"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "赛力斯汽车（湖北）"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "2003-06-27T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "http://www.dfdongfeng.com.cn/"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Seres Auto (Hubei)"
+      },
+      "parent" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q104907477"
+      },
+      "parentLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Seres Group"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q55608782"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "赛力斯汽车（湖北）"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "2003-06-27T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "http://www.dfsk.com/"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Seres Auto (Hubei)"
+      },
+      "parent" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q104907477"
+      },
+      "parentLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Seres Group"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q28127238"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "长安标致雪铁龙"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "2011-11-01T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "http://www.capsa.com.cn/"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Changan PSA"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q28127238"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "长安标致雪铁龙"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "2011-11-01T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "http://www.capsa.com.cn/index.php/en/"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Changan PSA"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q50379347"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "凯翼汽车"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "2014-01-01T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "https://kaiyiglobal.com/"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Kaiyi Auto"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q50379347"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "凯翼汽车"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "2014-01-01T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "https://www.kaiyihome.com/"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Kaiyi Auto"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q27555283"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "領克"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "2016-10-20T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "https://www.lynkco.com/"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Lynk & Co"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q55118127"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "吉利汽車"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "1986-01-01T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "https://www.geely.com"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Geely Auto"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q33111848"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "北京汽车"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "2010-09-01T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "http://www.baicmotor.com"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "BAIC Motor"
+      },
+      "parent" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q814712"
+      },
+      "parentLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "BAIC Group"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q47313237"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "拜腾"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "2016-03-01T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "https://www.byton.com/"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Byton"
+      },
+      "parent" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q860580"
+      },
+      "parentLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Tencent"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q29921278"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "蔚来汽车"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "2014-11-01T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "https://www.nio.com"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Nio Inc."
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q120192864"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "枫叶汽车"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "2020-01-01T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "https://www.mapleauto.cn/"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Maple Automobiles"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q96676812"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "2019-01-01T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "https://www.beijingauto.com.cn/"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Beijing"
+      },
+      "parent" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q96983171"
+      },
+      "parentLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "BAIC BluePark"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q123574937"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "小米汽车"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "2021-01-01T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "https://www.xiaomiev.com"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Xiaomi Auto"
+      },
+      "parent" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q1636958"
+      },
+      "parentLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Xiaomi"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q10371083"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "1997-01-01T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "http://www.shineray.com.cn/"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Shineray Group"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q10371083"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "1997-01-01T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "https://www.shineray.com/"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Shineray Group"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q1076132"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "2012-01-01T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "https://en.weichai.com"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Weichai (Chongqing) Automotive"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q120192864"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "枫叶汽车"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "2019-01-01T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "https://www.mapleauto.cn/"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Maple Automobiles"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q132155860"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "大众汽车（安徽）有限公司"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "2017-12-22T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "https://www.volkswagen-anhui.com/"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Volkswagen (Anhui) Automotive Co., Ltd."
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q122652175"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "东风纳米"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "2020-01-01T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "https://www.dna-nev.com.cn/"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Dongfeng Nammi"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q65158716"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "爱驰汽车"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "2017-01-01T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "https://www.ai-ways.com/"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Aiways"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q111660349"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "问界"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "2021-12-02T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "https://aito.auto/"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "AITO"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q3273406"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "金龙联合汽车"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "1988-12-03T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "https://www.king-long.com"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "King Long"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q3273406"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "金龙联合汽车"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "1988-12-03T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "https://www.king-long.com.cn/"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "King Long"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q1062020"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "昌河汽车"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "1970-01-01T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "http://www.changheauto.com/"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Changhe"
+      },
+      "parent" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q29366"
+      },
+      "parentLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Changan Automobile"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q98145436"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "捷途"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "2018-01-22T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "https://www.jetour.com.cn/"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Jetour"
+      },
+      "parent" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q591001"
+      },
+      "parentLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Chery Automobile"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q64797075"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "威马汽车"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "2015-01-01T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "http://www.wm-motor.com"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Weltmeister"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q105320128"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "雷丁汽车"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "2008-01-01T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "http://www.letin-auto.com/"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Levdeo"
+      },
+      "parent" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q8052055"
+      },
+      "parentLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Yema Auto"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q105320128"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "雷丁汽车"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "2008-01-01T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "http://www.levdeo.com/"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Levdeo"
+      },
+      "parent" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q8052055"
+      },
+      "parentLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Yema Auto"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q106617594"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "智己汽车"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "2020-01-01T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "https://www.immotors.com/"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "IM Motors"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q106621124"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "極氪"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "2021-03-23T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "https://zeekrglobal.com/"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Zeekr"
+      },
+      "parent" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q739000"
+      },
+      "parentLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Geely"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q106621124"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "極氪"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "2021-03-23T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "https://zeekrlife.com"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Zeekr"
+      },
+      "parent" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q739000"
+      },
+      "parentLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Geely"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q63196664"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "易捷特新能源汽车"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "2017-08-01T00:00:00Z"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "eGT New Energy Automotive"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q85740196"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "广汽埃安"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "2017-07-28T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "https://www.aion.com.cn/"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "GAC Aion"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q107769699"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "创维汽车"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "2017-01-01T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "https://en.skywellev.com/"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Skyworth Auto"
+      },
+      "parent" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q65046953"
+      },
+      "parentLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Nanjing Golden Dragon Bus"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q107769699"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "创维汽车"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "2017-01-01T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "https://www.skyworthev.com/"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Skyworth Auto"
+      },
+      "parent" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q65046953"
+      },
+      "parentLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Nanjing Golden Dragon Bus"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q65059276"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "大乘汽車"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "2018-09-01T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "http://www.dorcenauto.com/"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Dorcen"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q65059276"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "大乘汽車"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "2018-09-01T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "https://www.dorcen.com/"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Dorcen"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q65051634"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "思皓汽车"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "2018-01-01T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "http://www.sol-auto.com.cn/"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Sol"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q65051634"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "思皓汽车"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "2018-01-01T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "https://www.jac.com.cn/jacweb/sh/"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Sol"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q99535383"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "国金汽车"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "https://www.gjqczz.com/"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Sinogold"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q99535383"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "国金汽车"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "https://www.sinogoldcar.com/"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Sinogold"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q65046953"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "南京金龙"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "2000-01-01T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "http://www.njgdbus.com/"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Nanjing Golden Dragon Bus"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q104907477"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "赛力斯集团"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "1986-09-01T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "https://en.seres.cn/"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Seres Group"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q104907477"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "赛力斯集团"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "1986-09-01T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "https://www.seres.cn/"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Seres Group"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q96983171"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "北汽蓝谷"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "2009-10-23T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "https://www.bjev.com.cn/"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "BAIC BluePark"
+      },
+      "parent" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q814712"
+      },
+      "parentLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "BAIC Group"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q96385439"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "開瑞"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "2009-01-01T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "https://www.mykarry.com/"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Karry"
+      },
+      "parent" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q591001"
+      },
+      "parentLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Chery Automobile"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q14772"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "百度"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "2000-01-01T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "https://www.baidu.com/"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Baidu"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q3273406"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "金龙联合汽车"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "1988-01-01T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "https://www.king-long.com"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "King Long"
+      }
+    }, {
+      "manufacturer" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q3273406"
+      },
+      "manufacturerZh" : {
+        "xml:lang" : "zh",
+        "type" : "literal",
+        "value" : "金龙联合汽车"
+      },
+      "inception" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#dateTime",
+        "type" : "literal",
+        "value" : "1988-01-01T00:00:00Z"
+      },
+      "website" : {
+        "type" : "uri",
+        "value" : "https://www.king-long.com.cn/"
+      },
+      "manufacturerLabel" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "King Long"
+      }
+    } ]
+  }
+}

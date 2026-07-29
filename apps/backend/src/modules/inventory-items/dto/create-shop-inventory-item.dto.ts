@@ -38,6 +38,19 @@ export class CreateShopInventoryItemDto {
   @IsString()
   @Length(1, 100)
   oemNumber?: string;
+  @ApiPropertyOptional({ format: 'uuid' })
+  @IsOptional()
+  @IsUUID()
+  oemPartId?: string;
+  @ApiPropertyOptional({ format: 'uuid' })
+  @IsOptional()
+  @IsUUID()
+  partBrandId?: string;
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  @Length(1, 100)
+  externalPartNumber?: string;
   @ApiPropertyOptional({ enum: PartCondition, default: PartCondition.NEW })
   @IsOptional()
   @IsEnum(PartCondition)

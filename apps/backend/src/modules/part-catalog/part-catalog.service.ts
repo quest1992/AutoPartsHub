@@ -134,6 +134,8 @@ export class PartCatalogService {
         _count: { select: { compatibilities: true } },
       },
     });
+    if (item && (!item.isActive || !item.category.isActive))
+      throw new NotFoundException('Деталь каталога не найдена');
     if (!item) throw new NotFoundException('Деталь каталога не найдена');
     return item;
   }

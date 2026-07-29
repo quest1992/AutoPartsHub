@@ -24,10 +24,25 @@
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "npm run test:e2e:migrate && jest --config ./test/jest-e2e.json",
     "test:e2e:migrate": "tsx scripts/migrate-e2e.ts",
-    "test:migrations:fresh": "tsx scripts/verify-migrations-fresh.ts"
-    ,"test:migrations:snapshot": "tsx scripts/verify-migrations-snapshot.ts"
-    ,"catalog:migrate-bms": "tsx scripts/migrate-bms-catalog-taxonomy.ts"
-    ,"db:backup": "tsx scripts/backup-database.ts"
+    "test:migrations:fresh": "tsx scripts/verify-migrations-fresh.ts",
+    "test:migrations:snapshot": "tsx scripts/verify-migrations-snapshot.ts",
+    "catalog:migrate-bms": "tsx scripts/migrate-bms-catalog-taxonomy.ts",
+    "catalog:v2:plan": "tsx prisma/catalog-v2.seed.ts",
+    "catalog:v2:apply": "tsx prisma/catalog-v2.seed.ts --apply",
+    "catalog:v2:report": "tsx scripts/generate-catalog-v2-report.ts",
+    "catalog:v2:verify": "tsx scripts/verify-catalog-v2-live.ts",
+    "catalog:v2:purge-archive": "tsx scripts/purge-archived-catalog.ts",
+    "vehicle-db:plan": "tsx prisma/vehicle-database.seed.ts",
+    "vehicle-db:apply": "tsx prisma/vehicle-database.seed.ts --apply",
+    "china-vehicle-db:plan": "tsx prisma/china-vehicle-database.seed.ts",
+    "china-vehicle-db:apply": "tsx prisma/china-vehicle-database.seed.ts --apply",
+    "china-vehicle-specs:plan": "tsx prisma/china-vehicle-specifications.seed.ts",
+    "china-vehicle-specs:apply": "tsx prisma/china-vehicle-specifications.seed.ts --apply",
+    "part-brands:plan": "tsx prisma/part-brands.seed.ts",
+    "part-brands:apply": "tsx prisma/part-brands.seed.ts --apply",
+    "oem-db:plan": "tsx prisma/oem-database.seed.ts",
+    "oem-db:apply": "tsx prisma/oem-database.seed.ts --apply",
+    "db:backup": "tsx scripts/backup-database.ts"
   },
   "dependencies": {
     "@nestjs/common": "^11.0.1",

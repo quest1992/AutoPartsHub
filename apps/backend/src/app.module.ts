@@ -36,6 +36,7 @@ import { ShopSettlementsModule } from './modules/shop-settlements/shop-settlemen
 import { FinanceAuditModule } from './modules/finance-audit/finance-audit.module';
 import { VehicleDatabaseModule } from './modules/vehicle-database/vehicle-database.module';
 import { PartTaxonomyModule } from './modules/part-taxonomy/part-taxonomy.module';
+import { OemDatabaseModule } from './modules/oem-database/oem-database.module';
 
 @Module({
   imports: [
@@ -64,6 +65,7 @@ import { PartTaxonomyModule } from './modules/part-taxonomy/part-taxonomy.module
     FinanceAuditModule,
     VehicleDatabaseModule,
     PartTaxonomyModule,
+    OemDatabaseModule,
     InventoryItemsModule,
     InventoryMovementsModule,
     SalesModule,

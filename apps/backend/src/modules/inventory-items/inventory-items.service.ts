@@ -14,6 +14,7 @@ import {
 } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
 import { buildInventoryKey } from '../../common/utils/inventory-key';
+import { normalizePartNumber } from '../../common/utils/part-number-normalizer';
 import { ShopWarehousesService } from '../shop-warehouses/shop-warehouses.service';
 import { AdjustInventoryDto } from './dto/adjust-inventory.dto';
 import { ChangeQuantityDto } from './dto/change-quantity.dto';
@@ -45,6 +46,14 @@ const include = {
       },
     },
   },
+  oemPart: {
+    include: {
+      manufacturer: true,
+      categories: { include: { catalogItem: true } },
+      fitments: { include: { vehicleModel: true, vehicleGeneration: true } },
+    },
+  },
+  partBrand: true,
 } satisfies Prisma.ShopInventoryItemInclude;
 
 @Injectable()
@@ -62,6 +71,7 @@ export class InventoryItemsService {
     const data = this.normalize(dto);
     await this.ensureActiveShop(shopId);
     await this.ensureActivePart(data.partCatalogItemId);
+    await this.ensureOemLinks(data.oemPartId, data.partBrandId);
     return this.prisma.$transaction(async (tx) => {
       const warehouse = await this.warehouses.resolve(
         tx,
@@ -110,16 +120,16 @@ export class InventoryItemsService {
       ? await this.categoryIds(query.rootCategoryId)
       : undefined;
     const where: Prisma.ShopInventoryItemWhereInput = {
+      partCatalogItem: {
+        isActive: true,
+        category: { isActive: true },
+        ...(query.categoryId && { categoryId: query.categoryId }),
+        ...(categoryIds && { categoryId: { in: categoryIds } }),
+      },
       ...(shopId && { shopId }),
       ...(query.warehouseId && { warehouseId: query.warehouseId }),
       ...(query.partCatalogItemId && {
         partCatalogItemId: query.partCatalogItemId,
-      }),
-      ...(query.categoryId && {
-        partCatalogItem: { categoryId: query.categoryId },
-      }),
-      ...(categoryIds && {
-        partCatalogItem: { categoryId: { in: categoryIds } },
       }),
       ...(query.condition && { condition: query.condition }),
       ...(query.isActive !== undefined && { isActive: query.isActive }),
@@ -324,6 +334,7 @@ export class InventoryItemsService {
   ) {
     const existing = await this.scopedItem(id, actor);
     const data = this.normalize(dto);
+    await this.ensureOemLinks(data.oemPartId, data.partBrandId);
     const brand = data.brand ?? existing.brand,
       sku = data.sku ?? existing.sku,
       condition = data.condition ?? existing.condition;
@@ -555,6 +566,11 @@ export class InventoryItemsService {
       ...(dto.brand !== undefined && { brand: empty(dto.brand) }),
       ...(dto.sku !== undefined && { sku: empty(dto.sku) }),
       ...(dto.oemNumber !== undefined && { oemNumber: empty(dto.oemNumber) }),
+      ...(dto.externalPartNumber !== undefined && {
+        externalPartNumber: empty(dto.externalPartNumber),
+        normalizedExternalPartNumber:
+          normalizePartNumber(dto.externalPartNumber ?? '') || null,
+      }),
       ...(dto.currency !== undefined && {
         currency: dto.currency.trim().toUpperCase(),
       }),
@@ -575,6 +591,26 @@ export class InventoryItemsService {
       throw new BadRequestException(
         'Нельзя добавить позицию в неактивный магазин',
       );
+  }
+  private async ensureOemLinks(oemPartId?: string, partBrandId?: string) {
+    const [oemPart, partBrand] = await Promise.all([
+      oemPartId
+        ? this.prisma.oemPart.findUnique({
+            where: { id: oemPartId },
+            select: { id: true },
+          })
+        : null,
+      partBrandId
+        ? this.prisma.partBrand.findFirst({
+            where: { id: partBrandId, isActive: true },
+            select: { id: true },
+          })
+        : null,
+    ]);
+    if (oemPartId && !oemPart)
+      throw new NotFoundException('OEM part not found');
+    if (partBrandId && !partBrand)
+      throw new NotFoundException('Active PartBrand not found');
   }
   private async ensureActivePart(id: string) {
     const p = await this.prisma.partCatalogItem.findUnique({
@@ -615,6 +651,7 @@ export class InventoryItemsService {
   }
   private async categoryIds(root: string) {
     const all = await this.prisma.partCategory.findMany({
+        where: { isActive: true },
         select: { id: true, parentId: true },
       }),
       map = new Map<string, string[]>();

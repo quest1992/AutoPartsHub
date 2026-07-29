@@ -56,8 +56,17 @@ export class SalesService {
         update: { value: { increment: 1 } },
       });
       const items = await tx.shopInventoryItem.findMany({
-        where: { id: { in: d.items.map((x) => x.inventoryItemId) } },
-        include: { partCatalogItem: true, warehouse: true },
+        where: {
+          id: { in: d.items.map((x) => x.inventoryItemId) },
+          partCatalogItem: {
+            isActive: true,
+            category: { isActive: true },
+          },
+        },
+        include: {
+          partCatalogItem: { include: { category: true } },
+          warehouse: true,
+        },
       });
       if (items.length !== d.items.length)
         throw new NotFoundException('Складская позиция не найдена');

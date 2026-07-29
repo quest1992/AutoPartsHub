@@ -39,6 +39,8 @@ export class InventorySearchService {
       }),
     };
     const partCatalogItem: Prisma.PartCatalogItemWhereInput = {
+      isActive: true,
+      category: { isActive: true },
       ...(q.categoryId && { categoryId: q.categoryId }),
       ...(Object.keys(compatibility).length && {
         compatibilities: { some: compatibility },
@@ -48,7 +50,7 @@ export class InventorySearchService {
       isActive: true,
       shop: { isActive: true },
       ...(shopId && { shopId }),
-      ...(Object.keys(partCatalogItem).length && { partCatalogItem }),
+      partCatalogItem,
       ...(q.inStockOnly !== false && { quantity: { gt: 0 } }),
       ...((q.minPrice !== undefined || q.maxPrice !== undefined) && {
         price: {

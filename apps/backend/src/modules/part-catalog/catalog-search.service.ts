@@ -114,6 +114,8 @@ export class CatalogSearchService {
       : [];
 
     const where: Prisma.PartCatalogItemWhereInput = {
+      isActive: true,
+      category: { isActive: true },
       ...(query.categoryId && { categoryId: query.categoryId }),
       ...(categoryIds && { categoryId: { in: categoryIds } }),
       ...(query.side && { side: query.side }),
@@ -121,7 +123,6 @@ export class CatalogSearchService {
       ...(query.isUniversal !== undefined && {
         isUniversal: query.isUniversal,
       }),
-      ...(query.isActive !== undefined && { isActive: query.isActive }),
       ...(query.internalCode && {
         internalCode: { equals: query.internalCode, mode: 'insensitive' },
       }),
@@ -169,6 +170,7 @@ export class CatalogSearchService {
       normalizedSearch
         ? this.prisma.partCategory.findMany({
             where: {
+              isActive: true,
               AND: getPartNameTokens(normalizedSearch).map((token) => ({
                 name: { contains: token, mode: 'insensitive' as const },
               })),
@@ -190,7 +192,11 @@ export class CatalogSearchService {
     );
     const mappedData = missingMappedIds.length
       ? await this.prisma.partCatalogItem.findMany({
-          where: { id: { in: missingMappedIds }, isActive: true },
+          where: {
+            id: { in: missingMappedIds },
+            isActive: true,
+            category: { isActive: true },
+          },
           include: {
             category: { select: categorySelect },
             compatibilities: {
@@ -209,7 +215,11 @@ export class CatalogSearchService {
         if (category.catalogItemMappings[0]?.targetCatalogItem) return 1;
         const subtreeIds = await this.getCategorySubtreeIds(category.id);
         return this.prisma.partCatalogItem.count({
-          where: { categoryId: { in: subtreeIds }, isActive: true },
+          where: {
+            categoryId: { in: subtreeIds },
+            isActive: true,
+            category: { isActive: true },
+          },
         });
       }),
     );
@@ -249,6 +259,7 @@ export class CatalogSearchService {
 
   private async getCategorySubtreeIds(rootCategoryId: string) {
     const categories = await this.prisma.partCategory.findMany({
+      where: { isActive: true },
       select: { id: true, parentId: true },
     });
     const children = new Map<string, string[]>();

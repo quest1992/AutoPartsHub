@@ -1,0 +1,1267 @@
+﻿[
+    {
+        "makeSlug":  "byd",
+        "makeName":  "BYD",
+        "modelSlug":  "dolphin",
+        "modelName":  "Dolphin",
+        "vehicleType":  "passenger_car",
+        "bodyStyle":  "hatchback",
+        "years":  [
+                      "2023",
+                      "2024",
+                      "2025"
+                  ],
+        "sourcePath":  "src/byd/dolphin"
+    },
+    {
+        "makeSlug":  "byd",
+        "makeName":  "BYD",
+        "modelSlug":  "dolphin_mini",
+        "modelName":  "Dolphin Mini",
+        "vehicleType":  "passenger_car",
+        "bodyStyle":  "hatchback",
+        "years":  [
+                      "2023",
+                      "2024",
+                      "2025"
+                  ],
+        "sourcePath":  "src/byd/dolphin_mini"
+    },
+    {
+        "makeSlug":  "byd",
+        "makeName":  "BYD",
+        "modelSlug":  "han",
+        "modelName":  "Han",
+        "vehicleType":  "passenger_car",
+        "bodyStyle":  "sedan",
+        "years":  [
+                      "2023",
+                      "2024",
+                      "2025"
+                  ],
+        "sourcePath":  "src/byd/han"
+    },
+    {
+        "makeSlug":  "byd",
+        "makeName":  "BYD",
+        "modelSlug":  "king",
+        "modelName":  "King",
+        "vehicleType":  "suv",
+        "bodyStyle":  "crossover",
+        "years":  [
+                      "2024",
+                      "2025"
+                  ],
+        "sourcePath":  "src/byd/king"
+    },
+    {
+        "makeSlug":  "byd",
+        "makeName":  "BYD",
+        "modelSlug":  "seal",
+        "modelName":  "Seal",
+        "vehicleType":  "passenger_car",
+        "bodyStyle":  "sedan",
+        "years":  [
+                      "2023",
+                      "2024",
+                      "2025"
+                  ],
+        "sourcePath":  "src/byd/seal"
+    },
+    {
+        "makeSlug":  "byd",
+        "makeName":  "BYD",
+        "modelSlug":  "song_plus",
+        "modelName":  "Song Plus",
+        "vehicleType":  "suv",
+        "bodyStyle":  "suv",
+        "years":  [
+                      "2023",
+                      "2024",
+                      "2025"
+                  ],
+        "sourcePath":  "src/byd/song_plus"
+    },
+    {
+        "makeSlug":  "byd",
+        "makeName":  "BYD",
+        "modelSlug":  "tang",
+        "modelName":  "Tang",
+        "vehicleType":  "suv",
+        "bodyStyle":  "suv",
+        "years":  [
+                      "2023",
+                      "2024",
+                      "2025"
+                  ],
+        "sourcePath":  "src/byd/tang"
+    },
+    {
+        "makeSlug":  "byd",
+        "makeName":  "BYD",
+        "modelSlug":  "yuan_plus",
+        "modelName":  "Yuan Plus",
+        "vehicleType":  "suv",
+        "bodyStyle":  "crossover",
+        "years":  [
+                      "2023",
+                      "2024",
+                      "2025"
+                  ],
+        "sourcePath":  "src/byd/yuan_plus"
+    },
+    {
+        "makeSlug":  "byd",
+        "makeName":  "BYD",
+        "modelSlug":  "yuan_up",
+        "modelName":  "Yuan Up",
+        "vehicleType":  "suv",
+        "bodyStyle":  "suv",
+        "years":  [
+                      "2024",
+                      "2025"
+                  ],
+        "sourcePath":  "src/byd/yuan_up"
+    },
+    {
+        "makeSlug":  "changan",
+        "makeName":  "Changan",
+        "modelSlug":  "deepal_l07",
+        "modelName":  "Deepal L07",
+        "vehicleType":  "passenger_car",
+        "bodyStyle":  "sedan",
+        "years":  [
+                      "2025"
+                  ],
+        "sourcePath":  "src/changan/deepal_l07"
+    },
+    {
+        "makeSlug":  "changan",
+        "makeName":  "Changan",
+        "modelSlug":  "deepal_s7",
+        "modelName":  "Deepal S7",
+        "vehicleType":  "suv",
+        "bodyStyle":  "suv",
+        "years":  [
+                      "2023",
+                      "2024",
+                      "2025"
+                  ],
+        "sourcePath":  "src/changan/deepal_s7"
+    },
+    {
+        "makeSlug":  "changan",
+        "makeName":  "Changan",
+        "modelSlug":  "deepal_sl03",
+        "modelName":  "Deepal SL03",
+        "vehicleType":  "passenger_car",
+        "bodyStyle":  "sedan",
+        "years":  [
+                      "2023",
+                      "2024",
+                      "2025"
+                  ],
+        "sourcePath":  "src/changan/deepal_sl03"
+    },
+    {
+        "makeSlug":  "changan",
+        "makeName":  "Changan",
+        "modelSlug":  "lumin",
+        "modelName":  "Lumin",
+        "vehicleType":  "passenger_car",
+        "bodyStyle":  "hatchback",
+        "years":  [
+                      "2023",
+                      "2024",
+                      "2025"
+                  ],
+        "sourcePath":  "src/changan/lumin"
+    },
+    {
+        "makeSlug":  "changan",
+        "makeName":  "Changan",
+        "modelSlug":  "nevo_a06",
+        "modelName":  "Nevo A06",
+        "vehicleType":  "passenger_car",
+        "bodyStyle":  "sedan",
+        "years":  [
+                      "2025"
+                  ],
+        "sourcePath":  "src/changan/nevo_a06"
+    },
+    {
+        "makeSlug":  "changan",
+        "makeName":  "Changan",
+        "modelSlug":  "nevo_a07",
+        "modelName":  "Nevo A07",
+        "vehicleType":  "passenger_car",
+        "bodyStyle":  "sedan",
+        "years":  [
+                      "2023",
+                      "2024",
+                      "2025"
+                  ],
+        "sourcePath":  "src/changan/nevo_a07"
+    },
+    {
+        "makeSlug":  "changan",
+        "makeName":  "Changan",
+        "modelSlug":  "nevo_q05",
+        "modelName":  "Nevo Q05",
+        "vehicleType":  "suv",
+        "bodyStyle":  "suv",
+        "years":  [
+                      "2025"
+                  ],
+        "sourcePath":  "src/changan/nevo_q05"
+    },
+    {
+        "makeSlug":  "chery",
+        "makeName":  "Chery",
+        "modelSlug":  "eq7",
+        "modelName":  "eQ7",
+        "vehicleType":  "suv",
+        "bodyStyle":  "crossover",
+        "years":  [
+                      "2023",
+                      "2024",
+                      "2025"
+                  ],
+        "sourcePath":  "src/chery/eq7"
+    },
+    {
+        "makeSlug":  "chery",
+        "makeName":  "Chery",
+        "modelSlug":  "exeed_sterra_es",
+        "modelName":  "Exeed Sterra ES",
+        "vehicleType":  "passenger_car",
+        "bodyStyle":  "sedan",
+        "years":  [
+                      "2025"
+                  ],
+        "sourcePath":  "src/chery/exeed_sterra_es"
+    },
+    {
+        "makeSlug":  "chery",
+        "makeName":  "Chery",
+        "modelSlug":  "fulwin_a9l",
+        "modelName":  "Fulwin A9L",
+        "vehicleType":  "passenger_car",
+        "bodyStyle":  "sedan",
+        "years":  [
+                      "2025"
+                  ],
+        "sourcePath":  "src/chery/fulwin_a9l"
+    },
+    {
+        "makeSlug":  "chery",
+        "makeName":  "Chery",
+        "modelSlug":  "fulwin_t11",
+        "modelName":  "Fulwin T11",
+        "vehicleType":  "suv",
+        "bodyStyle":  "crossover",
+        "years":  [
+                      "2025"
+                  ],
+        "sourcePath":  "src/chery/fulwin_t11"
+    },
+    {
+        "makeSlug":  "chery",
+        "makeName":  "Chery",
+        "modelSlug":  "icar",
+        "modelName":  "iCar",
+        "vehicleType":  "passenger_car",
+        "bodyStyle":  "hatchback",
+        "years":  [
+                      "2023",
+                      "2024"
+                  ],
+        "sourcePath":  "src/chery/icar"
+    },
+    {
+        "makeSlug":  "chery",
+        "makeName":  "Chery",
+        "modelSlug":  "jaecoo_j7",
+        "modelName":  "Jaecoo J7",
+        "vehicleType":  "suv",
+        "bodyStyle":  "crossover",
+        "years":  [
+                      "2025"
+                  ],
+        "sourcePath":  "src/chery/jaecoo_j7"
+    },
+    {
+        "makeSlug":  "chery",
+        "makeName":  "Chery",
+        "modelSlug":  "omoda_7",
+        "modelName":  "Omoda 7",
+        "vehicleType":  "suv",
+        "bodyStyle":  "crossover",
+        "years":  [
+                      "2024",
+                      "2025"
+                  ],
+        "sourcePath":  "src/chery/omoda_7"
+    },
+    {
+        "makeSlug":  "chery",
+        "makeName":  "Chery",
+        "modelSlug":  "omoda_e5",
+        "modelName":  "Omoda E5",
+        "vehicleType":  "suv",
+        "bodyStyle":  "crossover",
+        "years":  [
+                      "2024",
+                      "2025"
+                  ],
+        "sourcePath":  "src/chery/omoda_e5"
+    },
+    {
+        "makeSlug":  "chery",
+        "makeName":  "Chery",
+        "modelSlug":  "qq_domi",
+        "modelName":  "QQ Domi",
+        "vehicleType":  "passenger_car",
+        "bodyStyle":  "hatchback",
+        "years":  [
+                      "2025"
+                  ],
+        "sourcePath":  "src/chery/qq_domi"
+    },
+    {
+        "makeSlug":  "chery",
+        "makeName":  "Chery",
+        "modelSlug":  "tansuo_06",
+        "modelName":  "Tansuo 06",
+        "vehicleType":  "suv",
+        "bodyStyle":  "crossover",
+        "years":  [
+                      "2023",
+                      "2024",
+                      "2025"
+                  ],
+        "sourcePath":  "src/chery/tansuo_06"
+    },
+    {
+        "makeSlug":  "chery",
+        "makeName":  "Chery",
+        "modelSlug":  "tiggo_7_pro_phev",
+        "modelName":  "Tiggo 7 Pro PHEV",
+        "vehicleType":  "suv",
+        "bodyStyle":  "crossover",
+        "years":  [
+                      "2025"
+                  ],
+        "sourcePath":  "src/chery/tiggo_7_pro_phev"
+    },
+    {
+        "makeSlug":  "chery",
+        "makeName":  "Chery",
+        "modelSlug":  "tiggo_8_pro_phev",
+        "modelName":  "Tiggo 8 Pro PHEV",
+        "vehicleType":  "suv",
+        "bodyStyle":  "crossover",
+        "years":  [
+                      "2024",
+                      "2025"
+                  ],
+        "sourcePath":  "src/chery/tiggo_8_pro_phev"
+    },
+    {
+        "makeSlug":  "dongfeng",
+        "makeName":  "Dongfeng",
+        "modelSlug":  "epi_007",
+        "modelName":  "eПЂ 007",
+        "vehicleType":  "passenger_car",
+        "bodyStyle":  "sedan",
+        "years":  [
+                      "2023",
+                      "2024",
+                      "2025"
+                  ],
+        "sourcePath":  "src/dongfeng/epi_007"
+    },
+    {
+        "makeSlug":  "dongfeng",
+        "makeName":  "Dongfeng",
+        "modelSlug":  "epi_008",
+        "modelName":  "eПЂ 008",
+        "vehicleType":  "suv",
+        "bodyStyle":  "suv",
+        "years":  [
+                      "2023",
+                      "2024",
+                      "2025"
+                  ],
+        "sourcePath":  "src/dongfeng/epi_008"
+    },
+    {
+        "makeSlug":  "fangchengbao",
+        "makeName":  "FangChengBao",
+        "modelSlug":  "bao_5",
+        "modelName":  "Bao 5",
+        "vehicleType":  "suv",
+        "bodyStyle":  "suv",
+        "years":  [
+                      "2023",
+                      "2024",
+                      "2025"
+                  ],
+        "sourcePath":  "src/fangchengbao/bao_5"
+    },
+    {
+        "makeSlug":  "fangchengbao",
+        "makeName":  "FangChengBao",
+        "modelSlug":  "tai_3",
+        "modelName":  "Tai 3",
+        "vehicleType":  "suv",
+        "bodyStyle":  "crossover",
+        "years":  [
+                      "2025"
+                  ],
+        "sourcePath":  "src/fangchengbao/tai_3"
+    },
+    {
+        "makeSlug":  "gac_aion",
+        "makeName":  "GAC Aion",
+        "modelSlug":  "aion_es",
+        "modelName":  "Aion ES",
+        "vehicleType":  "passenger_car",
+        "bodyStyle":  "sedan",
+        "years":  [
+                      "2024",
+                      "2025"
+                  ],
+        "sourcePath":  "src/gac_aion/aion_es"
+    },
+    {
+        "makeSlug":  "gac_aion",
+        "makeName":  "GAC Aion",
+        "modelSlug":  "aion_rt",
+        "modelName":  "Aion RT",
+        "vehicleType":  "passenger_car",
+        "bodyStyle":  "sedan",
+        "years":  [
+                      "2024",
+                      "2025"
+                  ],
+        "sourcePath":  "src/gac_aion/aion_rt"
+    },
+    {
+        "makeSlug":  "gac_aion",
+        "makeName":  "GAC Aion",
+        "modelSlug":  "aion_v",
+        "modelName":  "Aion V",
+        "vehicleType":  "suv",
+        "bodyStyle":  "crossover",
+        "years":  [
+                      "2023",
+                      "2024",
+                      "2025"
+                  ],
+        "sourcePath":  "src/gac_aion/aion_v"
+    },
+    {
+        "makeSlug":  "gac_aion",
+        "makeName":  "GAC Aion",
+        "modelSlug":  "aion_y",
+        "modelName":  "Aion Y",
+        "vehicleType":  "suv",
+        "bodyStyle":  "crossover",
+        "years":  [
+                      "2023",
+                      "2024",
+                      "2025"
+                  ],
+        "sourcePath":  "src/gac_aion/aion_y"
+    },
+    {
+        "makeSlug":  "gac_aion",
+        "makeName":  "GAC Aion",
+        "modelSlug":  "hyper_gt",
+        "modelName":  "Hyper GT",
+        "vehicleType":  "passenger_car",
+        "bodyStyle":  "sedan",
+        "years":  [
+                      "2023",
+                      "2024",
+                      "2025"
+                  ],
+        "sourcePath":  "src/gac_aion/hyper_gt"
+    },
+    {
+        "makeSlug":  "gac_aion",
+        "makeName":  "GAC Aion",
+        "modelSlug":  "hyptec_hl",
+        "modelName":  "Hyptec HL",
+        "vehicleType":  "suv",
+        "bodyStyle":  "crossover",
+        "years":  [
+                      "2025"
+                  ],
+        "sourcePath":  "src/gac_aion/hyptec_hl"
+    },
+    {
+        "makeSlug":  "gac_aion",
+        "makeName":  "GAC Aion",
+        "modelSlug":  "hyptec_ht",
+        "modelName":  "Hyptec HT",
+        "vehicleType":  "suv",
+        "bodyStyle":  "crossover",
+        "years":  [
+                      "2025"
+                  ],
+        "sourcePath":  "src/gac_aion/hyptec_ht"
+    },
+    {
+        "makeSlug":  "geely",
+        "makeName":  "Geely",
+        "modelSlug":  "ex2",
+        "modelName":  "EX2",
+        "vehicleType":  "passenger_car",
+        "bodyStyle":  "hatchback",
+        "years":  [
+                      "2025"
+                  ],
+        "sourcePath":  "src/geely/ex2"
+    },
+    {
+        "makeSlug":  "geely",
+        "makeName":  "Geely",
+        "modelSlug":  "ex5",
+        "modelName":  "EX5",
+        "vehicleType":  "suv",
+        "bodyStyle":  "crossover",
+        "years":  [
+                      "2024",
+                      "2025"
+                  ],
+        "sourcePath":  "src/geely/ex5"
+    },
+    {
+        "makeSlug":  "geely",
+        "makeName":  "Geely",
+        "modelSlug":  "galaxy_e8",
+        "modelName":  "Galaxy E8",
+        "vehicleType":  "passenger_car",
+        "bodyStyle":  "sedan",
+        "years":  [
+                      "2024",
+                      "2025"
+                  ],
+        "sourcePath":  "src/geely/galaxy_e8"
+    },
+    {
+        "makeSlug":  "geely",
+        "makeName":  "Geely",
+        "modelSlug":  "panda_mini",
+        "modelName":  "Panda Mini",
+        "vehicleType":  "passenger_car",
+        "bodyStyle":  "hatchback",
+        "years":  [
+                      "2023",
+                      "2024",
+                      "2025"
+                  ],
+        "sourcePath":  "src/geely/panda_mini"
+    },
+    {
+        "makeSlug":  "geely",
+        "makeName":  "Geely",
+        "modelSlug":  "xingyuan",
+        "modelName":  "Xingyuan",
+        "vehicleType":  "passenger_car",
+        "bodyStyle":  "hatchback",
+        "years":  [
+                      "2024",
+                      "2025"
+                  ],
+        "sourcePath":  "src/geely/xingyuan"
+    },
+    {
+        "makeSlug":  "gwm",
+        "makeName":  "GWM",
+        "modelSlug":  "haval_h6_gt",
+        "modelName":  "Haval H6 GT",
+        "vehicleType":  "suv",
+        "bodyStyle":  "suv",
+        "years":  [
+                      "2023",
+                      "2024",
+                      "2025"
+                  ],
+        "sourcePath":  "src/gwm/haval_h6_gt"
+    },
+    {
+        "makeSlug":  "gwm",
+        "makeName":  "GWM",
+        "modelSlug":  "haval_h6_phev19",
+        "modelName":  "Haval H6 PHEV19",
+        "vehicleType":  "suv",
+        "bodyStyle":  "suv",
+        "years":  [
+                      "2025"
+                  ],
+        "sourcePath":  "src/gwm/haval_h6_phev19"
+    },
+    {
+        "makeSlug":  "gwm",
+        "makeName":  "GWM",
+        "modelSlug":  "haval_h6_phev34",
+        "modelName":  "Haval H6 PHEV34",
+        "vehicleType":  "suv",
+        "bodyStyle":  "suv",
+        "years":  [
+                      "2023",
+                      "2024",
+                      "2025"
+                  ],
+        "sourcePath":  "src/gwm/haval_h6_phev34"
+    },
+    {
+        "makeSlug":  "gwm",
+        "makeName":  "GWM",
+        "modelSlug":  "ora_03_gt",
+        "modelName":  "ORA 03 GT",
+        "vehicleType":  "passenger_car",
+        "bodyStyle":  "hatchback",
+        "years":  [
+                      "2023",
+                      "2024",
+                      "2025"
+                  ],
+        "sourcePath":  "src/gwm/ora_03_gt"
+    },
+    {
+        "makeSlug":  "gwm",
+        "makeName":  "GWM",
+        "modelSlug":  "ora_03_skin",
+        "modelName":  "ORA 03 Skin",
+        "vehicleType":  "passenger_car",
+        "bodyStyle":  "hatchback",
+        "years":  [
+                      "2023",
+                      "2024",
+                      "2025"
+                  ],
+        "sourcePath":  "src/gwm/ora_03_skin"
+    },
+    {
+        "makeSlug":  "hiphi",
+        "makeName":  "HiPhi",
+        "modelSlug":  "hiphi_x",
+        "modelName":  "HiPhi X",
+        "vehicleType":  "suv",
+        "bodyStyle":  "suv",
+        "years":  [
+                      "2023",
+                      "2024",
+                      "2025"
+                  ],
+        "sourcePath":  "src/hiphi/hiphi_x"
+    },
+    {
+        "makeSlug":  "hiphi",
+        "makeName":  "HiPhi",
+        "modelSlug":  "hiphi_z",
+        "modelName":  "HiPhi Z",
+        "vehicleType":  "passenger_car",
+        "bodyStyle":  "sedan",
+        "years":  [
+                      "2023",
+                      "2024",
+                      "2025"
+                  ],
+        "sourcePath":  "src/hiphi/hiphi_z"
+    },
+    {
+        "makeSlug":  "hongqi",
+        "makeName":  "Hongqi",
+        "modelSlug":  "e_hs9",
+        "modelName":  "E-HS9",
+        "vehicleType":  "suv",
+        "bodyStyle":  "suv",
+        "years":  [
+                      "2023",
+                      "2024",
+                      "2025"
+                  ],
+        "sourcePath":  "src/hongqi/e_hs9"
+    },
+    {
+        "makeSlug":  "hongqi",
+        "makeName":  "Hongqi",
+        "modelSlug":  "e_qm5",
+        "modelName":  "E-QM5",
+        "vehicleType":  "passenger_car",
+        "bodyStyle":  "sedan",
+        "years":  [
+                      "2023",
+                      "2024",
+                      "2025"
+                  ],
+        "sourcePath":  "src/hongqi/e_qm5"
+    },
+    {
+        "makeSlug":  "im_motors",
+        "makeName":  "IM Motors",
+        "modelSlug":  "l7",
+        "modelName":  "L7",
+        "vehicleType":  "passenger_car",
+        "bodyStyle":  "sedan",
+        "years":  [
+                      "2023",
+                      "2024",
+                      "2025"
+                  ],
+        "sourcePath":  "src/im_motors/l7"
+    },
+    {
+        "makeSlug":  "im_motors",
+        "makeName":  "IM Motors",
+        "modelSlug":  "ls6",
+        "modelName":  "LS6",
+        "vehicleType":  "suv",
+        "bodyStyle":  "crossover",
+        "years":  [
+                      "2023",
+                      "2024",
+                      "2025"
+                  ],
+        "sourcePath":  "src/im_motors/ls6"
+    },
+    {
+        "makeSlug":  "im_motors",
+        "makeName":  "IM Motors",
+        "modelSlug":  "ls7",
+        "modelName":  "LS7",
+        "vehicleType":  "suv",
+        "bodyStyle":  "crossover",
+        "years":  [
+                      "2023",
+                      "2024",
+                      "2025"
+                  ],
+        "sourcePath":  "src/im_motors/ls7"
+    },
+    {
+        "makeSlug":  "leapmotor",
+        "makeName":  "Leapmotor",
+        "modelSlug":  "b01",
+        "modelName":  "B01",
+        "vehicleType":  "passenger_car",
+        "bodyStyle":  "sedan",
+        "years":  [
+                      "2025"
+                  ],
+        "sourcePath":  "src/leapmotor/b01"
+    },
+    {
+        "makeSlug":  "leapmotor",
+        "makeName":  "Leapmotor",
+        "modelSlug":  "b10",
+        "modelName":  "B10",
+        "vehicleType":  "suv",
+        "bodyStyle":  "crossover",
+        "years":  [
+                      "2025"
+                  ],
+        "sourcePath":  "src/leapmotor/b10"
+    },
+    {
+        "makeSlug":  "leapmotor",
+        "makeName":  "Leapmotor",
+        "modelSlug":  "c10",
+        "modelName":  "C10",
+        "vehicleType":  "suv",
+        "bodyStyle":  "crossover",
+        "years":  [
+                      "2025"
+                  ],
+        "sourcePath":  "src/leapmotor/c10"
+    },
+    {
+        "makeSlug":  "leapmotor",
+        "makeName":  "Leapmotor",
+        "modelSlug":  "c16",
+        "modelName":  "C16",
+        "vehicleType":  "suv",
+        "bodyStyle":  "crossover",
+        "years":  [
+                      "2024",
+                      "2025"
+                  ],
+        "sourcePath":  "src/leapmotor/c16"
+    },
+    {
+        "makeSlug":  "leapmotor",
+        "makeName":  "Leapmotor",
+        "modelSlug":  "lafa_5",
+        "modelName":  "Lafa 5",
+        "vehicleType":  "passenger_car",
+        "bodyStyle":  "hatchback",
+        "years":  [
+                      "2025"
+                  ],
+        "sourcePath":  "src/leapmotor/lafa_5"
+    },
+    {
+        "makeSlug":  "leapmotor",
+        "makeName":  "Leapmotor",
+        "modelSlug":  "t03",
+        "modelName":  "T03",
+        "vehicleType":  "passenger_car",
+        "bodyStyle":  "hatchback",
+        "years":  [
+                      "2023",
+                      "2024",
+                      "2025"
+                  ],
+        "sourcePath":  "src/leapmotor/t03"
+    },
+    {
+        "makeSlug":  "m_hero",
+        "makeName":  "M-Hero",
+        "modelSlug":  "917",
+        "modelName":  "917",
+        "vehicleType":  "suv",
+        "bodyStyle":  "suv",
+        "years":  [
+                      "2023",
+                      "2024",
+                      "2025"
+                  ],
+        "sourcePath":  "src/m_hero/917"
+    },
+    {
+        "makeSlug":  "nammi",
+        "makeName":  "Nammi",
+        "modelSlug":  "01",
+        "modelName":  "01",
+        "vehicleType":  "passenger_car",
+        "bodyStyle":  "hatchback",
+        "years":  [
+                      "2023",
+                      "2024",
+                      "2025"
+                  ],
+        "sourcePath":  "src/nammi/01"
+    },
+    {
+        "makeSlug":  "nammi",
+        "makeName":  "Nammi",
+        "modelSlug":  "06",
+        "modelName":  "06",
+        "vehicleType":  "suv",
+        "bodyStyle":  "crossover",
+        "years":  [
+                      "2023",
+                      "2024",
+                      "2025"
+                  ],
+        "sourcePath":  "src/nammi/06"
+    },
+    {
+        "makeSlug":  "nio",
+        "makeName":  "NIO",
+        "modelSlug":  "ec6",
+        "modelName":  "EC6",
+        "vehicleType":  "suv",
+        "bodyStyle":  "coupe",
+        "years":  [
+                      "2023",
+                      "2024",
+                      "2025"
+                  ],
+        "sourcePath":  "src/nio/ec6"
+    },
+    {
+        "makeSlug":  "nio",
+        "makeName":  "NIO",
+        "modelSlug":  "ec7",
+        "modelName":  "EC7",
+        "vehicleType":  "suv",
+        "bodyStyle":  "coupe",
+        "years":  [
+                      "2023",
+                      "2024",
+                      "2025"
+                  ],
+        "sourcePath":  "src/nio/ec7"
+    },
+    {
+        "makeSlug":  "nio",
+        "makeName":  "NIO",
+        "modelSlug":  "es6",
+        "modelName":  "ES6",
+        "vehicleType":  "suv",
+        "bodyStyle":  "crossover",
+        "years":  [
+                      "2023",
+                      "2024",
+                      "2025"
+                  ],
+        "sourcePath":  "src/nio/es6"
+    },
+    {
+        "makeSlug":  "nio",
+        "makeName":  "NIO",
+        "modelSlug":  "es7",
+        "modelName":  "ES7",
+        "vehicleType":  "suv",
+        "bodyStyle":  "crossover",
+        "years":  [
+                      "2023",
+                      "2024",
+                      "2025"
+                  ],
+        "sourcePath":  "src/nio/es7"
+    },
+    {
+        "makeSlug":  "nio",
+        "makeName":  "NIO",
+        "modelSlug":  "es8",
+        "modelName":  "ES8",
+        "vehicleType":  "suv",
+        "bodyStyle":  "crossover",
+        "years":  [
+                      "2023",
+                      "2024",
+                      "2025"
+                  ],
+        "sourcePath":  "src/nio/es8"
+    },
+    {
+        "makeSlug":  "nio",
+        "makeName":  "NIO",
+        "modelSlug":  "et5",
+        "modelName":  "ET5",
+        "vehicleType":  "passenger_car",
+        "bodyStyle":  "sedan",
+        "years":  [
+                      "2023",
+                      "2024",
+                      "2025"
+                  ],
+        "sourcePath":  "src/nio/et5"
+    },
+    {
+        "makeSlug":  "nio",
+        "makeName":  "NIO",
+        "modelSlug":  "et7",
+        "modelName":  "ET7",
+        "vehicleType":  "passenger_car",
+        "bodyStyle":  "sedan",
+        "years":  [
+                      "2023",
+                      "2024",
+                      "2025"
+                  ],
+        "sourcePath":  "src/nio/et7"
+    },
+    {
+        "makeSlug":  "nio",
+        "makeName":  "NIO",
+        "modelSlug":  "et9",
+        "modelName":  "ET9",
+        "vehicleType":  "passenger_car",
+        "bodyStyle":  "sedan",
+        "years":  [
+                      "2025"
+                  ],
+        "sourcePath":  "src/nio/et9"
+    },
+    {
+        "makeSlug":  "nio",
+        "makeName":  "NIO",
+        "modelSlug":  "firefly_ev",
+        "modelName":  "Firefly EV",
+        "vehicleType":  "passenger_car",
+        "bodyStyle":  "hatchback",
+        "years":  [
+                      "2025"
+                  ],
+        "sourcePath":  "src/nio/firefly_ev"
+    },
+    {
+        "makeSlug":  "rising_auto",
+        "makeName":  "Rising Auto",
+        "modelSlug":  "f7",
+        "modelName":  "F7",
+        "vehicleType":  "passenger_car",
+        "bodyStyle":  "sedan",
+        "years":  [
+                      "2023",
+                      "2024",
+                      "2025"
+                  ],
+        "sourcePath":  "src/rising_auto/f7"
+    },
+    {
+        "makeSlug":  "rising_auto",
+        "makeName":  "Rising Auto",
+        "modelSlug":  "r7",
+        "modelName":  "R7",
+        "vehicleType":  "suv",
+        "bodyStyle":  "crossover",
+        "years":  [
+                      "2023",
+                      "2024",
+                      "2025"
+                  ],
+        "sourcePath":  "src/rising_auto/r7"
+    },
+    {
+        "makeSlug":  "roewe",
+        "makeName":  "Roewe",
+        "modelSlug":  "d6",
+        "modelName":  "D6",
+        "vehicleType":  "passenger_car",
+        "bodyStyle":  "sedan",
+        "years":  [
+                      "2025"
+                  ],
+        "sourcePath":  "src/roewe/d6"
+    },
+    {
+        "makeSlug":  "roewe",
+        "makeName":  "Roewe",
+        "modelSlug":  "d7",
+        "modelName":  "D7",
+        "vehicleType":  "passenger_car",
+        "bodyStyle":  "sedan",
+        "years":  [
+                      "2023",
+                      "2024",
+                      "2025"
+                  ],
+        "sourcePath":  "src/roewe/d7"
+    },
+    {
+        "makeSlug":  "voyah",
+        "makeName":  "Voyah",
+        "modelSlug":  "courage",
+        "modelName":  "Courage",
+        "vehicleType":  "suv",
+        "bodyStyle":  "suv",
+        "years":  [
+                      "2023",
+                      "2024",
+                      "2025"
+                  ],
+        "sourcePath":  "src/voyah/courage"
+    },
+    {
+        "makeSlug":  "voyah",
+        "makeName":  "Voyah",
+        "modelSlug":  "dream",
+        "modelName":  "Dream",
+        "vehicleType":  "van",
+        "bodyStyle":  "mpv",
+        "years":  [
+                      "2023",
+                      "2024",
+                      "2025"
+                  ],
+        "sourcePath":  "src/voyah/dream"
+    },
+    {
+        "makeSlug":  "voyah",
+        "makeName":  "Voyah",
+        "modelSlug":  "free",
+        "modelName":  "Free",
+        "vehicleType":  "suv",
+        "bodyStyle":  "suv",
+        "years":  [
+                      "2023",
+                      "2024",
+                      "2025"
+                  ],
+        "sourcePath":  "src/voyah/free"
+    },
+    {
+        "makeSlug":  "xpeng",
+        "makeName":  "XPeng",
+        "modelSlug":  "g6",
+        "modelName":  "G6",
+        "vehicleType":  "suv",
+        "bodyStyle":  "crossover",
+        "years":  [
+                      "2023",
+                      "2024",
+                      "2025"
+                  ],
+        "sourcePath":  "src/xpeng/g6"
+    },
+    {
+        "makeSlug":  "xpeng",
+        "makeName":  "XPeng",
+        "modelSlug":  "g7",
+        "modelName":  "G7",
+        "vehicleType":  "suv",
+        "bodyStyle":  "crossover",
+        "years":  [
+                      "2025"
+                  ],
+        "sourcePath":  "src/xpeng/g7"
+    },
+    {
+        "makeSlug":  "xpeng",
+        "makeName":  "XPeng",
+        "modelSlug":  "mona_m03",
+        "modelName":  "Mona M03",
+        "vehicleType":  "passenger_car",
+        "bodyStyle":  "sedan",
+        "years":  [
+                      "2024",
+                      "2025"
+                  ],
+        "sourcePath":  "src/xpeng/mona_m03"
+    },
+    {
+        "makeSlug":  "xpeng",
+        "makeName":  "XPeng",
+        "modelSlug":  "p7_gen2",
+        "modelName":  "P7 (2nd Generation)",
+        "vehicleType":  "passenger_car",
+        "bodyStyle":  "sedan",
+        "years":  [
+                      "2025"
+                  ],
+        "sourcePath":  "src/xpeng/p7_gen2"
+    },
+    {
+        "makeSlug":  "xpeng",
+        "makeName":  "XPeng",
+        "modelSlug":  "p7_plus",
+        "modelName":  "P7+",
+        "vehicleType":  "passenger_car",
+        "bodyStyle":  "sedan",
+        "years":  [
+                      "2024",
+                      "2025"
+                  ],
+        "sourcePath":  "src/xpeng/p7_plus"
+    },
+    {
+        "makeSlug":  "xpeng",
+        "makeName":  "XPeng",
+        "modelSlug":  "x9",
+        "modelName":  "X9",
+        "vehicleType":  "van",
+        "bodyStyle":  "minivan",
+        "years":  [
+                      "2024",
+                      "2025"
+                  ],
+        "sourcePath":  "src/xpeng/x9"
+    },
+    {
+        "makeSlug":  "yangwang",
+        "makeName":  "YangWang",
+        "modelSlug":  "u7",
+        "modelName":  "U7",
+        "vehicleType":  "passenger_car",
+        "bodyStyle":  "sedan",
+        "years":  [
+                      "2025"
+                  ],
+        "sourcePath":  "src/yangwang/u7"
+    },
+    {
+        "makeSlug":  "yangwang",
+        "makeName":  "YangWang",
+        "modelSlug":  "u8",
+        "modelName":  "U8",
+        "vehicleType":  "suv",
+        "bodyStyle":  "suv",
+        "years":  [
+                      "2023",
+                      "2024",
+                      "2025"
+                  ],
+        "sourcePath":  "src/yangwang/u8"
+    },
+    {
+        "makeSlug":  "yangwang",
+        "makeName":  "YangWang",
+        "modelSlug":  "u9",
+        "modelName":  "U9",
+        "vehicleType":  "passenger_car",
+        "bodyStyle":  "coupe",
+        "years":  [
+                      "2023",
+                      "2024",
+                      "2025"
+                  ],
+        "sourcePath":  "src/yangwang/u9"
+    },
+    {
+        "makeSlug":  "zeekr",
+        "makeName":  "Zeekr",
+        "modelSlug":  "001",
+        "modelName":  "001",
+        "vehicleType":  "passenger_car",
+        "bodyStyle":  "shooting_brake",
+        "years":  [
+                      "2023",
+                      "2024",
+                      "2025"
+                  ],
+        "sourcePath":  "src/zeekr/001"
+    },
+    {
+        "makeSlug":  "zeekr",
+        "makeName":  "Zeekr",
+        "modelSlug":  "007",
+        "modelName":  "007",
+        "vehicleType":  "passenger_car",
+        "bodyStyle":  "sedan",
+        "years":  [
+                      "2023",
+                      "2024",
+                      "2025"
+                  ],
+        "sourcePath":  "src/zeekr/007"
+    },
+    {
+        "makeSlug":  "zeekr",
+        "makeName":  "Zeekr",
+        "modelSlug":  "009",
+        "modelName":  "009",
+        "vehicleType":  "van",
+        "bodyStyle":  "mpv",
+        "years":  [
+                      "2024",
+                      "2025"
+                  ],
+        "sourcePath":  "src/zeekr/009"
+    },
+    {
+        "makeSlug":  "zeekr",
+        "makeName":  "Zeekr",
+        "modelSlug":  "7x",
+        "modelName":  "7X",
+        "vehicleType":  "suv",
+        "bodyStyle":  "crossover",
+        "years":  [
+                      "2024",
+                      "2025"
+                  ],
+        "sourcePath":  "src/zeekr/7x"
+    },
+    {
+        "makeSlug":  "zeekr",
+        "makeName":  "Zeekr",
+        "modelSlug":  "x",
+        "modelName":  "X",
+        "vehicleType":  "suv",
+        "bodyStyle":  "crossover",
+        "years":  [
+                      "2023",
+                      "2024",
+                      "2025"
+                  ],
+        "sourcePath":  "src/zeekr/x"
+    }
+]

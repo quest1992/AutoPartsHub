@@ -82,8 +82,18 @@ export class CustomerOrdersService {
       );
     return this.serializable(async (tx) => {
       const inventory = await tx.shopInventoryItem.findMany({
-        where: { id: { in: dto.items.map((item) => item.inventoryItemId) } },
-        include: { shop: true, warehouse: true, partCatalogItem: true },
+        where: {
+          id: { in: dto.items.map((item) => item.inventoryItemId) },
+          partCatalogItem: {
+            isActive: true,
+            category: { isActive: true },
+          },
+        },
+        include: {
+          shop: true,
+          warehouse: true,
+          partCatalogItem: { include: { category: true } },
+        },
       });
       if (inventory.length !== dto.items.length)
         throw new NotFoundException(
@@ -799,6 +809,10 @@ export class CustomerOrdersService {
       isActive: true,
       shop: { isActive: true },
       warehouse: { isActive: true },
+      partCatalogItem: {
+        isActive: true,
+        category: { isActive: true },
+      },
       ...(query.shopId && { shopId: query.shopId }),
       ...(query.warehouseId && { warehouseId: query.warehouseId }),
       ...(query.catalogItemId && { partCatalogItemId: query.catalogItemId }),

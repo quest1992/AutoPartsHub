@@ -114,7 +114,7 @@ export class PurchasesService {
             throw new ForbiddenException(
               'Складская позиция принадлежит другому магазину',
             );
-          if (!item.isActive)
+          if (!item.isActive || !item.partCatalogItem.isActive)
             throw new BadRequestException(
               'Нельзя принять неактивную складскую позицию',
             );

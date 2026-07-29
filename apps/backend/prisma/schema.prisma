@@ -72,6 +72,125 @@ enum PartNumberType {
   INTERNAL
 }
 
+enum PartBrandType {
+  OEM
+  OES
+  AFTERMARKET
+  PREMIUM
+  BUDGET
+  PERFORMANCE
+  EV
+  MOTORCYCLE
+  TRUCK
+  BUS
+  INDUSTRIAL
+}
+
+enum PartBrandStatus {
+  ACTIVE
+  INACTIVE
+  HISTORIC
+  UNKNOWN
+}
+
+enum PartBrandAliasType {
+  ALTERNATIVE_NAME
+  ABBREVIATION
+  TRADE_NAME
+  PREVIOUS_NAME
+}
+
+enum OemPartStatus {
+  ACTIVE
+  DISCONTINUED
+  SUPERSEDED
+  UNKNOWN
+}
+
+enum OemPartAliasType {
+  FORMATTING
+  OLD_NUMBER
+  REPLACED_NUMBER
+  SUPERSESSION
+  REGIONAL
+  SUPPLIER
+  MANUAL
+}
+
+enum OemSourceType {
+  OPEN_DATA
+  MANUFACTURER
+  SUPPLIER
+  SHOP
+  MANUAL_ENTRY
+  CSV_IMPORT
+  API
+  COMMERCIAL_LICENSE
+  UNKNOWN
+}
+
+enum OemPartBrandRelationType {
+  VEHICLE_MANUFACTURER
+  ORIGINAL_SUPPLIER
+  OES
+  AFTERMARKET
+  PACKAGING_BRAND
+  UNKNOWN
+}
+
+enum OemFitmentPosition {
+  FRONT
+  REAR
+  LEFT
+  RIGHT
+  FRONT_LEFT
+  FRONT_RIGHT
+  REAR_LEFT
+  REAR_RIGHT
+  INNER
+  OUTER
+  UPPER
+  LOWER
+  CENTER
+  NOT_APPLICABLE
+  UNKNOWN
+}
+
+enum OemCrossReferenceType {
+  REPLACEMENT
+  SUPERSESSION
+  PREDECESSOR
+  SUCCESSOR
+  INTERCHANGE
+  AFTERMARKET_ANALOG
+  OES_EQUIVALENT
+  POSSIBLE_MATCH
+}
+
+enum OemImportBatchStatus {
+  PLANNED
+  RUNNING
+  COMPLETED
+  FAILED
+  CANCELLED
+}
+
+enum OemContributionType {
+  NEW_OEM
+  NEW_ALIAS
+  CATEGORY_MAPPING
+  FITMENT
+  CROSS_REFERENCE
+  CORRECTION
+}
+
+enum OemContributionStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  DUPLICATE
+}
+
 enum InventoryMovementType {
   INITIAL_BALANCE
   IMPORT
@@ -202,6 +321,7 @@ model Shop {
   commissionSetting         ShopCommissionSetting?
   payables                  ShopPayable[]
   payouts                   ShopPayout[]
+  oemContributions          OemContribution[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -255,6 +375,10 @@ model User {
   taxonomyDecisionsApproved       PartTaxonomyDecision[]           @relation("TaxonomyDecisionApprovedBy")
   taxonomyDecisionsApplied        PartTaxonomyDecision[]           @relation("TaxonomyDecisionAppliedBy")
   taxonomyAuditEvents             PartTaxonomyAuditEvent[]
+  oemImportBatches                OemImportBatch[]
+  oemContributionsSubmitted       OemContribution[]                @relation("OemContributionSubmittedBy")
+  oemContributionsReviewed        OemContribution[]                @relation("OemContributionReviewedBy")
+  oemAuditLogs                    OemAuditLog[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -288,15 +412,25 @@ model Category {
 model Manufacturer {
   id String @id @default(uuid())
 
-  name        String  @unique
-  slug        String  @unique
-  country     String?
-  website     String?
-  logo        String?
-  description String?
+  name             String                   @unique
+  englishName      String?
+  chineseName      String?
+  pinyin           String?
+  slug             String                   @unique
+  country          String?
+  city             String?
+  foundedYear      Int?
+  parentCompany    String?
+  manufacturerType VehicleManufacturerType?
+  website          String?
+  logo             String?
+  description      String?
+  sourceRefs       String[]                 @default([])
 
-  vehicleModels VehicleModel[]
-  engines       Engine[]
+  vehicleModels   VehicleModel[]
+  engines         Engine[]
+  oemParts        OemPart[]
+  oemPartFitments OemPartFitment[]
 
   isActive Boolean @default(true)
 
@@ -304,19 +438,38 @@ model Manufacturer {
   updatedAt DateTime @updatedAt
 
   @@index([isActive])
+  @@index([manufacturerType])
 }
 
 model VehicleModel {
   id String @id @default(uuid())
 
-  name         String
-  slug         String
-  description  String?
-  internalCode String?
+  name           String
+  slug           String
+  description    String?
+  internalCode   String?
+  startYear      Int?
+  endYear        Int?
+  vehicleType    String?
+  chineseName    String?
+  exportName     String?
+  bodyStyle      String?
+  segment        String?
+  series         String?
+  vehicleClass   String?
+  doors          Int?
+  seats          Int?
+  powertrainType VehiclePowertrainType?
+  platform       String?
+  bodyCode       String?
+  exportIndex    String?
+  sourceRefs     String[]               @default([])
 
-  manufacturerId String
-  manufacturer   Manufacturer        @relation(fields: [manufacturerId], references: [id], onDelete: Restrict)
-  generations    VehicleGeneration[]
+  manufacturerId  String
+  manufacturer    Manufacturer           @relation(fields: [manufacturerId], references: [id], onDelete: Restrict)
+  generations     VehicleGeneration[]
+  specifications  VehicleSpecification[]
+  oemPartFitments OemPartFitment[]
 
   isActive Boolean @default(true)
 
@@ -327,6 +480,10 @@ model VehicleModel {
   @@unique([manufacturerId, slug])
   @@index([manufacturerId])
   @@index([isActive])
+  @@index([startYear])
+  @@index([endYear])
+  @@index([vehicleType])
+  @@index([powertrainType])
 }
 
 model VehicleGeneration {
@@ -338,16 +495,24 @@ model VehicleGeneration {
   code        String?
   displayName String?
   notes       String?
+  platform    String?
+  bodyCode    String?
+  exportIndex String?
+  sourceRefs  String[] @default([])
 
   vehicleModelId  String
-  vehicleModel    VehicleModel          @relation(fields: [vehicleModelId], references: [id], onDelete: Restrict)
+  vehicleModel    VehicleModel           @relation(fields: [vehicleModelId], references: [id], onDelete: Restrict)
   compatibilities PartCompatibility[]
   engines         Engine[]
   modifications   VehicleModification[]
   inventoryItems  ShopInventoryItem[]
+  specifications  VehicleSpecification[]
+  oemPartFitments OemPartFitment[]
 
-  startYear Int?
-  endYear   Int?
+  startYear  Int?
+  endYear    Int?
+  isFacelift Boolean               @default(false)
+  kind       VehicleGenerationKind @default(GENERATION)
 
   isActive Boolean @default(true)
 
@@ -359,6 +524,107 @@ model VehicleGeneration {
   @@index([isActive])
   @@index([startYear])
   @@index([endYear])
+  @@index([kind])
+}
+
+enum VehicleGenerationKind {
+  GENERATION
+  MODEL_YEAR
+}
+
+enum VehicleManufacturerType {
+  STATE_OWNED
+  PRIVATE
+  JOINT_VENTURE
+  SUBBRAND
+  EXPORT_BRAND
+  COMMERCIAL
+  HISTORIC
+  OTHER
+}
+
+enum VehiclePowertrainType {
+  ICE
+  MHEV
+  HEV
+  PHEV
+  BEV
+  EREV
+  FCEV
+  UNKNOWN
+}
+
+model VehicleSpecification {
+  id String @id @default(uuid())
+
+  vehicleModelId String
+  vehicleModel   VehicleModel @relation(fields: [vehicleModelId], references: [id], onDelete: Restrict)
+
+  generationId String?
+  generation   VehicleGeneration? @relation(fields: [generationId], references: [id], onDelete: Restrict)
+
+  sourceKey String  @unique
+  specHash  String  @unique
+  year      Int
+  trim      String?
+  variant   String?
+
+  powertrainType   VehiclePowertrainType
+  driveType        String?
+  transmissionType String?
+
+  engineCode           String?
+  engineDisplacementCc Int?
+  engineTurbo          Boolean?
+  engineCylinders      Int?
+  enginePowerKw        Decimal? @db.Decimal(10, 3)
+  engineTorqueNm       Decimal? @db.Decimal(10, 3)
+
+  motorCount     Int?
+  motorPowerKw   Decimal? @db.Decimal(10, 3)
+  motorTorqueNm  Decimal? @db.Decimal(10, 3)
+  motorPositions String[] @default([])
+
+  batteryManufacturer String?
+  batteryChemistry    String?
+  batteryGrossKwh     Decimal? @db.Decimal(10, 3)
+  batteryUsableKwh    Decimal? @db.Decimal(10, 3)
+
+  rangeCltcKm Decimal? @db.Decimal(10, 3)
+  rangeWltpKm Decimal? @db.Decimal(10, 3)
+  rangeEpaKm  Decimal? @db.Decimal(10, 3)
+  rangeNedcKm Decimal? @db.Decimal(10, 3)
+  rangeData   Json
+
+  acChargeKw       Decimal? @db.Decimal(10, 3)
+  dcChargeKw       Decimal? @db.Decimal(10, 3)
+  chargeConnectors String[] @default([])
+
+  platform      String?
+  bodyCode      String?
+  internalIndex String?
+  doors         Int?
+  seats         Int?
+
+  sourceTitle       String
+  sourceUrl         String
+  sourceRetrievedAt DateTime
+  sourceLicense     String
+  sources           Json
+
+  oemPartFitments OemPartFitment[]
+
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([vehicleModelId])
+  @@index([generationId])
+  @@index([year])
+  @@index([powertrainType])
+  @@index([batteryManufacturer])
+  @@index([platform])
+  @@index([isActive])
 }
 
 model Engine {
@@ -624,6 +890,7 @@ model PartCatalogItem {
   customerOrderItems     CustomerOrderItem[]
   categoryMappings       PartCategoryCatalogItemMapping[]
   taxonomyDecisions      PartTaxonomyDecision[]
+  oemPartCategories      OemPartCategory[]
 
   replacedById String?
   replacedBy   PartCatalogItem?  @relation("PartCatalogItemReplacement", fields: [replacedById], references: [id], onDelete: Restrict)
@@ -808,6 +1075,322 @@ model PartNumberManufacturer {
   @@index([isActive])
 }
 
+model PartBrand {
+  id String @id @default(uuid())
+
+  officialName           String
+  englishName            String?
+  normalizedName         String          @unique
+  slug                   String          @unique
+  countryOfOrigin        String?
+  city                   String?
+  foundedYear            Int?
+  parentCompany          String?
+  officialWebsite        String?
+  normalizedWebsite      String?
+  status                 PartBrandStatus @default(UNKNOWN)
+  types                  PartBrandType[]
+  specializations        String[]
+  manufacturingCountries String[]
+  logoUrl                String?
+
+  sourceExternalId  String
+  sourceUrl         String
+  sourceName        String
+  sourceLicense     String
+  sourceRetrievedAt DateTime
+
+  isActive           Boolean             @default(true)
+  aliases            PartBrandAlias[]
+  oemPartBrands      OemPartBrand[]
+  oemCrossReferences OemCrossReference[]
+  inventoryItems     ShopInventoryItem[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([sourceName, sourceExternalId])
+  @@index([countryOfOrigin])
+  @@index([normalizedWebsite])
+  @@index([status])
+  @@index([isActive])
+}
+
+model PartBrandAlias {
+  id String @id @default(uuid())
+
+  partBrandId String
+  partBrand   PartBrand @relation(fields: [partBrandId], references: [id], onDelete: Cascade)
+
+  name           String
+  normalizedName String
+  type           PartBrandAliasType @default(ALTERNATIVE_NAME)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([partBrandId, normalizedName])
+  @@index([normalizedName])
+  @@index([partBrandId])
+}
+
+model OemPart {
+  id String @id @default(uuid())
+
+  number                String
+  normalizedNumber      String
+  displayNumber         String
+  description           String?
+  descriptionNormalized String?
+  status                OemPartStatus @default(UNKNOWN)
+  metadata              Json          @default("{}")
+
+  manufacturerId String
+  manufacturer   Manufacturer @relation(fields: [manufacturerId], references: [id], onDelete: Restrict)
+  sourceId       String
+  source         OemSource    @relation(fields: [sourceId], references: [id], onDelete: Restrict)
+  sourceKey      String
+
+  aliases                 OemPartAlias[]
+  categories              OemPartCategory[]
+  brands                  OemPartBrand[]
+  fitments                OemPartFitment[]
+  outgoingCrossReferences OemCrossReference[] @relation("OemCrossReferenceSource")
+  incomingCrossReferences OemCrossReference[] @relation("OemCrossReferenceTarget")
+  inventoryItems          ShopInventoryItem[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([manufacturerId, normalizedNumber])
+  @@unique([sourceId, sourceKey])
+  @@index([normalizedNumber])
+  @@index([manufacturerId])
+  @@index([sourceId])
+  @@index([status])
+}
+
+model OemPartAlias {
+  id String @id @default(uuid())
+
+  oemPartId       String
+  oemPart         OemPart          @relation(fields: [oemPartId], references: [id], onDelete: Cascade)
+  alias           String
+  normalizedAlias String
+  aliasType       OemPartAliasType
+  sourceId        String
+  source          OemSource        @relation(fields: [sourceId], references: [id], onDelete: Restrict)
+  createdAt       DateTime         @default(now())
+
+  @@unique([oemPartId, alias])
+  @@index([oemPartId])
+  @@index([normalizedAlias])
+  @@index([sourceId])
+}
+
+model OemSource {
+  id String @id @default(uuid())
+
+  name              String
+  url               String
+  sourceType        OemSourceType
+  license           String
+  licenseUrl        String?
+  usageNotes        String?
+  isCommercial      Boolean       @default(false)
+  isRedistributable Boolean       @default(false)
+  isActive          Boolean       @default(true)
+  retrievedAt       DateTime
+
+  oemParts        OemPart[]
+  aliases         OemPartAlias[]
+  categories      OemPartCategory[]
+  brands          OemPartBrand[]
+  fitments        OemPartFitment[]
+  crossReferences OemCrossReference[]
+  importBatches   OemImportBatch[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([name, url])
+  @@index([sourceType])
+  @@index([isRedistributable, isActive])
+}
+
+model OemPartCategory {
+  id String @id @default(uuid())
+
+  oemPartId     String
+  oemPart       OemPart         @relation(fields: [oemPartId], references: [id], onDelete: Cascade)
+  catalogItemId String
+  catalogItem   PartCatalogItem @relation(fields: [catalogItemId], references: [id], onDelete: Restrict)
+  isPrimary     Boolean         @default(false)
+  confidence    Int
+  sourceId      String
+  source        OemSource       @relation(fields: [sourceId], references: [id], onDelete: Restrict)
+  createdAt     DateTime        @default(now())
+
+  @@unique([oemPartId, catalogItemId])
+  @@index([oemPartId])
+  @@index([catalogItemId])
+  @@index([sourceId])
+}
+
+model OemPartBrand {
+  id String @id @default(uuid())
+
+  oemPartId    String
+  oemPart      OemPart                  @relation(fields: [oemPartId], references: [id], onDelete: Cascade)
+  partBrandId  String
+  partBrand    PartBrand                @relation(fields: [partBrandId], references: [id], onDelete: Restrict)
+  relationType OemPartBrandRelationType
+  confidence   Int
+  sourceId     String
+  source       OemSource                @relation(fields: [sourceId], references: [id], onDelete: Restrict)
+  createdAt    DateTime                 @default(now())
+
+  @@unique([oemPartId, partBrandId, relationType])
+  @@index([oemPartId])
+  @@index([partBrandId])
+  @@index([sourceId])
+}
+
+model OemPartFitment {
+  id String @id @default(uuid())
+
+  oemPartId String
+  oemPart   OemPart @relation(fields: [oemPartId], references: [id], onDelete: Cascade)
+
+  manufacturerId         String
+  manufacturer           Manufacturer          @relation(fields: [manufacturerId], references: [id], onDelete: Restrict)
+  vehicleModelId         String?
+  vehicleModel           VehicleModel?         @relation(fields: [vehicleModelId], references: [id], onDelete: Restrict)
+  vehicleGenerationId    String?
+  vehicleGeneration      VehicleGeneration?    @relation(fields: [vehicleGenerationId], references: [id], onDelete: Restrict)
+  vehicleSpecificationId String?
+  vehicleSpecification   VehicleSpecification? @relation(fields: [vehicleSpecificationId], references: [id], onDelete: Restrict)
+
+  yearFrom   Int?
+  yearTo     Int?
+  position   OemFitmentPosition @default(UNKNOWN)
+  side       PartSide           @default(NONE)
+  bodyType   String?
+  engineCode String?
+  motorCode  String?
+  driveType  String?
+  notes      String?
+  confidence Int
+  sourceId   String
+  source     OemSource          @relation(fields: [sourceId], references: [id], onDelete: Restrict)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([oemPartId])
+  @@index([manufacturerId])
+  @@index([vehicleModelId])
+  @@index([vehicleGenerationId])
+  @@index([vehicleSpecificationId])
+  @@index([sourceId])
+}
+
+model OemCrossReference {
+  id String @id @default(uuid())
+
+  fromOemPartId                String
+  fromOemPart                  OemPart               @relation("OemCrossReferenceSource", fields: [fromOemPartId], references: [id], onDelete: Cascade)
+  toOemPartId                  String?
+  toOemPart                    OemPart?              @relation("OemCrossReferenceTarget", fields: [toOemPartId], references: [id], onDelete: Restrict)
+  partBrandId                  String?
+  partBrand                    PartBrand?            @relation(fields: [partBrandId], references: [id], onDelete: Restrict)
+  externalPartNumber           String?
+  normalizedExternalPartNumber String?
+  relationType                 OemCrossReferenceType
+  confidence                   Int
+  sourceId                     String
+  source                       OemSource             @relation(fields: [sourceId], references: [id], onDelete: Restrict)
+  notes                        String?
+  fingerprint                  String                @unique
+  createdAt                    DateTime              @default(now())
+
+  @@index([fromOemPartId])
+  @@index([toOemPartId])
+  @@index([partBrandId])
+  @@index([normalizedExternalPartNumber])
+  @@index([relationType])
+  @@index([sourceId])
+}
+
+model OemImportBatch {
+  id String @id @default(uuid())
+
+  sourceId    String
+  source      OemSource            @relation(fields: [sourceId], references: [id], onDelete: Restrict)
+  fileName    String
+  checksum    String
+  status      OemImportBatchStatus
+  totalRows   Int                  @default(0)
+  validRows   Int                  @default(0)
+  invalidRows Int                  @default(0)
+  createdRows Int                  @default(0)
+  updatedRows Int                  @default(0)
+  skippedRows Int                  @default(0)
+  errorRows   Int                  @default(0)
+  startedAt   DateTime?
+  completedAt DateTime?
+  reportJson  Json
+  createdById String?
+  createdBy   User?                @relation(fields: [createdById], references: [id], onDelete: SetNull)
+  createdAt   DateTime             @default(now())
+  updatedAt   DateTime             @updatedAt
+
+  @@unique([checksum, sourceId])
+  @@index([sourceId])
+  @@index([status])
+  @@index([createdById])
+}
+
+model OemContribution {
+  id String @id @default(uuid())
+
+  shopId        String
+  shop          Shop                  @relation(fields: [shopId], references: [id], onDelete: Restrict)
+  submittedById String
+  submittedBy   User                  @relation("OemContributionSubmittedBy", fields: [submittedById], references: [id], onDelete: Restrict)
+  type          OemContributionType
+  payloadJson   Json
+  status        OemContributionStatus @default(PENDING)
+  reviewedById  String?
+  reviewedBy    User?                 @relation("OemContributionReviewedBy", fields: [reviewedById], references: [id], onDelete: SetNull)
+  reviewedAt    DateTime?
+  reviewComment String?
+  createdAt     DateTime              @default(now())
+
+  @@index([shopId, status])
+  @@index([submittedById])
+  @@index([reviewedById])
+  @@index([type])
+}
+
+model OemAuditLog {
+  id String @id @default(uuid())
+
+  entityType String
+  entityId   String
+  action     String
+  beforeJson Json?
+  afterJson  Json?
+  actorId    String?
+  actor      User?    @relation(fields: [actorId], references: [id], onDelete: SetNull)
+  source     String
+  createdAt  DateTime @default(now())
+
+  @@index([entityType, entityId])
+  @@index([actorId])
+  @@index([createdAt])
+}
+
 model PartAlias {
   id String @id @default(uuid())
 
@@ -914,28 +1497,34 @@ model ShopInventoryItem {
   warehouse    ShopWarehouse? @relation(fields: [warehouseId], references: [id], onDelete: Restrict)
   inventoryKey String         @unique
 
-  brand              String?
-  sku                String?
-  oemNumber          String?
-  condition          PartCondition              @default(NEW)
-  price              Decimal                    @db.Decimal(12, 2)
-  currency           String                     @default("TJS")
-  quantity           Int                        @default(0)
-  minQuantity        Int                        @default(0)
-  location           String?
-  notes              String?
-  compatibility      String?
-  imageUrl           String?
-  imagePublicId      String?
-  isActive           Boolean                    @default(true)
-  movements          InventoryMovement[]
-  saleItems          SaleItem[]
-  purchaseItems      PurchaseItem[]
-  moderationRequests CatalogModerationRequest[]
-  transferItems      InventoryTransferItem[]
-  stocktakeItems     StocktakeItem[]
-  customerOrderItems CustomerOrderItem[]
-  reservedQuantity   Int                        @default(0)
+  brand                        String?
+  sku                          String?
+  oemNumber                    String?
+  oemPartId                    String?
+  oemPart                      OemPart?                   @relation(fields: [oemPartId], references: [id], onDelete: Restrict)
+  partBrandId                  String?
+  partBrand                    PartBrand?                 @relation(fields: [partBrandId], references: [id], onDelete: Restrict)
+  externalPartNumber           String?
+  normalizedExternalPartNumber String?
+  condition                    PartCondition              @default(NEW)
+  price                        Decimal                    @db.Decimal(12, 2)
+  currency                     String                     @default("TJS")
+  quantity                     Int                        @default(0)
+  minQuantity                  Int                        @default(0)
+  location                     String?
+  notes                        String?
+  compatibility                String?
+  imageUrl                     String?
+  imagePublicId                String?
+  isActive                     Boolean                    @default(true)
+  movements                    InventoryMovement[]
+  saleItems                    SaleItem[]
+  purchaseItems                PurchaseItem[]
+  moderationRequests           CatalogModerationRequest[]
+  transferItems                InventoryTransferItem[]
+  stocktakeItems               StocktakeItem[]
+  customerOrderItems           CustomerOrderItem[]
+  reservedQuantity             Int                        @default(0)
 
   createdAt           DateTime           @default(now())
   updatedAt           DateTime           @updatedAt
@@ -949,6 +1538,9 @@ model ShopInventoryItem {
   @@index([isActive])
   @@index([condition])
   @@index([sku])
+  @@index([oemPartId])
+  @@index([partBrandId])
+  @@index([normalizedExternalPartNumber])
 }
 
 model InventoryMovement {

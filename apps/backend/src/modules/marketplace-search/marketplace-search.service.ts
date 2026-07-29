@@ -48,6 +48,7 @@ export class MarketplaceSearchService {
     }
     const catalogWhere: Prisma.PartCatalogItemWhereInput = {
       isActive: true,
+      category: { isActive: true },
       ...(query.categoryId && { categoryId: query.categoryId }),
       ...(catalogAnd.length && { AND: catalogAnd }),
       ...(isVin

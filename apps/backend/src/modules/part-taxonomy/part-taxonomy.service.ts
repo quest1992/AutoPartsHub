@@ -57,6 +57,7 @@ export class PartTaxonomyService {
 
   async categories(query: TaxonomyCategoryQueryDto) {
     const categories = await this.prisma.partCategory.findMany({
+      where: { isActive: true },
       include: {
         parent: { select: { id: true, name: true, parentId: true } },
         children: { select: { id: true } },
@@ -149,8 +150,8 @@ export class PartTaxonomyService {
   }
 
   async category(id: string) {
-    const category = await this.prisma.partCategory.findUnique({
-      where: { id },
+    const category = await this.prisma.partCategory.findFirst({
+      where: { id, isActive: true },
       include: {
         parent: true,
         children: { orderBy: [{ sortOrder: 'asc' }, { name: 'asc' }] },
@@ -181,7 +182,7 @@ export class PartTaxonomyService {
     const normalized = normalizePartName(category.name);
     const duplicates = await this.prisma.partCategory
       .findMany({
-        where: { id: { not: id } },
+        where: { id: { not: id }, isActive: true },
         select: {
           id: true,
           name: true,
@@ -201,6 +202,7 @@ export class PartTaxonomyService {
 
   async recommendation(id: string) {
     const categories = await this.prisma.partCategory.findMany({
+      where: { isActive: true },
       include: {
         children: { select: { id: true } },
         partCatalogItems: { select: { id: true } },
@@ -233,6 +235,7 @@ export class PartTaxonomyService {
 
   async duplicateGroups() {
     const categories = await this.prisma.partCategory.findMany({
+      where: { isActive: true },
       select: {
         id: true,
         name: true,
