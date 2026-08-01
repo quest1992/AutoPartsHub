@@ -1,4 +1,9 @@
-import { PrismaClient, VehicleGenerationKind } from '@prisma/client';
+import {
+  PrismaClient,
+  VehicleGenerationKind,
+  VehiclePowertrainType,
+} from '@prisma/client';
+import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { MANUFACTURER_METADATA } from './vehicle-manufacturer-metadata';
@@ -40,6 +45,8 @@ const DATA_DIR = join(__dirname, 'data', 'vehicle-database');
 const VEHICLES_DB_FILE = join(DATA_DIR, 'vehiclesdb-2026.07.6.csv');
 const EPA_FILE = join(DATA_DIR, 'epa-model-years.csv');
 const BATCH_SIZE = 750;
+const EPA_SOURCE_URL = 'https://www.fueleconomy.gov/feg/epadata/vehicles.csv';
+const EPA_SOURCE_LICENSE = 'United States Government public data';
 
 function parseCsv(text: string): string[][] {
   const rows: string[][] = [];
@@ -358,6 +365,58 @@ async function applyDataset(prisma: PrismaClient, dataset: VehicleSeedDataset) {
       skipDuplicates: true,
     }),
   );
+
+  const databaseGenerations = await prisma.vehicleGeneration.findMany({
+    where: {
+      vehicleModelId: { in: [...modelIds.values()] },
+      kind: VehicleGenerationKind.MODEL_YEAR,
+    },
+    select: { id: true, slug: true, vehicleModelId: true, startYear: true },
+  });
+  const modelKeysById = new Map(
+    [...modelIds.entries()].map(([key, id]) => [id, key]),
+  );
+  const epaGenerationKeys = new Set(
+    dataset.generations.map(
+      (item) => `${item.makeSlug}/${item.modelSlug}/${item.slug}`,
+    ),
+  );
+  const epaGenerations = databaseGenerations.filter((generation) =>
+    epaGenerationKeys.has(
+      `${modelKeysById.get(generation.vehicleModelId)}/${generation.slug}`,
+    ),
+  );
+  await batches(epaGenerations, (batch) =>
+    prisma.vehicleSpecification.createMany({
+      data: batch.map((generation) => {
+        const modelKey = modelKeysById.get(generation.vehicleModelId)!;
+        const sourceKey = `epa-model-year:${modelKey}:${generation.startYear}`;
+        const specHash = createHash('sha256').update(sourceKey).digest('hex');
+        return {
+          vehicleModelId: generation.vehicleModelId,
+          generationId: generation.id,
+          sourceKey,
+          specHash,
+          year: generation.startYear!,
+          powertrainType: VehiclePowertrainType.UNKNOWN,
+          rangeData: {},
+          sourceTitle: 'US EPA/DOE FuelEconomy.gov model-year record',
+          sourceUrl: EPA_SOURCE_URL,
+          sourceRetrievedAt: new Date('2026-07-29T00:00:00.000Z'),
+          sourceLicense: EPA_SOURCE_LICENSE,
+          sources: [
+            {
+              title: 'US EPA/DOE FuelEconomy.gov',
+              url: EPA_SOURCE_URL,
+              license: EPA_SOURCE_LICENSE,
+            },
+          ],
+          isActive: true,
+        };
+      }),
+      skipDuplicates: true,
+    }),
+  );
 }
 
 function printPlan(dataset: VehicleSeedDataset) {
@@ -386,6 +445,7 @@ function printPlan(dataset: VehicleSeedDataset) {
         manufacturers: dataset.manufacturers.length,
         models: dataset.models.length,
         modelYearRecords: dataset.generations.length,
+        vehicleSpecifications: dataset.generations.length,
         knownOriginCountries: countries.size,
         manufacturersWithKnownOrigin: [...countries.values()].reduce(
           (sum, count) => sum + count,

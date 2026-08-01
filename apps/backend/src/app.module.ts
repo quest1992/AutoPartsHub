@@ -37,6 +37,9 @@ import { FinanceAuditModule } from './modules/finance-audit/finance-audit.module
 import { VehicleDatabaseModule } from './modules/vehicle-database/vehicle-database.module';
 import { PartTaxonomyModule } from './modules/part-taxonomy/part-taxonomy.module';
 import { OemDatabaseModule } from './modules/oem-database/oem-database.module';
+import { VehicleCatalogModule } from './modules/vehicle-catalog/vehicle-catalog.module';
+import { VehicleImportModule } from './modules/vehicle-import/vehicle-import.module';
+import { VehicleFitmentModule } from './modules/vehicle-fitment-engine/vehicle-fitment.module';
 
 @Module({
   imports: [
@@ -66,6 +69,9 @@ import { OemDatabaseModule } from './modules/oem-database/oem-database.module';
     VehicleDatabaseModule,
     PartTaxonomyModule,
     OemDatabaseModule,
+    VehicleCatalogModule,
+    VehicleImportModule,
+    VehicleFitmentModule,
     InventoryItemsModule,
     InventoryMovementsModule,
     SalesModule,

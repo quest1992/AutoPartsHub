@@ -1,0 +1,3179 @@
+{
+  "mode": "plan",
+  "manufacturersProcessed": 49,
+  "modelsProcessed": 396,
+  "vehicleGenerationsToCreate": 0,
+  "vehicleSpecificationsToCreate": 0,
+  "modelsRequiringManualReview": 396,
+  "coveredModels": [],
+  "manualReview": [
+    {
+      "manufacturer": "Aion",
+      "model": "Hyper HT",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Aion",
+      "model": "iA5",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Aion",
+      "model": "LX",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Aion",
+      "model": "S",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Aion",
+      "model": "S Max",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Aion",
+      "model": "S Plus",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Aion",
+      "model": "V plus",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "AITO",
+      "model": "M7",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "AITO",
+      "model": "M9",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Arcfox",
+      "model": "Alpha S",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Arcfox",
+      "model": "Alpha S5",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Arcfox",
+      "model": "Alpha T",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Arcfox",
+      "model": "Alpha T5",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Arcfox",
+      "model": "Kaola",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Arcfox",
+      "model": "Lite",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Avatr",
+      "model": "07",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Avatr",
+      "model": "11",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Avatr",
+      "model": "12",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "BAIC",
+      "model": "EU5",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "BAIC",
+      "model": "U5 Plus",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "BAIC",
+      "model": "X75",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Beijing",
+      "model": "BJ30",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Beijing",
+      "model": "BJ40L",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Beijing",
+      "model": "BJ60",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Beijing",
+      "model": "BJ80",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Beijing",
+      "model": "BJ90",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Beijing",
+      "model": "EX3",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Beijing",
+      "model": "U5",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Beijing",
+      "model": "U7",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Beijing",
+      "model": "X3",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Beijing",
+      "model": "X5",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Beijing",
+      "model": "X7",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Bestune",
+      "model": "B30",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "BMW",
+      "model": "Gran Turismo",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "BMW",
+      "model": "M1",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "BMW",
+      "model": "M4",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "BMW",
+      "model": "M8",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Buick",
+      "model": "E4",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Buick",
+      "model": "E5",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Buick",
+      "model": "Velite 6",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "BYD",
+      "model": "B2",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "BYD",
+      "model": "Chazor",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "BYD",
+      "model": "Corvette",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "BYD",
+      "model": "Destroyer",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "BYD",
+      "model": "E9",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "BYD",
+      "model": "Han EV",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "BYD",
+      "model": "Qin EV",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "BYD",
+      "model": "S2",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "BYD",
+      "model": "Summer",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Changan",
+      "model": "Benben E-Star",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Changan",
+      "model": "CS 75 Plus",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Changan",
+      "model": "CS 95 Plus",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Changan",
+      "model": "CS55 Plus",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Changan",
+      "model": "Hunter Plus",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Changan",
+      "model": "Kaicene Star 5",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Changan",
+      "model": "Kaicene Truck Single Row",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Changan",
+      "model": "Kaicene Truck With Cabin",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Changan",
+      "model": "Nevo A05",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Changan",
+      "model": "Nevo Q07",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Changan",
+      "model": "Qiyuan A",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Changan",
+      "model": "Qiyuan E",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Changan",
+      "model": "Qiyuan Q",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Changan",
+      "model": "Z-Chine",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Changhe",
+      "model": "A6",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Changhe",
+      "model": "Ideal I",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Changhe",
+      "model": "Ideal II",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Changhe",
+      "model": "M50",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Changhe",
+      "model": "M70",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Changhe",
+      "model": "Q25",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Changhe",
+      "model": "Q35",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Changhe",
+      "model": "Q7",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Chery",
+      "model": "Amulet",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Chery",
+      "model": "B14",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Chery",
+      "model": "Bonus",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Chery",
+      "model": "Bonus 3",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Chery",
+      "model": "Cowin 1",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Chery",
+      "model": "Cowin 2",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Chery",
+      "model": "Cowin 5",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Chery",
+      "model": "Cowin E3",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Chery",
+      "model": "CrossEastar",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Chery",
+      "model": "eQ",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Chery",
+      "model": "Fora",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Chery",
+      "model": "Galaxy Starshine 8",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Chery",
+      "model": "IndiS",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Chery",
+      "model": "Karry K50",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Chery",
+      "model": "Kimo",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Chery",
+      "model": "M11",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Chery",
+      "model": "Oriental Son",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Chery",
+      "model": "Riich G2",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Chery",
+      "model": "Tiggo 7 Pro Max",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Chery",
+      "model": "Tiggo 8 Pro",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Chery",
+      "model": "Tiggo 8 Pro Max",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Chery",
+      "model": "Very",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Chevrolet",
+      "model": "Astra",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Chevrolet",
+      "model": "Celta",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Chevrolet",
+      "model": "Corsa",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Chevrolet",
+      "model": "Damas",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Chevrolet",
+      "model": "G",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Chevrolet",
+      "model": "K30",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Chevrolet",
+      "model": "Lanos",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Chevrolet",
+      "model": "Menlo",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Chevrolet",
+      "model": "Nexia",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Chevrolet",
+      "model": "Rezzo",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Deepal",
+      "model": "G318",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Deepal",
+      "model": "SL03",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Deepal",
+      "model": "SL07",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Denza",
+      "model": "EV",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Denza",
+      "model": "N9",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Dongfeng",
+      "model": "EN 007",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Dongfeng",
+      "model": "EP 008",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Dongfeng",
+      "model": "Forthing",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Dongfeng",
+      "model": "Hedmos 06",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Dongfeng",
+      "model": "L7",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Dongfeng",
+      "model": "L8",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Dongfeng",
+      "model": "Landian E5",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Ford",
+      "model": "Express",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Ford",
+      "model": "Focus C-Max",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Ford",
+      "model": "Freda",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Foton",
+      "model": "Tunland S",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "GAC",
+      "model": "Empow",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "GAC",
+      "model": "Trumpchi GA3",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "GAC",
+      "model": "Trumpchi GS5",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "GAC",
+      "model": "Trumphi GM8",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Geely",
+      "model": "Atlas Pro",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Geely",
+      "model": "Coolray",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Geely",
+      "model": "Galaxy М8",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Geely",
+      "model": "Galaxy М9",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Geely",
+      "model": "Geometry",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Geely",
+      "model": "Tugella",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Geely",
+      "model": "Vision",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "HiPhi",
+      "model": "X",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "HiPhi",
+      "model": "Z",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Honda",
+      "model": "Ascot",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Honda",
+      "model": "Ascot Innova",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Honda",
+      "model": "Asty",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Honda",
+      "model": "Avancier",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Honda",
+      "model": "Capa",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Honda",
+      "model": "Civic Ballade",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Honda",
+      "model": "Crider",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Honda",
+      "model": "Domani",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Honda",
+      "model": "Elision",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Honda",
+      "model": "eNP2",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Honda",
+      "model": "Life",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Honda",
+      "model": "MNV",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Honda",
+      "model": "Orthia",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Honda",
+      "model": "Partner",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Honda",
+      "model": "Rafaga",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Honda",
+      "model": "Vamos",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Honda",
+      "model": "XNV",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Hongqi",
+      "model": "H5",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Hongqi",
+      "model": "H7",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Hongqi",
+      "model": "HQ9",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Hongqi",
+      "model": "HS3",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Hongqi",
+      "model": "HS5",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Hongqi",
+      "model": "LS7",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Hunan Leopaard Motors",
+      "model": "C5",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Hunan Leopaard Motors",
+      "model": "C5 EV",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Hunan Leopaard Motors",
+      "model": "CS10",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Hunan Leopaard Motors",
+      "model": "CS7",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Hunan Leopaard Motors",
+      "model": "CS9",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Hunan Leopaard Motors",
+      "model": "Mattu",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Hunan Leopaard Motors",
+      "model": "Q6",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Hyptec",
+      "model": "HT",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Hyundai",
+      "model": "Aslan",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Hyundai",
+      "model": "Avanta Touring",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Hyundai",
+      "model": "Click",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Hyundai",
+      "model": "Dynasty",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Hyundai",
+      "model": "Encino",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Hyundai",
+      "model": "Exel",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Hyundai",
+      "model": "i50",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Hyundai",
+      "model": "Marcia",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Hyundai",
+      "model": "Maxcruz",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Hyundai",
+      "model": "Verna",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "JAC",
+      "model": "E-J7",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "JAC",
+      "model": "E-JS1",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "JAC",
+      "model": "E-JS4",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "JAC",
+      "model": "iEV7S",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "JAC",
+      "model": "J7",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "JAC",
+      "model": "JS3",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "JAC",
+      "model": "JS8",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "JAC",
+      "model": "M3",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "JAC",
+      "model": "M4",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "JAC",
+      "model": "Pick Up T6",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "JAC",
+      "model": "Pick Up T8 Pro",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "JAC",
+      "model": "RF8",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "JAC",
+      "model": "S3",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "JAC",
+      "model": "S3 Pro",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "JAC",
+      "model": "T6",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "JAC",
+      "model": "T8",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "JAC",
+      "model": "T9",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "JAC",
+      "model": "X200",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Kia",
+      "model": "Avella Delta",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Kia",
+      "model": "Besta",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Kia",
+      "model": "Capital",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Kia",
+      "model": "Ceed Sporty Wagon",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Kia",
+      "model": "Cerato Koup",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Kia",
+      "model": "Concord",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Kia",
+      "model": "Credos II",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Kia",
+      "model": "Elan",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Kia",
+      "model": "Enterprise",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Kia",
+      "model": "K series",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Kia",
+      "model": "K2",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Kia",
+      "model": "K8",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Kia",
+      "model": "K9",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Kia",
+      "model": "Potencia",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Kia",
+      "model": "Quoris",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Kia",
+      "model": "Ray",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Kia",
+      "model": "Regal",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Kia",
+      "model": "Roadster",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Kia",
+      "model": "Rocsta",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Kia",
+      "model": "Sportage Grand",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Kia",
+      "model": "Visto",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Leapmotor",
+      "model": "C01",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Leapmotor",
+      "model": "C11",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Leapmotor",
+      "model": "LP-S01",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Leapmotor",
+      "model": "LP-T03",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Lexus",
+      "model": "CT series",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Lexus",
+      "model": "ES series",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Lexus",
+      "model": "GS series",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Lexus",
+      "model": "GX series",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Lexus",
+      "model": "HS series",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Lexus",
+      "model": "IS series",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Lexus",
+      "model": "LM series",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Lexus",
+      "model": "LS series",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Lexus",
+      "model": "LX series",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Lexus",
+      "model": "NX series",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Lexus",
+      "model": "RX series",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Lexus",
+      "model": "RZ series",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Lexus",
+      "model": "SC series",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Lexus",
+      "model": "TX series",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Lexus",
+      "model": "UX series",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Li Auto",
+      "model": "i6",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Li Auto",
+      "model": "i8",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Li Auto",
+      "model": "L6",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Li Auto",
+      "model": "L7",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Li Auto",
+      "model": "L8",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Li Auto",
+      "model": "L9",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Li Auto",
+      "model": "Mega",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Li Auto",
+      "model": "One",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Livan",
+      "model": "RL7",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Livan",
+      "model": "RL9",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Lynk & Co",
+      "model": "06",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Mazda",
+      "model": "AZ",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Mazda",
+      "model": "AZ1",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Mazda",
+      "model": "AZ3",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Mazda",
+      "model": "B",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Mazda",
+      "model": "E",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Mazda",
+      "model": "Efini MS8",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Mazda",
+      "model": "Efini MS9",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Mazda",
+      "model": "Etude",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Mazda",
+      "model": "Eunos 500",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Mazda",
+      "model": "Eunos 800",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Mazda",
+      "model": "Eunos 900",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Mazda",
+      "model": "EZ-6",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Mazda",
+      "model": "Lantis",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Mazda",
+      "model": "Levante",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Mazda",
+      "model": "Luce",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Mazda",
+      "model": "Marvi",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Mazda",
+      "model": "MS3",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Mazda",
+      "model": "MS6",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Mazda",
+      "model": "MS8",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Mazda",
+      "model": "MS9",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Mazda",
+      "model": "MX8",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Mazda",
+      "model": "Proceed",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Mazda",
+      "model": "RX6",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Mazda",
+      "model": "Speed6",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Mercedes-Benz",
+      "model": "CE class",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Mercedes-Benz",
+      "model": "CL class",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Mercedes-Benz",
+      "model": "CLA-Class",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Mercedes-Benz",
+      "model": "CLC class",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Mercedes-Benz",
+      "model": "CLK class",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Mercedes-Benz",
+      "model": "CLS class",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Mercedes-Benz",
+      "model": "GL class",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Mercedes-Benz",
+      "model": "GLA class",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Mercedes-Benz",
+      "model": "GLB class",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Mercedes-Benz",
+      "model": "GLC class",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Mercedes-Benz",
+      "model": "GLE class",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Mercedes-Benz",
+      "model": "GLK class",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Mercedes-Benz",
+      "model": "ML class",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Mercedes-Benz",
+      "model": "SL class",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Mercedes-Benz",
+      "model": "SLK class",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Mercedes-Benz",
+      "model": "W124",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Mercedes-Benz",
+      "model": "W201",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Neta",
+      "model": "Aya",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Neta",
+      "model": "GT",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Neta",
+      "model": "N01",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Neta",
+      "model": "S",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Neta",
+      "model": "U",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Nissan",
+      "model": "100SX",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Nissan",
+      "model": "280 ZX",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Nissan",
+      "model": "Auster",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Nissan",
+      "model": "Bassara",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Nissan",
+      "model": "Bluebird Maxima",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Nissan",
+      "model": "California",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Nissan",
+      "model": "Camino",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Nissan",
+      "model": "Cargo",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Nissan",
+      "model": "Dayz Roox",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Nissan",
+      "model": "Expert",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Nissan",
+      "model": "King Cab",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Nissan",
+      "model": "Largo",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Nissan",
+      "model": "Lengley",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Nissan",
+      "model": "Liberty",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Nissan",
+      "model": "Lucino",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Nissan",
+      "model": "Moco",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Nissan",
+      "model": "N7",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Nissan",
+      "model": "Otti",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Nissan",
+      "model": "Prairie Joy",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Nissan",
+      "model": "Qashqai+2",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Nissan",
+      "model": "R Nessa",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Nissan",
+      "model": "Terrano II",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Roewe",
+      "model": "i5",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Roewe",
+      "model": "i6",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Roewe",
+      "model": "iMAX8 EV",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Roewe",
+      "model": "Lomemo",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Roewe",
+      "model": "Marvel R",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Roewe",
+      "model": "Roewe RX9",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Roewe",
+      "model": "RX3",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Roewe",
+      "model": "RX5 II",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Roewe",
+      "model": "RX8",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Rolls-Royce",
+      "model": "Carmargue",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Skyworth",
+      "model": "EV6",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Tesla",
+      "model": "Roadster II",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Tesla",
+      "model": "Semi",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Toyota",
+      "model": "Avensis Verso",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Toyota",
+      "model": "Axio",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Toyota",
+      "model": "Belta",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Toyota",
+      "model": "Blizzard",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Toyota",
+      "model": "BZ3",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Toyota",
+      "model": "BZ3X",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Toyota",
+      "model": "BZ5X",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Toyota",
+      "model": "BZ7",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Toyota",
+      "model": "Cami",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Toyota",
+      "model": "Camry Gracia",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Toyota",
+      "model": "Carina ED",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Toyota",
+      "model": "Carina II",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Toyota",
+      "model": "Ceres",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Toyota",
+      "model": "Corolla Verso",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Toyota",
+      "model": "Corona Exiv",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Toyota",
+      "model": "Corona Mark II",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Toyota",
+      "model": "Corona Premio",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Toyota",
+      "model": "Cynos",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Toyota",
+      "model": "Duet",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Toyota",
+      "model": "Emina",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Toyota",
+      "model": "Exiv",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Toyota",
+      "model": "Fielder",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Toyota",
+      "model": "Gaia",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Toyota",
+      "model": "Hiace Regius",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Toyota",
+      "model": "Levin",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Toyota",
+      "model": "Lucida",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Toyota",
+      "model": "Marino",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Toyota",
+      "model": "Mark II",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Toyota",
+      "model": "Mark X ZiO",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Toyota",
+      "model": "Master",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Toyota",
+      "model": "Master Ace",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Toyota",
+      "model": "Master Ace Surf",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Toyota",
+      "model": "Master Surf",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Toyota",
+      "model": "Modell F",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Toyota",
+      "model": "Nadia",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Toyota",
+      "model": "Opa",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Toyota",
+      "model": "Premio",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Toyota",
+      "model": "Pronard",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Toyota",
+      "model": "Scepter",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Toyota",
+      "model": "Solara",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Toyota",
+      "model": "Sprinter",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Toyota",
+      "model": "Sprinter Carib",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Toyota",
+      "model": "Sprinter Marino",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Toyota",
+      "model": "Sprinter Trueno",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Toyota",
+      "model": "Touring",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Toyota",
+      "model": "Town Ace Noah",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Toyota",
+      "model": "Townace Regius",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Toyota",
+      "model": "Vibe",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Toyota",
+      "model": "Vista Ardeo",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Volkswagen",
+      "model": "Bora Syncro",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Volkswagen",
+      "model": "Camping",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Volkswagen",
+      "model": "E-Bora",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Volkswagen",
+      "model": "Golf Country",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Volkswagen",
+      "model": "ID.Unyx",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Volkswagen",
+      "model": "Kaefer",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Volkswagen",
+      "model": "Polo Classic",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Volkswagen",
+      "model": "Tavendor",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Voyah",
+      "model": "Passion",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Voyah",
+      "model": "Taishan",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Weltmeister",
+      "model": "EX5",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Weltmeister",
+      "model": "EX5-Z",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Weltmeister",
+      "model": "EX6",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Weltmeister",
+      "model": "M7",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Wuling",
+      "model": "Bingo plus",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Wuling",
+      "model": "Cloud",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Wuling",
+      "model": "Hongguang",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Wuling",
+      "model": "Longka",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Wuling",
+      "model": "Rongguang",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Wuling",
+      "model": "Starlight PHEV",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Wuling",
+      "model": "Xingguang",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Wuling",
+      "model": "Yangguang",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "Xiaomi",
+      "model": "SU7",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    },
+    {
+      "manufacturer": "XPeng",
+      "model": "G3i",
+      "reasons": [
+        "no verified model-year source match",
+        "no verified factory specification source match"
+      ]
+    }
+  ]
+}

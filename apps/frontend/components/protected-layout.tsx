@@ -14,6 +14,12 @@ type NavigationItem = {
 };
 
 const navigationItems: NavigationItem[] = [
+  {
+    href: '/vehicles',
+    label: 'Подбор по автомобилю',
+    permissions: ['CATALOG_VIEW'],
+    icon: '🚗',
+  },
   { href: '/dashboard', label: 'Главная', icon: '🏠' },
   {
     href: '/search',

@@ -470,6 +470,11 @@ model VehicleModel {
   generations     VehicleGeneration[]
   specifications  VehicleSpecification[]
   oemPartFitments OemPartFitment[]
+  aliases         VehicleModelAlias[]
+
+  mergedIntoId String?
+  mergedInto   VehicleModel?  @relation("VehicleModelMerge", fields: [mergedIntoId], references: [id], onDelete: Restrict)
+  mergedModels VehicleModel[] @relation("VehicleModelMerge")
 
   isActive Boolean @default(true)
 
@@ -484,6 +489,26 @@ model VehicleModel {
   @@index([endYear])
   @@index([vehicleType])
   @@index([powertrainType])
+  @@index([mergedIntoId])
+}
+
+model VehicleModelAlias {
+  id String @id @default(uuid())
+
+  vehicleModelId String
+  vehicleModel   VehicleModel @relation(fields: [vehicleModelId], references: [id], onDelete: Cascade)
+
+  name           String
+  normalizedName String
+  sourceUrl      String
+  sourceLicense  String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([vehicleModelId, normalizedName])
+  @@index([normalizedName])
+  @@index([vehicleModelId])
 }
 
 model VehicleGeneration {
@@ -1388,6 +1413,24 @@ model OemAuditLog {
 
   @@index([entityType, entityId])
   @@index([actorId])
+  @@index([createdAt])
+}
+
+model VehicleDataAuditLog {
+  id String @id @default(uuid())
+
+  batchId       String
+  action        String
+  sourceModelId String
+  targetModelId String?
+  beforeJson    Json
+  afterJson     Json
+  metadata      Json?
+  createdAt     DateTime @default(now())
+
+  @@index([batchId])
+  @@index([sourceModelId])
+  @@index([targetModelId])
   @@index([createdAt])
 }
 
