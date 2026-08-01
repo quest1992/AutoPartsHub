@@ -7,14 +7,18 @@ import { VehicleCatalogService } from './vehicle-catalog.service';
 describe('VehicleCatalogService', () => {
   const prisma: any = {
     $transaction: jest.fn(async (queries: unknown[]) => Promise.all(queries)),
-    manufacturer: { findMany: jest.fn(), findFirst: jest.fn() },
+    manufacturer: {
+      count: jest.fn(),
+      findMany: jest.fn(),
+      findFirst: jest.fn(),
+    },
     vehicleModel: {
       count: jest.fn(),
       findMany: jest.fn(),
       findFirst: jest.fn(),
     },
     vehicleModelAlias: { findMany: jest.fn() },
-    vehicleSpecification: { findFirst: jest.fn() },
+    vehicleSpecification: { count: jest.fn(), findFirst: jest.fn() },
     partCategory: { findMany: jest.fn(), findFirst: jest.fn() },
     partCatalogItem: { count: jest.fn(), findMany: jest.fn() },
   };
@@ -95,6 +99,29 @@ describe('VehicleCatalogService', () => {
     });
 
     expect(result.data.map((item) => item.id)).toEqual(['mercedes']);
+  });
+  it('returns global active vehicle catalog statistics', async () => {
+    prisma.manufacturer.count.mockResolvedValue(155);
+    prisma.vehicleModel.count.mockResolvedValue(1119);
+    prisma.vehicleSpecification.count.mockResolvedValue(382);
+
+    await expect(service.stats()).resolves.toEqual({
+      manufacturers: 155,
+      models: 1119,
+      specifications: 382,
+    });
+    expect(prisma.vehicleModel.count).toHaveBeenCalledWith({
+      where: { isActive: true, manufacturer: { isActive: true } },
+    });
+    expect(prisma.vehicleSpecification.count).toHaveBeenCalledWith({
+      where: {
+        isActive: true,
+        vehicleModel: {
+          isActive: true,
+          manufacturer: { isActive: true },
+        },
+      },
+    });
   });
   it('returns models for an active manufacturer', async () => {
     prisma.manufacturer.findFirst.mockResolvedValue({ id: 'maker' });

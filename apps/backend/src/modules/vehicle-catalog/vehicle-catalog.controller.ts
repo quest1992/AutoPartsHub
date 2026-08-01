@@ -32,7 +32,9 @@ export class VehicleCatalogController {
   constructor(private readonly service: VehicleCatalogService) {}
 
   @Get('search')
-  @ApiOperation({ summary: 'Глобальный поиск автомобиля' })
+  @ApiOperation({
+    summary: 'Глобальный поиск автомобиля',
+  })
   search(@Query() query: VehicleCatalogQueryDto) {
     return this.service.search(query);
   }
@@ -44,6 +46,12 @@ export class VehicleCatalogController {
   })
   manufacturers(@Query() query: VehicleCatalogQueryDto) {
     return this.service.manufacturers(query);
+  }
+
+  @Get('stats')
+  @ApiOperation({ summary: 'Статистика справочника автомобилей' })
+  stats() {
+    return this.service.stats();
   }
 
   @Get(':manufacturerId/models')

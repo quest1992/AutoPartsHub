@@ -230,6 +230,26 @@ export class VehicleCatalogService {
     );
     return { data, meta: pageMeta(total, query.page, query.limit) };
   }
+  async stats() {
+    const activeVehicleModel: Prisma.VehicleModelWhereInput = {
+      isActive: true,
+      manufacturer: { isActive: true },
+    };
+    const [manufacturers, models, specifications] =
+      await this.prisma.$transaction([
+        this.prisma.manufacturer.count({ where: { isActive: true } }),
+        this.prisma.vehicleModel.count({ where: activeVehicleModel }),
+        this.prisma.vehicleSpecification.count({
+          where: {
+            isActive: true,
+            vehicleModel: activeVehicleModel,
+          },
+        }),
+      ]);
+
+    console.log({ manufacturers, models, specifications });
+    return { manufacturers, models, specifications };
+  }
   async models(manufacturerId: string, query: VehicleCatalogQueryDto) {
     await this.ensureManufacturer(manufacturerId);
     const where: Prisma.VehicleModelWhereInput = {

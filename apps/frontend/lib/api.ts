@@ -960,7 +960,10 @@ export async function confirmInventoryImport(
   const body = await response.json().catch(() => null);
   if (!response.ok) {
     if (response.status === 401) clearSession();
-    throw new ApiError(response.status, body?.message ?? "Ошибка импорта");
+    throw new ApiError(
+      response.status,
+      body?.message ?? "Ошибка импорта",
+    );
   }
   return body as InventoryImportConfirmResponse;
 }
@@ -1087,7 +1090,10 @@ export async function downloadInventoryImportTemplate() {
     headers: token ? { Authorization: `Bearer ${token}` } : {},
   });
   if (!response.ok)
-    throw new ApiError(response.status, "Не удалось скачать шаблон");
+    throw new ApiError(
+      response.status,
+      "Не удалось скачать шаблон",
+    );
   const blob = await response.blob();
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
@@ -2246,6 +2252,13 @@ export const getVehicleManufacturers = (
     `/vehicles/manufacturers?${documentQuery({ search, page, limit })}`,
     { signal },
   );
+export type VehicleCatalogStats = {
+  manufacturers: number;
+  models: number;
+  specifications: number;
+};
+export const getVehicleCatalogStats = (signal?: AbortSignal) =>
+  request<VehicleCatalogStats>("/vehicles/stats", { signal });
 export const getVehicleCatalogModels = (
   manufacturerId: string,
   search = "",

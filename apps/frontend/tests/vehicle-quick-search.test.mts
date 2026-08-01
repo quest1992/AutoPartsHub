@@ -40,6 +40,11 @@ test("quick search uses typed API and keeps the step-by-step picker", async () =
   );
   assert.match(page, /Производители не найдены/);
   assert.match(page, /Загрузка производителей/);
+  assert.match(page, /getVehicleCatalogStats\(controller\.signal\)/);
+  assert.match(page, /catalogStats\?\.manufacturers/);
+  assert.match(page, /catalogStats\?\.models/);
+  assert.match(page, /catalogStats\?\.specifications/);
+  assert.match(api, /vehicles\/stats/);
   assert.match(api, /vehicleCatalogQuickSearch/);
   assert.match(api, /encodeURIComponent\(query\)/);
   assert.match(api, /signal\?: AbortSignal/);

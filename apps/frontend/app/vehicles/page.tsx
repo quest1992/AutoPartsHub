@@ -28,6 +28,7 @@ import { VehicleQuickSearch } from "../../components/vehicle-quick-search";
 import {
   getVehicleCatalogModel,
   getVehicleCatalogModels,
+  getVehicleCatalogStats,
   getVehicleManufacturers,
   VehicleCatalogManufacturer,
   VehicleCatalogModel,
@@ -61,13 +62,14 @@ export default function VehiclesPage() {
   const [manufacturers, setManufacturers] = useState<
     VehicleCatalogManufacturer[]
   >([]);
-  const [manufacturerTotal, setManufacturerTotal] = useState<number | null>(
-    null,
-  );
+  const [catalogStats, setCatalogStats] = useState<{
+    manufacturers: number;
+    models: number;
+    specifications: number;
+  } | null>(null);
   const [manufacturer, setManufacturer] =
     useState<VehicleCatalogManufacturer | null>(null);
   const [models, setModels] = useState<VehicleCatalogModel[]>([]);
-  const [modelsTotal, setModelsTotal] = useState<number | null>(null);
   const [model, setModel] = useState<VehicleCatalogModel | null>(null);
   const [generationId, setGenerationId] = useState("");
   const [loading, setLoading] = useState(false);
@@ -80,7 +82,6 @@ export default function VehiclesPage() {
       getVehicleManufacturers(manufacturerQuery, 1, 100, controller.signal)
         .then((r) => {
           setManufacturers(r.data);
-          setManufacturerTotal(r.meta.total);
         })
         .catch((e) => {
           if (e?.name !== "AbortError")
@@ -100,11 +101,24 @@ export default function VehiclesPage() {
     };
   }, [manufacturerQuery]);
   useEffect(() => {
+    const controller = new AbortController();
+    getVehicleCatalogStats(controller.signal)
+      .then(setCatalogStats)
+      .catch((e) => {
+        if (e?.name !== "AbortError")
+          setError(
+            e instanceof Error
+              ? e.message
+              : "Не удалось загрузить статистику автомобилей",
+          );
+      });
+    return () => controller.abort();
+  }, []);
+  useEffect(() => {
     if (!manufacturer) return;
     getVehicleCatalogModels(manufacturer.id)
       .then((r) => {
         setModels(r.data);
-        setModelsTotal(r.meta.total);
       })
       .catch((e) => setError(e.message))
       .finally(() => setModelLoading(false));
@@ -133,7 +147,11 @@ export default function VehiclesPage() {
       if (full.generations.length === 0 && full.specifications.length === 1)
         router.push(`/vehicles/${full.specifications[0].id}`);
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Не удалось загрузить модель");
+      setError(
+        e instanceof Error
+          ? e.message
+          : "Не удалось загрузить модель",
+      );
     } finally {
       setModelLoading(false);
     }
@@ -199,7 +217,8 @@ export default function VehiclesPage() {
                 color="text.secondary"
                 sx={{ mt: 0.75 }}
               >
-                Выберите автомобиль или воспользуйтесь быстрым поиском.
+                Выберите автомобиль или
+                воспользуйтесь быстрым поиском.
               </Typography>
             </Box>
             <Stack
@@ -216,9 +235,9 @@ export default function VehiclesPage() {
               }}
             >
               {[
-                ["Производителей", manufacturerTotal],
-                ["Моделей", modelsTotal],
-                ["Спецификаций", model?.specifications.length ?? null],
+                ["Производителей", catalogStats?.manufacturers],
+                ["Моделей", catalogStats?.models],
+                ["Спецификаций", catalogStats?.specifications],
               ].map(([label, value]) => (
                 <Box key={String(label)}>
                   <Typography variant="caption" color="text.secondary">
@@ -259,7 +278,8 @@ export default function VehiclesPage() {
                   Быстрый поиск
                 </Typography>
                 <Typography variant="caption" color="text.secondary">
-                  Марка, модель или альтернативное название
+                  Марка, модель или альтернативное
+                  название
                 </Typography>
                 <VehicleQuickSearch
                   onSelect={(value) => void chooseQuick(value)}
@@ -271,7 +291,8 @@ export default function VehiclesPage() {
                   Выбор автомобиля
                 </Typography>
                 <Typography variant="caption" color="text.secondary">
-                  Последовательно уточните автомобиль
+                  Последовательно уточните
+                  автомобиль
                 </Typography>
               </Box>
               {loading && !manufacturers.length ? (
@@ -344,14 +365,18 @@ export default function VehiclesPage() {
                   `${g.name} · ${years(g.startYear, g.endYear)}`
                 }
                 onChange={(_, v) => setGenerationId(v?.id ?? "")}
-                renderInput={(p) => <TextField {...p} label="Поколение" />}
+                renderInput={(p) => (
+                  <TextField {...p} label="Поколение" />
+                )}
               />
               <Autocomplete
                 options={specifications}
                 disabled={!model || !specifications.length}
                 getOptionLabel={specName}
                 onChange={(_, v) => v && router.push(`/vehicles/${v.id}`)}
-                renderInput={(p) => <TextField {...p} label="Комплектация" />}
+                renderInput={(p) => (
+                  <TextField {...p} label="Комплектация" />
+                )}
               />
             </Stack>
             <Box component="main">
@@ -392,7 +417,8 @@ export default function VehiclesPage() {
                     >
                       Выберите автомобиль слева
                       <br />
-                      или воспользуйтесь быстрым поиском.
+                      или воспользуйтесь быстрым
+                      поиском.
                     </Typography>
                   </Box>
                 </Card>
@@ -407,7 +433,9 @@ export default function VehiclesPage() {
                 <Stack spacing={2.5}>
                   <Breadcrumbs>
                     <Link href="/dashboard">Главная</Link>
-                    <Typography color="text.secondary">Автомобили</Typography>
+                    <Typography color="text.secondary">
+                      Автомобили
+                    </Typography>
                     <Typography color="text.secondary">
                       {model.manufacturer?.name ?? manufacturer?.name}
                     </Typography>
@@ -452,8 +480,14 @@ export default function VehiclesPage() {
                           model.generations.find((g) => g.id === generationId)
                             ?.name ?? "Не выбрано",
                         ],
-                        ["Тип двигателя", model.powertrainType ?? "Не указан"],
-                        ["Годы выпуска", years(model.startYear, model.endYear)],
+                        [
+                          "Тип двигателя",
+                          model.powertrainType ?? "Не указан",
+                        ],
+                        [
+                          "Годы выпуска",
+                          years(model.startYear, model.endYear),
+                        ],
                       ].map(([l, v]) => (
                         <Grid key={l} size={{ xs: 6, md: 2.4 }}>
                           <Typography variant="caption" color="text.secondary">
@@ -475,7 +509,8 @@ export default function VehiclesPage() {
                       color="text.secondary"
                       sx={{ mb: 2 }}
                     >
-                      Выберите точную модификацию для перехода к OEM-каталогу.
+                      Выберите точную модификацию
+                      для перехода к OEM-каталогу.
                     </Typography>
                     {specifications.length ? (
                       <Grid container spacing={1.5}>
@@ -508,7 +543,8 @@ export default function VehiclesPage() {
                       </Grid>
                     ) : (
                       <Alert severity="info">
-                        Для этой модели пока нет подтверждённых заводских
+                        Для этой модели пока нет
+                        подтверждённых заводских
                         спецификаций.
                       </Alert>
                     )}
