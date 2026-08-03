@@ -11,6 +11,15 @@ import {
   getPartCategories,
 } from "../lib/api";
 
+const categoryMatchLabels = {
+  prefix: "\u041a\u0430\u0442\u0435\u0433\u043e\u0440\u0438\u044f",
+  found:
+    "\u043d\u0430\u0439\u0434\u0435\u043d\u043e \u043f\u043e\u0437\u0438\u0446\u0438\u0439 \u043a\u0430\u0442\u0430\u043b\u043e\u0433\u0430",
+  empty:
+    "\u043f\u043e\u0437\u0438\u0446\u0438\u0439 \u043a\u0430\u0442\u0430\u043b\u043e\u0433\u0430 \u043f\u043e\u043a\u0430 \u043d\u0435\u0442",
+  suggest:
+    "\u041f\u0440\u0435\u0434\u043b\u043e\u0436\u0438\u0442\u044c \u0434\u0435\u0442\u0430\u043b\u044c \u0432 \u044d\u0442\u043e\u0439 \u043a\u0430\u0442\u0435\u0433\u043e\u0440\u0438\u0438",
+};
 export function CatalogPicker({
   value,
   onChange,
@@ -31,8 +40,10 @@ export function CatalogPicker({
   const [categorySearch, setCategorySearch] = useState("");
   const [categories, setCategories] = useState<PartCategoryOption[]>([]);
   const [categoriesLoading, setCategoriesLoading] = useState(false);
-  const [selectedCategory, setSelectedCategory] =
-    useState<PartCategoryOption | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<{
+    id: string;
+    label: string;
+  } | null>(null);
   const [form, setForm] = useState({
     name: "",
     suggestedCategoryId: "",
@@ -87,17 +98,24 @@ export function CatalogPicker({
       ? `${category.parent.name} → ${category.name}`
       : category.name;
 
-  function openForm() {
-    setForm((current) => ({ ...current, name: q.trim() }));
+  function openForm(match?: CatalogCategoryMatch) {
+    setForm((current) => ({
+      ...current,
+      name: q.trim(),
+      suggestedCategoryId: match?.categoryId ?? "",
+    }));
     setShowForm(true);
-    setCategorySearch("");
-    setSelectedCategory(null);
+    setCategorySearch(match?.path ?? "");
+    setSelectedCategory(
+      match ? { id: match.categoryId, label: match.path } : null,
+    );
     setCategories([]);
   }
 
   function chooseCategory(category: PartCategoryOption) {
-    setSelectedCategory(category);
-    setCategorySearch(categoryPath(category));
+    const label = categoryPath(category);
+    setSelectedCategory({ id: category.id, label });
+    setCategorySearch(label);
     setCategories([]);
     setForm((current) => ({ ...current, suggestedCategoryId: category.id }));
   }
@@ -207,13 +225,27 @@ export function CatalogPicker({
       {ready && !loading && trueCategoryMatches.length > 0 && (
         <div className="mt-2 rounded border border-amber-200 bg-amber-50 p-3 text-sm">
           {trueCategoryMatches.map((match) => (
-            <p key={match.categoryId}>
-              Категория «{match.path}»:{" "}
-              {match.catalogItemCount
-                ? `найдено позиций каталога: ${match.catalogItemCount}`
-                : "позиций каталога пока нет"}
-              .
-            </p>
+            <div
+              key={match.categoryId}
+              className="flex flex-wrap items-center justify-between gap-2 border-b border-amber-200 py-2 last:border-b-0"
+            >
+              <p>
+                {categoryMatchLabels.prefix} {match.path}:{" "}
+                {match.catalogItemCount
+                  ? `${categoryMatchLabels.found}: ${match.catalogItemCount}`
+                  : categoryMatchLabels.empty}
+                .
+              </p>
+              {match.catalogItemCount === 0 && (
+                <button
+                  type="button"
+                  onClick={() => openForm(match)}
+                  className="rounded bg-blue-600 px-3 py-2 text-white"
+                >
+                  {categoryMatchLabels.suggest}
+                </button>
+              )}
+            </div>
           ))}
         </div>
       )}
@@ -226,7 +258,7 @@ export function CatalogPicker({
             <p>Такой позиции нет в центральном каталоге.</p>
             <button
               type="button"
-              onClick={openForm}
+              onClick={() => openForm()}
               className="mt-2 rounded bg-blue-600 px-3 py-2 text-white"
             >
               Предложить новую позицию
@@ -256,7 +288,7 @@ export function CatalogPicker({
             <label className="text-sm">Категория</label>
             {selectedCategory ? (
               <div className="mt-1 flex items-center justify-between rounded border border-blue-200 bg-blue-50 p-3">
-                <span>{categoryPath(selectedCategory)}</span>
+                <span>{selectedCategory.label}</span>
                 <button
                   type="button"
                   onClick={clearCategory}
