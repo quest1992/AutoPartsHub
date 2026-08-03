@@ -1,4 +1,4 @@
-import { UserRole } from '@prisma/client';
+﻿import { UserRole } from '@prisma/client';
 import { Test } from '@nestjs/testing';
 import { PrismaService } from '../../prisma/prisma.service';
 import { VinService } from '../vin/vin.service';
@@ -11,16 +11,23 @@ describe('MarketplaceSearchService', () => {
     partCatalogItemId: 'catalog',
     imageUrl: null,
     brand: 'Toyota',
+    oemNumber: 'SELLER-OEM-1',
+    compatibility: 'BYD e2, BYD Yuan UP; Geely MK',
     quantity: 2,
     price: { toFixed: () => '350.00' },
     currency: 'TJS',
     location: 'A-12',
     condition: 'NEW',
-    shop: { id: 'shop', name: 'Авто Мир', city: 'Душанбе', address: null },
+    shop: {
+      id: 'shop',
+      name: 'РђРІС‚Рѕ РњРёСЂ',
+      city: 'Р”СѓС€Р°РЅР±Рµ',
+      address: null,
+    },
     partCatalogItem: {
-      name: 'Масляный фильтр',
+      name: 'РњР°СЃР»СЏРЅС‹Р№ С„РёР»СЊС‚СЂ',
       internalCode: 'AS-1',
-      category: { id: 'category', name: 'Фильтры' },
+      category: { id: 'category', name: 'Р¤РёР»СЊС‚СЂС‹' },
       partNumbers: [
         {
           type: 'OEM',
@@ -87,10 +94,29 @@ describe('MarketplaceSearchService', () => {
     expect(vin.decode).toHaveBeenCalledTimes(1);
     expect(result.queryType).toBe('VIN');
     expect(result.items[0]).toMatchObject({
-      name: 'Масляный фильтр',
-      oemNumbers: ['90915-YZZD2'],
+      name: 'РњР°СЃР»СЏРЅС‹Р№ С„РёР»СЊС‚СЂ',
+      oemNumbers: ['SELLER-OEM-1', '90915-YZZD2'],
       crossNumbers: ['OC 534'],
       warehouse: 'A-12',
+    });
+  });
+
+  it('includes seller-entered OEM and compatibility in the marketplace card', async () => {
+    const result = await service.search(
+      {
+        q: 'filter',
+        inStockOnly: true,
+        originalOnly: false,
+        analogOnly: false,
+        page: 1,
+        limit: 12,
+      },
+      { role: UserRole.SUPER_ADMIN, shopId: null },
+    );
+
+    expect(result.items[0]).toMatchObject({
+      oemNumbers: ['SELLER-OEM-1', '90915-YZZD2'],
+      compatibility: ['BYD e2', 'BYD Yuan UP', 'Geely MK'],
     });
   });
 

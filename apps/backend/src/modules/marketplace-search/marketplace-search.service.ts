@@ -1,4 +1,4 @@
-import { ForbiddenException, Injectable } from '@nestjs/common';
+﻿import { ForbiddenException, Injectable } from '@nestjs/common';
 import { PartNumberType, Prisma, UserRole } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
 import { InventoryActor } from '../inventory-items/inventory-items.service';
@@ -85,6 +85,19 @@ export class MarketplaceSearchService {
       ...(minimum > 0 && { quantity: { gte: minimum } }),
     };
 
+    if (text && !isVin && normalizedNumber) {
+      where.OR = [
+        { oemNumber: { contains: text, mode: 'insensitive' } },
+        { partCatalogItem: catalogWhere },
+      ];
+      where.partCatalogItem = {
+        isActive: true,
+        category: { isActive: true },
+        ...(query.categoryId && { categoryId: query.categoryId }),
+        ...(catalogAnd.length && { AND: catalogAnd }),
+      };
+    }
+
     const [items, total] = await this.prisma.$transaction([
       this.prisma.shopInventoryItem.findMany({
         where,
@@ -165,6 +178,15 @@ export class MarketplaceSearchService {
 
   private detectTextType(items: any[], normalizedNumber: string) {
     if (!normalizedNumber) return 'NAME';
+    const inventoryOemMatch = items.some(
+      (item) =>
+        item.oemNumber &&
+        item.oemNumber
+          .replace(/[^a-zA-Z0-9]/g, '')
+          .toUpperCase()
+          .includes(normalizedNumber),
+    );
+    if (inventoryOemMatch) return 'OEM';
     const match = items
       .flatMap((item) => item.partCatalogItem.partNumbers)
       .find((number) => number.normalizedNumber.includes(normalizedNumber));
@@ -174,7 +196,12 @@ export class MarketplaceSearchService {
 
   private present(item: any) {
     const numbers = item.partCatalogItem.partNumbers;
+    const sellerCompatibility = (item.compatibility ?? '')
+      .split(/[\n,;]+/)
+      .map((value: string) => value.trim())
+      .filter(Boolean);
     const compatibility = [
+      ...sellerCompatibility,
       ...item.partCatalogItem.vehicleFitments.map((fitment) => {
         const generation = fitment.engine.generation;
         const model = generation.vehicleModel;
@@ -195,9 +222,12 @@ export class MarketplaceSearchService {
       name: item.partCatalogItem.name,
       internalCode: item.partCatalogItem.internalCode,
       imageUrl: item.imageUrl,
-      oemNumbers: numbers
-        .filter((number) => number.type === PartNumberType.OEM)
-        .map((number) => number.rawNumber),
+      oemNumbers: [
+        ...(item.oemNumber ? [item.oemNumber] : []),
+        ...numbers
+          .filter((number) => number.type === PartNumberType.OEM)
+          .map((number) => number.rawNumber),
+      ].filter((value, index, values) => values.indexOf(value) === index),
       crossNumbers: numbers
         .filter((number) => number.type !== PartNumberType.OEM)
         .map((number) => number.rawNumber),
@@ -218,10 +248,14 @@ export class MarketplaceSearchService {
   private resolveShop(actor: InventoryActor, requested?: string) {
     if (actor.role === UserRole.SUPER_ADMIN) return requested;
     if (!actor.shopId) {
-      throw new ForbiddenException('Пользователь не привязан к магазину');
+      throw new ForbiddenException(
+        'РџРѕР»СЊР·РѕРІР°С‚РµР»СЊ РЅРµ РїСЂРёРІСЏР·Р°РЅ Рє РјР°РіР°Р·РёРЅСѓ',
+      );
     }
     if (requested && requested !== actor.shopId) {
-      throw new ForbiddenException('Нельзя искать остатки другого магазина');
+      throw new ForbiddenException(
+        'РќРµР»СЊР·СЏ РёСЃРєР°С‚СЊ РѕСЃС‚Р°С‚РєРё РґСЂСѓРіРѕРіРѕ РјР°РіР°Р·РёРЅР°',
+      );
     }
     return actor.shopId;
   }
