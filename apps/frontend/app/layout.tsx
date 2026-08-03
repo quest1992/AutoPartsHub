@@ -1,10 +1,11 @@
-import type { Metadata } from "next";
+﻿import type { Metadata } from "next";
 import "./globals.css";
 import { AuthProvider } from "../components/auth-provider";
+import { PageHelp } from "../components/page-help";
 
 export const metadata: Metadata = {
   title: "AutoStock",
-  description: "Единая база автозапчастей",
+  description: "Р•РґРёРЅР°СЏ Р±Р°Р·Р° Р°РІС‚РѕР·Р°РїС‡Р°СЃС‚РµР№",
 };
 
 export default function RootLayout({
@@ -15,7 +16,10 @@ export default function RootLayout({
   return (
     <html lang="ru">
       <body>
-        <AuthProvider>{children}</AuthProvider>
+        <AuthProvider>
+          {children}
+          <PageHelp />
+        </AuthProvider>
       </body>
     </html>
   );
