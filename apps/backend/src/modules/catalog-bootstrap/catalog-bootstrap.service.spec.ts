@@ -142,12 +142,35 @@ describe('CatalogBootstrapService', () => {
     expect(response.results[0].status).toBe('EXISTING');
   });
 
-  it('blocks unsafe mass creation until an approved taxonomy mapping exists', async () => {
+  it('creates a base position in every empty leaf category', async () => {
     const { partCatalogService, service } = setup();
+    partCatalogService.create.mockResolvedValue({ id: 'created-1' });
 
-    await expect(service.autoCreateSafe()).rejects.toThrow(
-      'Массовое создание отключено',
+    const response = await service.autoCreateSafe();
+
+    expect(partCatalogService.create).toHaveBeenCalledWith(
+      expect.objectContaining({ categoryId: 'category-1' }),
     );
+    expect(response).toEqual(
+      expect.objectContaining({
+        categoriesFound: 1,
+        created: 1,
+        skippedExisting: 0,
+        failed: 0,
+      }),
+    );
+  });
+
+  it('skips a category that already has a catalog position', async () => {
+    const { prisma, partCatalogService, service } = setup();
+    prisma.partCatalogItem.findMany.mockResolvedValue([
+      { id: 'part-1', categoryId: 'category-1' },
+    ]);
+
+    const response = await service.autoCreateSafe();
+
     expect(partCatalogService.create).not.toHaveBeenCalled();
+    expect(response.skippedExisting).toBe(1);
+    expect(response.created).toBe(0);
   });
 });
