@@ -1,4 +1,5 @@
 import {
+  Prisma,
   PrismaClient,
   VehicleGenerationKind,
   VehiclePowertrainType,
@@ -41,12 +42,39 @@ export type VehicleSeedDataset = {
   generations: GenerationSeed[];
 };
 
+type ExistingManufacturer = {
+  id: string;
+  name: string;
+  slug: string;
+};
+
+type VehicleDatabasePreflight = {
+  manufacturerIdByDatasetSlug: Map<string, string>;
+  manufacturersToCreate: ManufacturerSeed[];
+  manufacturersMatched: number;
+  modelsToCreate: ModelSeed[];
+  modelsMatched: number;
+  generationsToCreate: GenerationSeed[];
+  generationsMatched: number;
+  specificationSourceKeysToCreate: string[];
+  specificationsMatched: number;
+  unresolvedConflicts: string[];
+  ambiguousConflicts: string[];
+};
+
 const DATA_DIR = join(__dirname, 'data', 'vehicle-database');
 const VEHICLES_DB_FILE = join(DATA_DIR, 'vehiclesdb-2026.07.6.csv');
 const EPA_FILE = join(DATA_DIR, 'epa-model-years.csv');
 const BATCH_SIZE = 750;
 const EPA_SOURCE_URL = 'https://www.fueleconomy.gov/feg/epadata/vehicles.csv';
 const EPA_SOURCE_LICENSE = 'United States Government public data';
+const EPA_NOTES = 'US EPA/DOE FuelEconomy.gov model-year record';
+const PRODUCTION_WRITE_ENV = 'VEHICLE_DB_ALLOW_WRITE';
+const TRANSACTION_TIMEOUT_MS = 5 * 60 * 1000;
+
+const MANUFACTURER_IDENTITY_OVERRIDES: Record<string, string[]> = {
+  'lynk-co': ['lynk-and-co'],
+};
 
 function parseCsv(text: string): string[][] {
   const rows: string[][] = [];
@@ -260,6 +288,183 @@ export function assertDataset(dataset: VehicleSeedDataset) {
   }
 }
 
+function normalizedIdentity(value: string): string {
+  return slugify(value);
+}
+
+function addIndexValue(
+  index: Map<string, ExistingManufacturer[]>,
+  key: string,
+  manufacturer: ExistingManufacturer,
+) {
+  const values = index.get(key) ?? [];
+  values.push(manufacturer);
+  index.set(key, values);
+}
+
+function buildManufacturerIndexes(manufacturers: ExistingManufacturer[]) {
+  const bySlug = new Map<string, ExistingManufacturer[]>();
+  const byName = new Map<string, ExistingManufacturer[]>();
+  for (const manufacturer of manufacturers) {
+    addIndexValue(bySlug, manufacturer.slug, manufacturer);
+    addIndexValue(byName, normalizedIdentity(manufacturer.name), manufacturer);
+  }
+  return { bySlug, byName };
+}
+
+function manufacturerCandidates(
+  seed: ManufacturerSeed,
+  indexes: ReturnType<typeof buildManufacturerIndexes>,
+) {
+  const candidates: ExistingManufacturer[] = [
+    ...(indexes.bySlug.get(seed.slug) ?? []),
+    ...(indexes.byName.get(normalizedIdentity(seed.name)) ?? []),
+  ];
+  for (const aliasSlug of MANUFACTURER_IDENTITY_OVERRIDES[seed.slug] ?? []) {
+    candidates.push(...(indexes.bySlug.get(aliasSlug) ?? []));
+  }
+  return [
+    ...new Map(candidates.map((item) => [item.id, item])).values(),
+  ];
+}
+
+function generationDatasetKey(generation: GenerationSeed) {
+  return `${generation.makeSlug}/${generation.modelSlug}/${generation.slug}`;
+}
+
+function specificationSourceKey(generation: GenerationSeed) {
+  return `epa-model-year:${generation.makeSlug}/${generation.modelSlug}:${generation.startYear}`;
+}
+
+async function buildPreflight(
+  prisma: PrismaClient,
+  dataset: VehicleSeedDataset,
+): Promise<VehicleDatabasePreflight> {
+  const existingManufacturers = await prisma.manufacturer.findMany({
+    select: { id: true, name: true, slug: true },
+  });
+  const indexes = buildManufacturerIndexes(existingManufacturers);
+  const manufacturerIdByDatasetSlug = new Map<string, string>();
+  const manufacturersToCreate: ManufacturerSeed[] = [];
+  const unresolvedConflicts: string[] = [];
+  const ambiguousConflicts: string[] = [];
+
+  for (const seed of dataset.manufacturers) {
+    const candidates = manufacturerCandidates(seed, indexes);
+    if (candidates.length > 1) {
+      ambiguousConflicts.push(
+        `${seed.name} [${seed.slug}] matched: ${candidates
+          .map((item) => `${item.name} [${item.slug}]`)
+          .join(', ')}`,
+      );
+    } else if (candidates.length === 1) {
+      manufacturerIdByDatasetSlug.set(seed.slug, candidates[0].id);
+    } else {
+      manufacturersToCreate.push(seed);
+    }
+  }
+
+  const resolvedManufacturerIds = [...manufacturerIdByDatasetSlug.values()];
+  const existingModels = resolvedManufacturerIds.length
+    ? await prisma.vehicleModel.findMany({
+        where: { manufacturerId: { in: resolvedManufacturerIds } },
+        select: { id: true, manufacturerId: true, slug: true },
+      })
+    : [];
+  const datasetSlugByManufacturerId = new Map(
+    [...manufacturerIdByDatasetSlug.entries()].map(([slug, id]) => [id, slug]),
+  );
+  const modelIdByDatasetKey = new Map<string, string>();
+  for (const model of existingModels) {
+    const makeSlug = datasetSlugByManufacturerId.get(model.manufacturerId);
+    if (makeSlug) modelIdByDatasetKey.set(`${makeSlug}/${model.slug}`, model.id);
+  }
+
+  const modelsToCreate: ModelSeed[] = [];
+  for (const model of dataset.models) {
+    const key = `${model.makeSlug}/${model.slug}`;
+    if (!manufacturerIdByDatasetSlug.has(model.makeSlug)) {
+      if (!manufacturersToCreate.some((item) => item.slug === model.makeSlug)) {
+        unresolvedConflicts.push(`Model parent unresolved: ${key}`);
+      }
+      modelsToCreate.push(model);
+    } else if (!modelIdByDatasetKey.has(key)) {
+      modelsToCreate.push(model);
+    }
+  }
+
+  const resolvedModelIds = [...modelIdByDatasetKey.values()];
+  const existingGenerations = resolvedModelIds.length
+    ? await prisma.vehicleGeneration.findMany({
+        where: {
+          vehicleModelId: { in: resolvedModelIds },
+          kind: VehicleGenerationKind.MODEL_YEAR,
+        },
+        select: { id: true, vehicleModelId: true, slug: true },
+      })
+    : [];
+  const datasetModelKeyById = new Map(
+    [...modelIdByDatasetKey.entries()].map(([key, id]) => [id, key]),
+  );
+  const existingGenerationKeys = new Set(
+    existingGenerations.flatMap((generation) => {
+      const modelKey = datasetModelKeyById.get(generation.vehicleModelId);
+      return modelKey ? [`${modelKey}/${generation.slug}`] : [];
+    }),
+  );
+  const generationsToCreate = dataset.generations.filter(
+    (generation) => !existingGenerationKeys.has(generationDatasetKey(generation)),
+  );
+
+  const sourceKeys = dataset.generations.map(specificationSourceKey);
+  const existingSpecifications = await prisma.vehicleSpecification.findMany({
+    where: { sourceKey: { in: sourceKeys } },
+    select: { sourceKey: true },
+  });
+  const existingSourceKeys = new Set(
+    existingSpecifications.map((item) => item.sourceKey),
+  );
+  const specificationSourceKeysToCreate = sourceKeys.filter(
+    (sourceKey) => !existingSourceKeys.has(sourceKey),
+  );
+
+  return {
+    manufacturerIdByDatasetSlug,
+    manufacturersToCreate,
+    manufacturersMatched:
+      dataset.manufacturers.length - manufacturersToCreate.length,
+    modelsToCreate,
+    modelsMatched: dataset.models.length - modelsToCreate.length,
+    generationsToCreate,
+    generationsMatched: dataset.generations.length - generationsToCreate.length,
+    specificationSourceKeysToCreate,
+    specificationsMatched:
+      dataset.generations.length - specificationSourceKeysToCreate.length,
+    unresolvedConflicts: [...new Set(unresolvedConflicts)],
+    ambiguousConflicts: [...new Set(ambiguousConflicts)],
+  };
+}
+
+function assertPreflightSafe(preflight: VehicleDatabasePreflight) {
+  if (
+    preflight.unresolvedConflicts.length === 0 &&
+    preflight.ambiguousConflicts.length === 0
+  ) {
+    return;
+  }
+  throw new Error(
+    JSON.stringify(
+      {
+        message: 'Vehicle database preflight failed before writes',
+        unresolvedConflicts: preflight.unresolvedConflicts,
+        ambiguousConflicts: preflight.ambiguousConflicts,
+      },
+      null,
+      2,
+    ),
+  );
+}
+
 async function batches<T>(
   items: T[],
   operation: (batch: T[]) => Promise<unknown>,
@@ -269,195 +474,211 @@ async function batches<T>(
   }
 }
 
-async function applyDataset(prisma: PrismaClient, dataset: VehicleSeedDataset) {
-  await batches(dataset.manufacturers, (batch) =>
-    prisma.manufacturer.createMany({
-      data: batch.map((item) => ({ ...item, isActive: true })),
-      skipDuplicates: true,
-    }),
-  );
+async function applyDataset(
+  prisma: PrismaClient,
+  dataset: VehicleSeedDataset,
+  preflight: VehicleDatabasePreflight,
+) {
+  assertPreflightSafe(preflight);
+  await prisma.$transaction(
+    async (tx) => {
+      await batches(preflight.manufacturersToCreate, (batch) =>
+        tx.manufacturer.createMany({
+          data: batch.map((item) => ({ ...item, isActive: true })),
+          skipDuplicates: true,
+        }),
+      );
 
-  for (const item of dataset.manufacturers.filter(
-    (manufacturer) => manufacturer.country !== null,
-  )) {
-    await prisma.manufacturer.updateMany({
-      where: { slug: item.slug },
-      data: {
-        englishName: item.englishName,
-        country: item.country,
-        foundedYear: item.foundedYear,
-        isActive: true,
-      },
-    });
-  }
+      // Existing manufacturers are deliberately read-only. This seed never changes
+      // their isActive, country, englishName, foundedYear, or any other field.
+      const manufacturers = await tx.manufacturer.findMany({
+        select: { id: true, name: true, slug: true },
+      });
+      const indexes = buildManufacturerIndexes(manufacturers);
+      const manufacturerIds = new Map<string, string>();
+      for (const seed of dataset.manufacturers) {
+        const candidates = manufacturerCandidates(seed, indexes);
+        if (candidates.length !== 1) {
+          throw new Error(
+            `Manufacturer resolution changed inside transaction: ${seed.name} [${seed.slug}]`,
+          );
+        }
+        manufacturerIds.set(seed.slug, candidates[0].id);
+      }
 
-  const manufacturers = await prisma.manufacturer.findMany({
-    select: { id: true, slug: true },
-  });
-  const manufacturerIds = new Map(
-    manufacturers.map((item) => [item.slug, item.id]),
-  );
+      await batches(dataset.models, (batch) =>
+        tx.vehicleModel.createMany({
+          data: batch.map((item) => ({
+            manufacturerId: manufacturerIds.get(item.makeSlug)!,
+            name: item.name,
+            slug: item.slug,
+            startYear: item.startYear,
+            endYear: item.endYear,
+            vehicleType: item.vehicleType,
+            isActive: true,
+          })),
+          skipDuplicates: true,
+        }),
+      );
 
-  const missingMakes = dataset.manufacturers
-    .map((item) => item.slug)
-    .filter((slug) => !manufacturerIds.has(slug));
-  if (missingMakes.length > 0) {
-    throw new Error(
-      `Manufacturers could not be resolved: ${missingMakes.slice(0, 10).join(', ')}`,
-    );
-  }
+      const databaseModels = await tx.vehicleModel.findMany({
+        where: { manufacturerId: { in: [...manufacturerIds.values()] } },
+        select: { id: true, manufacturerId: true, slug: true },
+      });
+      const datasetSlugByManufacturerId = new Map(
+        [...manufacturerIds.entries()].map(([slug, id]) => [id, slug]),
+      );
+      const modelIds = new Map<string, string>();
+      for (const model of databaseModels) {
+        const makeSlug = datasetSlugByManufacturerId.get(model.manufacturerId);
+        if (makeSlug) modelIds.set(`${makeSlug}/${model.slug}`, model.id);
+      }
+      const unresolvedModels = dataset.models.filter(
+        (item) => !modelIds.has(`${item.makeSlug}/${item.slug}`),
+      );
+      if (unresolvedModels.length) {
+        throw new Error(
+          `Models could not be resolved: ${unresolvedModels
+            .slice(0, 20)
+            .map((item) => `${item.makeSlug}/${item.slug}`)
+            .join(', ')}`,
+        );
+      }
 
-  await batches(dataset.models, (batch) =>
-    prisma.vehicleModel.createMany({
-      data: batch.map((item) => ({
-        manufacturerId: manufacturerIds.get(item.makeSlug)!,
-        name: item.name,
-        slug: item.slug,
-        startYear: item.startYear,
-        endYear: item.endYear,
-        vehicleType: item.vehicleType,
-        isActive: true,
-      })),
-      skipDuplicates: true,
-    }),
-  );
+      await batches(dataset.generations, (batch) =>
+        tx.vehicleGeneration.createMany({
+          data: batch.map((item) => ({
+            vehicleModelId: modelIds.get(`${item.makeSlug}/${item.modelSlug}`)!,
+            name: item.name,
+            displayName: item.name,
+            slug: item.slug,
+            code: item.code,
+            startYear: item.startYear,
+            endYear: item.endYear,
+            isFacelift: false,
+            kind: VehicleGenerationKind.MODEL_YEAR,
+            notes: EPA_NOTES,
+            isActive: true,
+          })),
+          skipDuplicates: true,
+        }),
+      );
 
-  const databaseModels = await prisma.vehicleModel.findMany({
-    select: { id: true, manufacturerId: true, slug: true },
-  });
-  const manufacturerSlugs = new Map(
-    manufacturers.map((item) => [item.id, item.slug]),
-  );
-  const modelIds = new Map(
-    databaseModels.map((item) => [
-      `${manufacturerSlugs.get(item.manufacturerId)}/${item.slug}`,
-      item.id,
-    ]),
-  );
+      const databaseGenerations = await tx.vehicleGeneration.findMany({
+        where: {
+          vehicleModelId: { in: [...modelIds.values()] },
+          kind: VehicleGenerationKind.MODEL_YEAR,
+        },
+        select: { id: true, slug: true, vehicleModelId: true, startYear: true },
+      });
+      const modelKeysById = new Map(
+        [...modelIds.entries()].map(([key, id]) => [id, key]),
+      );
+      const epaGenerationKeys = new Set(
+        dataset.generations.map(generationDatasetKey),
+      );
+      const epaGenerations = databaseGenerations.filter((generation) => {
+        const modelKey = modelKeysById.get(generation.vehicleModelId);
+        return (
+          modelKey !== undefined &&
+          epaGenerationKeys.has(`${modelKey}/${generation.slug}`)
+        );
+      });
+      if (epaGenerations.length !== dataset.generations.length) {
+        throw new Error(
+          `Generation resolution failed: expected ${dataset.generations.length}, resolved ${epaGenerations.length}`,
+        );
+      }
 
-  const unresolvedModels = dataset.models.filter(
-    (item) => !modelIds.has(`${item.makeSlug}/${item.slug}`),
-  );
-  if (unresolvedModels.length > 0) {
-    throw new Error(
-      `Models could not be resolved: ${unresolvedModels
-        .slice(0, 10)
-        .map((item) => `${item.makeSlug}/${item.slug}`)
-        .join(', ')}`,
-    );
-  }
-
-  await batches(dataset.generations, (batch) =>
-    prisma.vehicleGeneration.createMany({
-      data: batch.map((item) => ({
-        vehicleModelId: modelIds.get(`${item.makeSlug}/${item.modelSlug}`)!,
-        name: item.name,
-        displayName: item.name,
-        slug: item.slug,
-        code: item.code,
-        startYear: item.startYear,
-        endYear: item.endYear,
-        isFacelift: false,
-        kind: VehicleGenerationKind.MODEL_YEAR,
-        notes: 'US EPA/DOE FuelEconomy.gov model-year record',
-        isActive: true,
-      })),
-      skipDuplicates: true,
-    }),
-  );
-
-  const databaseGenerations = await prisma.vehicleGeneration.findMany({
-    where: {
-      vehicleModelId: { in: [...modelIds.values()] },
-      kind: VehicleGenerationKind.MODEL_YEAR,
+      await batches(epaGenerations, (batch) =>
+        tx.vehicleSpecification.createMany({
+          data: batch.map((generation) => {
+            const modelKey = modelKeysById.get(generation.vehicleModelId)!;
+            const sourceKey = `epa-model-year:${modelKey}:${generation.startYear}`;
+            return {
+              vehicleModelId: generation.vehicleModelId,
+              generationId: generation.id,
+              sourceKey,
+              specHash: createHash('sha256').update(sourceKey).digest('hex'),
+              year: generation.startYear!,
+              powertrainType: VehiclePowertrainType.UNKNOWN,
+              rangeData: {},
+              sourceTitle: EPA_NOTES,
+              sourceUrl: EPA_SOURCE_URL,
+              sourceRetrievedAt: new Date('2026-07-29T00:00:00.000Z'),
+              sourceLicense: EPA_SOURCE_LICENSE,
+              sources: [
+                {
+                  title: 'US EPA/DOE FuelEconomy.gov',
+                  url: EPA_SOURCE_URL,
+                  license: EPA_SOURCE_LICENSE,
+                },
+              ],
+              isActive: true,
+            };
+          }),
+          skipDuplicates: true,
+        }),
+      );
     },
-    select: { id: true, slug: true, vehicleModelId: true, startYear: true },
-  });
-  const modelKeysById = new Map(
-    [...modelIds.entries()].map(([key, id]) => [id, key]),
-  );
-  const epaGenerationKeys = new Set(
-    dataset.generations.map(
-      (item) => `${item.makeSlug}/${item.modelSlug}/${item.slug}`,
-    ),
-  );
-  const epaGenerations = databaseGenerations.filter((generation) =>
-    epaGenerationKeys.has(
-      `${modelKeysById.get(generation.vehicleModelId)}/${generation.slug}`,
-    ),
-  );
-  await batches(epaGenerations, (batch) =>
-    prisma.vehicleSpecification.createMany({
-      data: batch.map((generation) => {
-        const modelKey = modelKeysById.get(generation.vehicleModelId)!;
-        const sourceKey = `epa-model-year:${modelKey}:${generation.startYear}`;
-        const specHash = createHash('sha256').update(sourceKey).digest('hex');
-        return {
-          vehicleModelId: generation.vehicleModelId,
-          generationId: generation.id,
-          sourceKey,
-          specHash,
-          year: generation.startYear!,
-          powertrainType: VehiclePowertrainType.UNKNOWN,
-          rangeData: {},
-          sourceTitle: 'US EPA/DOE FuelEconomy.gov model-year record',
-          sourceUrl: EPA_SOURCE_URL,
-          sourceRetrievedAt: new Date('2026-07-29T00:00:00.000Z'),
-          sourceLicense: EPA_SOURCE_LICENSE,
-          sources: [
-            {
-              title: 'US EPA/DOE FuelEconomy.gov',
-              url: EPA_SOURCE_URL,
-              license: EPA_SOURCE_LICENSE,
-            },
-          ],
-          isActive: true,
-        };
-      }),
-      skipDuplicates: true,
-    }),
+    {
+      isolationLevel: Prisma.TransactionIsolationLevel.Serializable,
+      maxWait: 30_000,
+      timeout: TRANSACTION_TIMEOUT_MS,
+    },
   );
 }
 
-function printPlan(dataset: VehicleSeedDataset) {
-  const countries = new Map<string, number>();
-  for (const item of dataset.manufacturers) {
-    if (item.country) {
-      countries.set(item.country, (countries.get(item.country) ?? 0) + 1);
-    }
-  }
-  const modelsByMake = new Map<string, number>();
-  for (const item of dataset.models) {
-    modelsByMake.set(
-      item.makeSlug,
-      (modelsByMake.get(item.makeSlug) ?? 0) + 1,
-    );
-  }
-  const largest = [...modelsByMake.entries()]
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, 15);
-  const requestedExamples = ['toyota', 'bmw', 'byd'];
-
+function printPlan(
+  dataset: VehicleSeedDataset,
+  preflight: VehicleDatabasePreflight,
+) {
   console.log(
     JSON.stringify(
       {
         mode: process.argv.includes('--apply') ? 'apply' : 'plan',
-        manufacturers: dataset.manufacturers.length,
-        models: dataset.models.length,
-        modelYearRecords: dataset.generations.length,
-        vehicleSpecifications: dataset.generations.length,
-        knownOriginCountries: countries.size,
-        manufacturersWithKnownOrigin: [...countries.values()].reduce(
-          (sum, count) => sum + count,
-          0,
-        ),
-        manufacturersByCountry: Object.fromEntries(
-          [...countries.entries()].sort((a, b) => b[1] - a[1]),
-        ),
-        largestManufacturers: Object.fromEntries(largest),
-        requestedManufacturerExamples: Object.fromEntries(
-          requestedExamples.map((slug) => [slug, modelsByMake.get(slug) ?? 0]),
-        ),
+        safety: {
+          productionWriteGuard: `${PRODUCTION_WRITE_ENV}=true`,
+          existingManufacturersUpdated: 0,
+          existingManufacturersReactivated: 0,
+          transactionIsolation: 'Serializable',
+          transactionMaxWaitMs: 30_000,
+          transactionTimeoutMs: TRANSACTION_TIMEOUT_MS,
+        },
+        dataset: {
+          manufacturers: dataset.manufacturers.length,
+          models: dataset.models.length,
+          generations: dataset.generations.length,
+          specifications: dataset.generations.length,
+        },
+        databaseDiff: {
+          manufacturersToCreate: preflight.manufacturersToCreate.length,
+          manufacturersMatched: preflight.manufacturersMatched,
+          modelsToCreate: preflight.modelsToCreate.length,
+          modelsMatched: preflight.modelsMatched,
+          generationsToCreate: preflight.generationsToCreate.length,
+          generationsMatched: preflight.generationsMatched,
+          specificationsToCreate:
+            preflight.specificationSourceKeysToCreate.length,
+          specificationsMatched: preflight.specificationsMatched,
+          unresolvedConflicts: preflight.unresolvedConflicts,
+          ambiguousConflicts: preflight.ambiguousConflicts,
+        },
+        samples: {
+          manufacturersToCreate: preflight.manufacturersToCreate
+            .slice(0, 20)
+            .map((item) => `${item.name} [${item.slug}]`),
+          modelsToCreate: preflight.modelsToCreate
+            .slice(0, 20)
+            .map((item) => `${item.makeSlug}/${item.slug}`),
+          generationsToCreate: preflight.generationsToCreate
+            .slice(0, 20)
+            .map(generationDatasetKey),
+          specificationsToCreate: preflight.specificationSourceKeysToCreate.slice(
+            0,
+            20,
+          ),
+        },
       },
       null,
       2,
@@ -465,18 +686,50 @@ function printPlan(dataset: VehicleSeedDataset) {
   );
 }
 
+function assertIdempotent(preflight: VehicleDatabasePreflight) {
+  const pending = {
+    manufacturers: preflight.manufacturersToCreate.length,
+    models: preflight.modelsToCreate.length,
+    generations: preflight.generationsToCreate.length,
+    specifications: preflight.specificationSourceKeysToCreate.length,
+    unresolvedConflicts: preflight.unresolvedConflicts.length,
+    ambiguousConflicts: preflight.ambiguousConflicts.length,
+  };
+  if (Object.values(pending).some((count) => count !== 0)) {
+    throw new Error(
+      `Post-apply idempotency verification failed: ${JSON.stringify(pending)}`,
+    );
+  }
+}
+
 async function main() {
   const dataset = buildVehicleSeedDataset();
-  printPlan(dataset);
-  if (!process.argv.includes('--apply')) {
-    console.log('Dry run complete. Use --apply to write to the database.');
-    return;
-  }
-
   const prisma = new PrismaClient();
   try {
-    await applyDataset(prisma, dataset);
-    console.log('World vehicle database seed applied successfully.');
+    const preflight = await buildPreflight(prisma, dataset);
+    printPlan(dataset, preflight);
+    assertPreflightSafe(preflight);
+
+    if (!process.argv.includes('--apply')) {
+      console.log('Dry run complete. No database records were changed.');
+      return;
+    }
+
+    if (
+      process.env.NODE_ENV === 'production' &&
+      process.env[PRODUCTION_WRITE_ENV] !== 'true'
+    ) {
+      throw new Error(
+        `Production write blocked. Set ${PRODUCTION_WRITE_ENV}=true explicitly.`,
+      );
+    }
+
+    await applyDataset(prisma, dataset, preflight);
+    const postApply = await buildPreflight(prisma, dataset);
+    printPlan(dataset, postApply);
+    assertPreflightSafe(postApply);
+    assertIdempotent(postApply);
+    console.log('World vehicle database seed applied successfully and verified.');
   } finally {
     await prisma.$disconnect();
   }

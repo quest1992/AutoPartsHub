@@ -247,7 +247,6 @@ export class VehicleCatalogService {
         }),
       ]);
 
-    console.log({ manufacturers, models, specifications });
     return { manufacturers, models, specifications };
   }
   async models(manufacturerId: string, query: VehicleCatalogQueryDto) {
