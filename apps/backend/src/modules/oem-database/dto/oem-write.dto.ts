@@ -25,7 +25,7 @@ export class CreateOemPartDto {
   @IsOptional() @IsString() description?: string;
   @IsOptional() @IsEnum(OemPartStatus) status?: OemPartStatus;
   @IsUUID() manufacturerId!: string;
-  @IsUUID() sourceId!: string;
+  @IsString() sourceId!: string;
   @IsString() sourceKey!: string;
   @IsOptional() @IsObject() metadata?: Record<string, unknown>;
 }
@@ -34,14 +34,14 @@ export class UpdateOemPartDto extends PartialType(CreateOemPartDto) {}
 export class AddOemAliasDto {
   @IsString() alias!: string;
   @IsEnum(OemPartAliasType) aliasType!: OemPartAliasType;
-  @IsUUID() sourceId!: string;
+  @IsString() sourceId!: string;
 }
 
 export class AddOemCategoryDto {
   @IsUUID() catalogItemId!: string;
   @IsOptional() @IsBoolean() isPrimary?: boolean;
   @IsInt() @Min(0) @Max(100) confidence!: number;
-  @IsUUID() sourceId!: string;
+  @IsString() sourceId!: string;
 }
 
 export class AddOemFitmentDto {
@@ -59,7 +59,7 @@ export class AddOemFitmentDto {
   @IsOptional() @IsString() driveType?: string;
   @IsOptional() @IsString() notes?: string;
   @IsInt() @Min(0) @Max(100) confidence!: number;
-  @IsUUID() sourceId!: string;
+  @IsString() sourceId!: string;
 }
 
 export class UpdateOemFitmentDto extends PartialType(AddOemFitmentDto) {}
@@ -71,7 +71,7 @@ export class AddOemCrossReferenceDto {
   @IsEnum(OemCrossReferenceType)
   relationType!: OemCrossReferenceType;
   @IsInt() @Min(0) @Max(100) confidence!: number;
-  @IsUUID() sourceId!: string;
+  @IsString() sourceId!: string;
   @IsOptional() @IsString() notes?: string;
 }
 

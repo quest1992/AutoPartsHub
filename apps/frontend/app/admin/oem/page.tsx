@@ -38,6 +38,14 @@ const statusLabels: Record<string, string> = {
   SUPERSEDED: "Заменён новым номером",
   UNKNOWN: "Не проверен",
 };
+function sourceLabel(name: string, license?: string) {
+  const translated: Record<string, string> = {
+    "Manual entry by platform operator": "Внесено администратором вручную",
+    "Shop-provided inventory data": "Данные, предоставленные магазином",
+  };
+  return translated[name] ?? [name, license].filter(Boolean).join(" · ");
+}
+
 const relationLabels: Record<string, string> = {
   AFTERMARKET_ANALOG: "Аналог другого производителя",
   INTERCHANGE: "Взаимозаменяемая деталь",
@@ -174,19 +182,17 @@ export default function OemAdminPage() {
     }
   }
   async function saveMain() {
-    if (
-      !main.manufacturerId ||
-      !main.number.trim() ||
-      !main.sourceId ||
-      !main.sourceKey.trim()
-    ) {
+    if (!main.manufacturerId || !main.number.trim() || !main.sourceId) {
       setError(
-        "Заполните производителя, OEM-номер, источник и ключ источника.",
+        "Заполните производителя, OEM-номер и источник.",
       );
       return;
     }
     const payload = {
       ...main,
+      sourceKey:
+        main.sourceKey.trim() ||
+        `manual:${main.manufacturerId}:${main.number.replace(/[^a-zA-Z0-9]/g, "").toUpperCase()}`,
       displayNumber: main.number.trim(),
       description: main.description.trim() || undefined,
     };
@@ -538,11 +544,11 @@ export default function OemAdminPage() {
                     onChange={(value) => setMain({ ...main, sourceId: value })}
                     options={options.sources.map((item) => [
                       item.id,
-                      `${item.name} · ${item.license ?? ""}`,
+                      sourceLabel(item.name, item.license),
                     ])}
                   />
                   <Input
-                    label="Номер страницы или записи в источнике"
+                    label="Ссылка или номер записи источника (необязательно)"
                     value={main.sourceKey}
                     onChange={(value) => setMain({ ...main, sourceKey: value })}
                   />
