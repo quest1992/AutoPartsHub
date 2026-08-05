@@ -41,7 +41,7 @@ export class CreateShopInventoryItemDto {
   @ApiPropertyOptional({ format: 'uuid' })
   @IsOptional()
   @IsUUID()
-  oemPartId?: string;
+  oemPartId?: string | null;
   @ApiPropertyOptional({ format: 'uuid' })
   @IsOptional()
   @IsUUID()

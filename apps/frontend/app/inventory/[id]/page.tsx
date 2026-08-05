@@ -52,6 +52,7 @@ export default function Detail() {
       brand: v.brand || undefined,
       sku: v.sku || undefined,
       oemNumber: v.oemNumber || undefined,
+      oemPartId: v.oemPartId || null,
       compatibility: v.compatibility.trim() || null,
       price: Number(v.price),
       currency: v.currency,
@@ -161,6 +162,7 @@ export default function Detail() {
       <div className="mt-3">
         <InventoryForm
           initial={valuesFrom(item)}
+          initialOem={item.oemPart}
           initialImageUrl={item.imageUrl}
           editing
           onSave={save}

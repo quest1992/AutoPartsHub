@@ -17,6 +17,7 @@ import {
   CreateOemContributionDto,
   CreateOemPartDto,
   UpdateOemPartDto,
+  UpdateOemFitmentDto,
 } from './dto/oem-write.dto';
 
 export type OemActor = {
@@ -37,6 +38,7 @@ const include = {
   },
   brands: { include: { partBrand: true, source: true } },
   fitments: {
+    where: { isActive: true },
     include: {
       manufacturer: true,
       vehicleModel: true,
@@ -46,6 +48,7 @@ const include = {
     },
   },
   outgoingCrossReferences: {
+    where: { isActive: true },
     include: { toOemPart: true, partBrand: true, source: true },
   },
 } satisfies Prisma.OemPartInclude;
@@ -73,6 +76,33 @@ export class OemDatabaseService {
     });
     if (!item) throw new NotFoundException('OEM part not found');
     return item;
+  }
+
+  async options() {
+    const [manufacturers, sources, partBrands] = await Promise.all([
+      this.prisma.manufacturer.findMany({
+        where: { isActive: true },
+        select: { id: true, name: true, slug: true },
+        orderBy: { name: 'asc' },
+      }),
+      this.prisma.oemSource.findMany({
+        where: { isActive: true },
+        select: {
+          id: true,
+          name: true,
+          url: true,
+          license: true,
+          sourceType: true,
+        },
+        orderBy: { name: 'asc' },
+      }),
+      this.prisma.partBrand.findMany({
+        where: { isActive: true },
+        select: { id: true, officialName: true },
+        orderBy: { officialName: 'asc' },
+      }),
+    ]);
+    return { manufacturers, sources, partBrands };
   }
 
   async create(dto: CreateOemPartDto, actor: OemActor) {
@@ -222,6 +252,7 @@ export class OemDatabaseService {
       throw new BadRequestException('yearFrom cannot exceed yearTo');
     }
     await this.assertFitment(dto);
+    await this.assertFitmentUnique(id, dto);
     return this.prisma.$transaction(async (tx) => {
       const item = await tx.oemPartFitment.create({
         data: { oemPartId: id, ...dto },
@@ -239,6 +270,86 @@ export class OemDatabaseService {
     });
   }
 
+  async updateFitment(
+    id: string,
+    fitmentId: string,
+    dto: UpdateOemFitmentDto,
+    actor: OemActor,
+  ) {
+    await this.get(id);
+    const before = await this.prisma.oemPartFitment.findFirst({
+      where: { id: fitmentId, oemPartId: id, isActive: true },
+    });
+    if (!before) throw new NotFoundException('Active OEM fitment not found');
+    const merged = { ...before, ...dto } as AddOemFitmentDto;
+    if (merged.yearFrom && merged.yearTo && merged.yearFrom > merged.yearTo)
+      throw new BadRequestException('yearFrom cannot exceed yearTo');
+    await this.assertSource(merged.sourceId);
+    await this.assertFitment(merged);
+    await this.assertFitmentUnique(id, merged, fitmentId);
+    return this.prisma.$transaction(async (tx) => {
+      const item = await tx.oemPartFitment.update({
+        where: { id: fitmentId },
+        data: dto,
+      });
+      await this.audit(
+        tx,
+        'OemPartFitment',
+        item.id,
+        'UPDATE',
+        before,
+        item,
+        actor,
+      );
+      return item;
+    });
+  }
+
+  async deactivate(id: string, actor: OemActor) {
+    const before = await this.get(id);
+    if (!before.isActive) return before;
+    return this.prisma.$transaction(async (tx) => {
+      const item = await tx.oemPart.update({
+        where: { id },
+        data: { isActive: false },
+        include,
+      });
+      await tx.oemPartFitment.updateMany({
+        where: { oemPartId: id },
+        data: { isActive: false },
+      });
+      await tx.oemCrossReference.updateMany({
+        where: { OR: [{ fromOemPartId: id }, { toOemPartId: id }] },
+        data: { isActive: false },
+      });
+      await this.audit(tx, 'OemPart', id, 'DEACTIVATE', before, item, actor);
+      return item;
+    });
+  }
+
+  async deactivateFitment(id: string, fitmentId: string, actor: OemActor) {
+    await this.get(id);
+    const before = await this.prisma.oemPartFitment.findFirst({
+      where: { id: fitmentId, oemPartId: id, isActive: true },
+    });
+    if (!before) throw new NotFoundException('Active OEM fitment not found');
+    return this.prisma.$transaction(async (tx) => {
+      const item = await tx.oemPartFitment.update({
+        where: { id: fitmentId },
+        data: { isActive: false },
+      });
+      await this.audit(
+        tx,
+        'OemPartFitment',
+        item.id,
+        'DEACTIVATE',
+        before,
+        item,
+        actor,
+      );
+      return item;
+    });
+  }
   async addCrossReference(
     id: string,
     dto: AddOemCrossReferenceDto,
@@ -298,6 +409,38 @@ export class OemDatabaseService {
     });
   }
 
+  async deactivateCrossReference(
+    id: string,
+    crossReferenceId: string,
+    actor: OemActor,
+  ) {
+    await this.get(id);
+    const before = await this.prisma.oemCrossReference.findFirst({
+      where: {
+        id: crossReferenceId,
+        fromOemPartId: id,
+        isActive: true,
+      },
+    });
+    if (!before)
+      throw new NotFoundException('Active OEM cross-reference not found');
+    return this.prisma.$transaction(async (tx) => {
+      const item = await tx.oemCrossReference.update({
+        where: { id: crossReferenceId },
+        data: { isActive: false },
+      });
+      await this.audit(
+        tx,
+        'OemCrossReference',
+        item.id,
+        'DEACTIVATE',
+        before,
+        item,
+        actor,
+      );
+      return item;
+    });
+  }
   async contribute(dto: CreateOemContributionDto, actor: OemActor) {
     if (!actor.shopId) throw new BadRequestException('Shop user is required');
     return this.prisma.oemContribution.create({
@@ -329,6 +472,7 @@ export class OemDatabaseService {
           outgoingCrossReferences: {
             some: {
               normalizedExternalPartNumber: { startsWith: normalized },
+              isActive: true,
             },
           },
         },
@@ -349,6 +493,7 @@ export class OemDatabaseService {
         {
           fitments: {
             some: {
+              isActive: true,
               vehicleModel: { name: { contains: raw, mode: 'insensitive' } },
             },
           },
@@ -356,16 +501,27 @@ export class OemDatabaseService {
       );
     }
     const where: Prisma.OemPartWhereInput = {
+      isActive: true,
       manufacturerId: query.manufacturerId,
       ...(query.vehicleModelId && {
-        fitments: { some: { vehicleModelId: query.vehicleModelId } },
+        fitments: {
+          some: { vehicleModelId: query.vehicleModelId, isActive: true },
+        },
       }),
       ...(query.vehicleGenerationId && {
-        fitments: { some: { vehicleGenerationId: query.vehicleGenerationId } },
+        fitments: {
+          some: {
+            vehicleGenerationId: query.vehicleGenerationId,
+            isActive: true,
+          },
+        },
       }),
       ...(query.vehicleSpecificationId && {
         fitments: {
-          some: { vehicleSpecificationId: query.vehicleSpecificationId },
+          some: {
+            vehicleSpecificationId: query.vehicleSpecificationId,
+            isActive: true,
+          },
         },
       }),
       ...(query.partBrandId && {
@@ -469,7 +625,10 @@ export class OemDatabaseService {
         where: {
           id: dto.vehicleGenerationId,
           isActive: true,
-          ...(dto.vehicleModelId && { vehicleModelId: dto.vehicleModelId }),
+          vehicleModel: {
+            manufacturerId: dto.manufacturerId,
+            ...(dto.vehicleModelId && { id: dto.vehicleModelId }),
+          },
         },
       });
       if (!generation)
@@ -480,7 +639,10 @@ export class OemDatabaseService {
         where: {
           id: dto.vehicleSpecificationId,
           isActive: true,
-          ...(dto.vehicleModelId && { vehicleModelId: dto.vehicleModelId }),
+          vehicleModel: {
+            manufacturerId: dto.manufacturerId,
+            ...(dto.vehicleModelId && { id: dto.vehicleModelId }),
+          },
           ...(dto.vehicleGenerationId && {
             generationId: dto.vehicleGenerationId,
           }),
@@ -489,6 +651,30 @@ export class OemDatabaseService {
       if (!specification)
         throw new BadRequestException('Specification is incompatible');
     }
+  }
+
+  private async assertFitmentUnique(
+    oemPartId: string,
+    dto: AddOemFitmentDto,
+    exceptId?: string,
+  ) {
+    const duplicate = await this.prisma.oemPartFitment.findFirst({
+      where: {
+        oemPartId,
+        isActive: true,
+        id: exceptId ? { not: exceptId } : undefined,
+        manufacturerId: dto.manufacturerId,
+        vehicleModelId: dto.vehicleModelId ?? null,
+        vehicleGenerationId: dto.vehicleGenerationId ?? null,
+        vehicleSpecificationId: dto.vehicleSpecificationId ?? null,
+        yearFrom: dto.yearFrom ?? null,
+        yearTo: dto.yearTo ?? null,
+        position: dto.position ?? 'UNKNOWN',
+        side: dto.side ?? 'NONE',
+      },
+      select: { id: true },
+    });
+    if (duplicate) throw new ConflictException('Duplicate OEM fitment');
   }
 
   private async reaches(start: string, target: string) {
@@ -500,7 +686,11 @@ export class OemDatabaseService {
       if (visited.has(current)) continue;
       visited.add(current);
       const edges = await this.prisma.oemCrossReference.findMany({
-        where: { fromOemPartId: current, toOemPartId: { not: null } },
+        where: {
+          fromOemPartId: current,
+          toOemPartId: { not: null },
+          isActive: true,
+        },
         select: { toOemPartId: true },
       });
       queue.push(...edges.map((edge) => edge.toOemPartId!).filter(Boolean));

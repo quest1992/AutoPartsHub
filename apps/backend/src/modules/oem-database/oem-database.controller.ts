@@ -27,6 +27,7 @@ import {
   CreateOemContributionDto,
   CreateOemPartDto,
   UpdateOemPartDto,
+  UpdateOemFitmentDto,
 } from './dto/oem-write.dto';
 import { OemActor, OemDatabaseService } from './oem-database.service';
 
@@ -43,7 +44,7 @@ type RequestWithUser = { user: OemActor };
   UserRole.VIEWER,
 )
 @RequirePermissions(Permission.CATALOG_VIEW)
-@Controller('oem')
+@Controller(['oem', 'admin/oem'])
 export class OemDatabaseController {
   constructor(private readonly service: OemDatabaseService) {}
 
@@ -55,6 +56,11 @@ export class OemDatabaseController {
   @Get()
   list(@Query() query: OemSearchQueryDto) {
     return this.service.list(query);
+  }
+
+  @Get('options')
+  options() {
+    return this.service.options();
   }
 
   @Get(':id')
@@ -113,6 +119,28 @@ export class OemDatabaseController {
     return this.service.addFitment(id, dto, req.user);
   }
 
+  @Patch(':id/fitments/:fitmentId')
+  @Roles(UserRole.SUPER_ADMIN)
+  @RequirePermissions(Permission.CATALOG_MANAGE)
+  updateFitment(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Param('fitmentId', ParseUUIDPipe) fitmentId: string,
+    @Body() dto: UpdateOemFitmentDto,
+    @Req() req: RequestWithUser,
+  ) {
+    return this.service.updateFitment(id, fitmentId, dto, req.user);
+  }
+
+  @Post(':id/fitments/:fitmentId/deactivate')
+  @Roles(UserRole.SUPER_ADMIN)
+  @RequirePermissions(Permission.CATALOG_MANAGE)
+  deactivateFitment(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Param('fitmentId', ParseUUIDPipe) fitmentId: string,
+    @Req() req: RequestWithUser,
+  ) {
+    return this.service.deactivateFitment(id, fitmentId, req.user);
+  }
   @Post(':id/cross-references')
   @Roles(UserRole.SUPER_ADMIN)
   @RequirePermissions(Permission.CATALOG_MANAGE)
@@ -122,6 +150,30 @@ export class OemDatabaseController {
     @Req() req: RequestWithUser,
   ) {
     return this.service.addCrossReference(id, dto, req.user);
+  }
+
+  @Post(':id/cross-references/:crossReferenceId/deactivate')
+  @Roles(UserRole.SUPER_ADMIN)
+  @RequirePermissions(Permission.CATALOG_MANAGE)
+  deactivateCrossReference(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Param('crossReferenceId', ParseUUIDPipe) crossReferenceId: string,
+    @Req() req: RequestWithUser,
+  ) {
+    return this.service.deactivateCrossReference(
+      id,
+      crossReferenceId,
+      req.user,
+    );
+  }
+  @Post(':id/deactivate')
+  @Roles(UserRole.SUPER_ADMIN)
+  @RequirePermissions(Permission.CATALOG_MANAGE)
+  deactivate(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Req() req: RequestWithUser,
+  ) {
+    return this.service.deactivate(id, req.user);
   }
 
   @Post('contributions')

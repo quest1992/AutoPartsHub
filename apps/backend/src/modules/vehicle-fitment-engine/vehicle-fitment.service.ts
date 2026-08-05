@@ -39,7 +39,11 @@ export class VehicleFitmentService {
     return this.cached(`specification:${id}`, async () => {
       const vehicle = await this.vehicle(id);
       const fitments = await this.prisma.oemPartFitment.findMany({
-        where: this.fitmentWhere(vehicle),
+        where: {
+          ...this.fitmentWhere(vehicle),
+          isActive: true,
+          oemPart: { isActive: true },
+        },
         select: {
           oemPartId: true,
           oemPart: {
@@ -119,8 +123,11 @@ export class VehicleFitmentService {
 
     const oemParts = await this.prisma.oemPart.findMany({
       where: {
+        isActive: true,
         manufacturerId: query.manufacturerId,
-        fitments: { some: this.fitmentWhere(vehicle) },
+        fitments: {
+          some: { ...this.fitmentWhere(vehicle), isActive: true },
+        },
         categories: {
           some: {
             catalogItem: {
@@ -160,7 +167,7 @@ export class VehicleFitmentService {
   async part(oemId: string, query: VehicleFitmentQueryDto) {
     this.validateFilters(query);
     const oem = await this.prisma.oemPart.findUnique({
-      where: { id: oemId },
+      where: { id: oemId, isActive: true },
       select: this.oemSelect(),
     });
     if (!oem) throw new NotFoundException('OEM part not found');
@@ -227,6 +234,7 @@ export class VehicleFitmentService {
         },
       },
       outgoingCrossReferences: {
+        where: { isActive: true },
         select: {
           id: true,
           relationType: true,

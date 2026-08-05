@@ -71,7 +71,11 @@ export class InventoryItemsService {
     const data = this.normalize(dto);
     await this.ensureActiveShop(shopId);
     await this.ensureActivePart(data.partCatalogItemId);
-    await this.ensureOemLinks(data.oemPartId, data.partBrandId);
+    await this.ensureOemLinks(
+      data.oemPartId,
+      data.partBrandId,
+      data.partCatalogItemId,
+    );
     return this.prisma.$transaction(async (tx) => {
       const warehouse = await this.warehouses.resolve(
         tx,
@@ -334,7 +338,11 @@ export class InventoryItemsService {
   ) {
     const existing = await this.scopedItem(id, actor);
     const data = this.normalize(dto);
-    await this.ensureOemLinks(data.oemPartId, data.partBrandId);
+    await this.ensureOemLinks(
+      data.oemPartId,
+      data.partBrandId,
+      existing.partCatalogItemId,
+    );
     const brand = data.brand ?? existing.brand,
       sku = data.sku ?? existing.sku,
       condition = data.condition ?? existing.condition;
@@ -592,11 +600,21 @@ export class InventoryItemsService {
         'Нельзя добавить позицию в неактивный магазин',
       );
   }
-  private async ensureOemLinks(oemPartId?: string, partBrandId?: string) {
+  private async ensureOemLinks(
+    oemPartId?: string | null,
+    partBrandId?: string | null,
+    catalogItemId?: string,
+  ) {
     const [oemPart, partBrand] = await Promise.all([
       oemPartId
-        ? this.prisma.oemPart.findUnique({
-            where: { id: oemPartId },
+        ? this.prisma.oemPart.findFirst({
+            where: {
+              id: oemPartId,
+              isActive: true,
+              ...(catalogItemId && {
+                categories: { some: { catalogItemId } },
+              }),
+            },
             select: { id: true },
           })
         : null,
@@ -608,7 +626,9 @@ export class InventoryItemsService {
         : null,
     ]);
     if (oemPartId && !oemPart)
-      throw new NotFoundException('OEM part not found');
+      throw new NotFoundException(
+        'Active OEM part linked to this catalog item not found',
+      );
     if (partBrandId && !partBrand)
       throw new NotFoundException('Active PartBrand not found');
   }

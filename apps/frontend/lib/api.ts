@@ -111,6 +111,12 @@ export type InventoryItem = {
   brand: string | null;
   sku: string | null;
   oemNumber: string | null;
+  oemPartId: string | null;
+  oemPart: {
+    id: string;
+    displayNumber: string;
+    manufacturer: { id: string; name: string };
+  } | null;
   compatibility: string | null;
   condition: string;
   price: string;
@@ -158,6 +164,7 @@ export type InventoryPayload = {
   brand?: string;
   sku?: string;
   oemNumber?: string;
+  oemPartId?: string | null;
   compatibility?: string | null;
   condition?: string;
   price?: number;
@@ -960,10 +967,7 @@ export async function confirmInventoryImport(
   const body = await response.json().catch(() => null);
   if (!response.ok) {
     if (response.status === 401) clearSession();
-    throw new ApiError(
-      response.status,
-      body?.message ?? "Ошибка импорта",
-    );
+    throw new ApiError(response.status, body?.message ?? "Ошибка импорта");
   }
   return body as InventoryImportConfirmResponse;
 }
@@ -1090,10 +1094,7 @@ export async function downloadInventoryImportTemplate() {
     headers: token ? { Authorization: `Bearer ${token}` } : {},
   });
   if (!response.ok)
-    throw new ApiError(
-      response.status,
-      "Не удалось скачать шаблон",
-    );
+    throw new ApiError(response.status, "Не удалось скачать шаблон");
   const blob = await response.blob();
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");

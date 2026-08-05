@@ -15,6 +15,7 @@ export default function NewInventoryPage() {
       brand: v.brand || undefined,
       sku: v.sku || undefined,
       oemNumber: v.oemNumber || undefined,
+      oemPartId: v.oemPartId || undefined,
       compatibility: v.compatibility.trim() || null,
       condition: v.condition,
       price: Number(v.price),

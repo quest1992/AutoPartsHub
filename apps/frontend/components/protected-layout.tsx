@@ -98,6 +98,7 @@ const navigationItems: NavigationItem[] = [
   { href: '/admin/taxonomy-studio', label: 'Таксономия каталога', roles: ['SUPER_ADMIN'], icon: '🧭' },
   { href: '/catalog-suggestions', label: 'Мои предложения', permissions: ['CATALOG_VIEW'], icon: '💡' },
   { href: '/admin/catalog-suggestions', label: 'Предложения каталога', roles: ['SUPER_ADMIN'], icon: '✅' },
+  { href: '/admin/oem', label: 'OEM / Fitment', roles: ['SUPER_ADMIN'], icon: '#' },
   { href: '/admin/vehicles', label: 'Автомобили', permissions: ['CATALOG_VIEW'], icon: '🚘' },
   {
     href: '/vin',

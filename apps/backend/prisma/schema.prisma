@@ -1169,6 +1169,7 @@ model OemPart {
   descriptionNormalized String?
   status                OemPartStatus @default(UNKNOWN)
   metadata              Json          @default("{}")
+  isActive              Boolean       @default(true)
 
   manufacturerId String
   manufacturer   Manufacturer @relation(fields: [manufacturerId], references: [id], onDelete: Restrict)
@@ -1193,6 +1194,7 @@ model OemPart {
   @@index([manufacturerId])
   @@index([sourceId])
   @@index([status])
+  @@index([isActive])
 }
 
 model OemPartAlias {
@@ -1308,6 +1310,7 @@ model OemPartFitment {
   confidence Int
   sourceId   String
   source     OemSource          @relation(fields: [sourceId], references: [id], onDelete: Restrict)
+  isActive   Boolean            @default(true)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -1318,6 +1321,7 @@ model OemPartFitment {
   @@index([vehicleGenerationId])
   @@index([vehicleSpecificationId])
   @@index([sourceId])
+  @@index([isActive])
 }
 
 model OemCrossReference {
@@ -1337,6 +1341,7 @@ model OemCrossReference {
   source                       OemSource             @relation(fields: [sourceId], references: [id], onDelete: Restrict)
   notes                        String?
   fingerprint                  String                @unique
+  isActive                     Boolean               @default(true)
   createdAt                    DateTime              @default(now())
 
   @@index([fromOemPartId])
@@ -1345,6 +1350,7 @@ model OemCrossReference {
   @@index([normalizedExternalPartNumber])
   @@index([relationType])
   @@index([sourceId])
+  @@index([isActive])
 }
 
 model OemImportBatch {

@@ -62,6 +62,8 @@ export class AddOemFitmentDto {
   @IsUUID() sourceId!: string;
 }
 
+export class UpdateOemFitmentDto extends PartialType(AddOemFitmentDto) {}
+
 export class AddOemCrossReferenceDto {
   @IsOptional() @IsUUID() toOemPartId?: string;
   @IsOptional() @IsUUID() partBrandId?: string;
