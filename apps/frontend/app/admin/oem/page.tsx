@@ -49,7 +49,10 @@ function sourceLabel(name: string, license?: string) {
 const relationLabels: Record<string, string> = {
   AFTERMARKET_ANALOG: "Аналог другого производителя",
   INTERCHANGE: "Взаимозаменяемая деталь",
-  REPLACEMENT: "Замена",
+  REPLACEMENT: "Замена детали",
+  SUPERSESSION: "Новый номер, заменяющий этот OEM",
+  PREDECESSOR: "Предыдущий OEM-номер",
+  SUCCESSOR: "Следующий OEM-номер",
   OES_EQUIVALENT: "Эквивалент OES",
   POSSIBLE_MATCH: "Возможное совпадение",
 };
@@ -183,9 +186,7 @@ export default function OemAdminPage() {
   }
   async function saveMain() {
     if (!main.manufacturerId || !main.number.trim() || !main.sourceId) {
-      setError(
-        "Заполните производителя, OEM-номер и источник.",
-      );
+      setError("Заполните производителя, OEM-номер и источник.");
       return;
     }
     const payload = {
@@ -637,7 +638,7 @@ export default function OemAdminPage() {
               {action === "cross" && (
                 <>
                   <Select
-                    label="Производитель аналога"
+                    label="Производитель детали (необязательно для предыдущего OEM)"
                     value={cross.partBrandId}
                     onChange={(value) =>
                       setCross({ ...cross, partBrandId: value })
@@ -670,7 +671,7 @@ export default function OemAdminPage() {
                     }
                     options={options.sources.map((item) => [
                       item.id,
-                      item.name,
+                      sourceLabel(item.name, item.license),
                     ])}
                   />
                   <Input
@@ -683,7 +684,10 @@ export default function OemAdminPage() {
                   />
                   <button
                     disabled={
-                      !cross.partBrandId ||
+                      (!cross.partBrandId &&
+                        ["AFTERMARKET_ANALOG", "OES_EQUIVALENT"].includes(
+                          cross.relationType,
+                        )) ||
                       !cross.externalPartNumber.trim() ||
                       !cross.sourceId ||
                       busy
