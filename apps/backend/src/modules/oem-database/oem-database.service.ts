@@ -366,8 +366,11 @@ export class OemDatabaseService {
       !dto.toOemPartId &&
       (!dto.partBrandId || !normalizedExternalPartNumber)
     ) {
-      throw new BadRequestException('Cross-reference target is incomplete');
+      throw new BadRequestException(
+        'Для внешнего номера выберите производителя детали и укажите номер',
+      );
     }
+    if (dto.partBrandId) await this.assertActivePartBrand(dto.partBrandId);
     if (dto.toOemPartId) {
       await this.get(dto.toOemPartId);
       if (await this.reaches(dto.toOemPartId, id)) {
@@ -407,6 +410,18 @@ export class OemDatabaseService {
       );
       return item;
     });
+  }
+
+  private async assertActivePartBrand(id: string) {
+    const brand = await this.prisma.partBrand.findFirst({
+      where: { id, isActive: true },
+      select: { id: true },
+    });
+    if (!brand) {
+      throw new BadRequestException(
+        'Выбранный производитель детали не найден или отключён',
+      );
+    }
   }
 
   async deactivateCrossReference(

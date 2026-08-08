@@ -85,6 +85,36 @@ type CuratedBrand = {
 
 const CURATED_BRANDS: CuratedBrand[] = [
   {
+    name: 'Toyota Genuine Parts',
+    wikidataId: 'Q53268',
+    aliases: ['Toyota Genuine Parts & Accessories', 'Toyota OEM'],
+    country: 'JP',
+    foundedYear: 1937,
+    website: 'https://www.toyota.com/',
+    types: ['OEM'],
+    specializations: ['genuine service parts'],
+  },
+  {
+    name: 'BYD Genuine Parts',
+    wikidataId: 'Q26070',
+    aliases: ['BYD OEM'],
+    country: 'CN',
+    foundedYear: 1995,
+    website: 'https://www.bydglobal.com/',
+    types: ['OEM', 'EV'],
+    specializations: ['genuine service parts', 'electric vehicles'],
+  },
+  {
+    name: 'Geely Genuine Parts',
+    wikidataId: 'Q185091',
+    aliases: ['Geely OEM'],
+    country: 'CN',
+    foundedYear: 1986,
+    website: 'https://global.geely.com/',
+    types: ['OEM', 'EV'],
+    specializations: ['genuine service parts', 'electric vehicles'],
+  },
+  {
     name: 'Bosch',
     wikidataId: 'Q234021',
     aliases: ['Robert Bosch', 'Robert Bosch GmbH'],
@@ -678,6 +708,10 @@ export function buildDataset(
     });
 }
 
+export function buildCuratedDataset(retrievedAt = new Date()): PartBrandSeed[] {
+  return buildDataset([], [], retrievedAt);
+}
+
 export function validateDataset(dataset: PartBrandSeed[]) {
   const duplicates = (values: string[]) =>
     values.filter((value, index) => values.indexOf(value) !== index);
@@ -737,6 +771,7 @@ async function databaseComparison(
 function report(
   dataset: PartBrandSeed[],
   comparison: { newBrands: number; updates: number },
+  curatedOnly: boolean,
 ) {
   const countType = (type: PartBrandType) =>
     dataset.filter((item) => item.types.includes(type)).length;
@@ -744,6 +779,7 @@ function report(
     JSON.stringify(
       {
         mode: process.argv.includes('--apply') ? 'apply' : 'plan',
+        dataset: curatedOnly ? 'curated' : 'world',
         foundBrands: dataset.length,
         ...comparison,
         aliases: dataset.reduce((sum, item) => sum + item.aliases.length, 0),
@@ -759,10 +795,12 @@ function report(
           EV: countType(PartBrandType.EV),
           PREMIUM: countType(PartBrandType.PREMIUM),
         },
-        sources: [
-          { name: VPIC_SOURCE, license: VPIC_LICENSE },
-          { name: WIKIDATA_SOURCE, license: WIKIDATA_LICENSE },
-        ],
+        sources: curatedOnly
+          ? [{ name: WIKIDATA_SOURCE, license: WIKIDATA_LICENSE }]
+          : [
+              { name: VPIC_SOURCE, license: VPIC_LICENSE },
+              { name: WIKIDATA_SOURCE, license: WIKIDATA_LICENSE },
+            ],
       },
       null,
       2,
@@ -819,22 +857,26 @@ async function applyDataset(prisma: PrismaClient, dataset: PartBrandSeed[]) {
 }
 
 async function main() {
-  const [vpic, plants] = await Promise.all([
-    fetchVpicManufacturers(),
-    fetchEquipmentPlants(),
-  ]);
-  const dataset = buildDataset(vpic, plants);
+  const curatedOnly = process.argv.includes('--curated-only');
+  const dataset = curatedOnly
+    ? buildCuratedDataset()
+    : await Promise.all([
+        fetchVpicManufacturers(),
+        fetchEquipmentPlants(),
+      ]).then(([vpic, plants]) => buildDataset(vpic, plants));
   validateDataset(dataset);
   const prisma = new PrismaClient();
   try {
     const comparison = await databaseComparison(prisma, dataset);
-    report(dataset, comparison);
+    report(dataset, comparison, curatedOnly);
     if (!process.argv.includes('--apply')) {
       console.log('Dry run complete. No database records were changed.');
       return;
     }
     await applyDataset(prisma, dataset);
-    console.log('World parts brands seed applied successfully.');
+    console.log(
+      `${curatedOnly ? 'Curated' : 'World'} parts brands seed applied successfully.`,
+    );
   } finally {
     await prisma.$disconnect();
   }

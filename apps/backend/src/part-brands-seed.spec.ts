@@ -1,5 +1,6 @@
 import {
   brandSlug,
+  buildCuratedDataset,
   buildDataset,
   mapVpicManufacturer,
   normalizeName,
@@ -36,6 +37,28 @@ describe('world parts brands seed', () => {
     expect(
       dataset.filter((item) => item.normalizedName === 'example parts'),
     ).toHaveLength(1);
+    expect(() => validateDataset(dataset)).not.toThrow();
+  });
+
+  it('builds the small curated seller-facing brand list', () => {
+    const dataset = buildCuratedDataset(new Date('2026-08-08'));
+    expect(dataset).toHaveLength(23);
+    expect(dataset.map((item) => item.officialName)).toEqual(
+      expect.arrayContaining([
+        'Toyota Genuine Parts',
+        'BYD Genuine Parts',
+        'Geely Genuine Parts',
+        'Bosch',
+        'Denso',
+        'NGK',
+        'Brembo',
+        'SKF',
+        'MAHLE',
+        'Valeo',
+        'ZF',
+        'Aisin',
+      ]),
+    );
     expect(() => validateDataset(dataset)).not.toThrow();
   });
 });

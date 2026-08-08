@@ -48,6 +48,8 @@
     "byd-cleanup:apply": "tsx scripts/byd-vehicle-cleanup.ts --apply",
     "part-brands:plan": "tsx prisma/part-brands.seed.ts",
     "part-brands:apply": "tsx prisma/part-brands.seed.ts --apply",
+    "part-brands:curated:plan": "tsx prisma/part-brands.seed.ts --curated-only",
+    "part-brands:curated:apply": "tsx prisma/part-brands.seed.ts --curated-only --apply",
     "oem-db:plan": "tsx prisma/oem-database.seed.ts",
     "oem-db:apply": "tsx prisma/oem-database.seed.ts --apply",
     "db:backup": "tsx scripts/backup-database.ts"

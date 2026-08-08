@@ -245,7 +245,11 @@ export default function OemAdminPage() {
           }),
         "Совместимость с автомобилем добавлена.",
       );
-    if (action === "cross")
+    if (action === "cross") {
+      if (!cross.partBrandId) {
+        setError("Для внешнего номера выберите производителя детали.");
+        return;
+      }
       await run(
         () =>
           addOemCrossReference(selected.id, {
@@ -255,6 +259,7 @@ export default function OemAdminPage() {
           }),
         "Номер аналога добавлен.",
       );
+    }
   }
 
   if (authLoading) return <p>Проверка доступа…</p>;
@@ -638,7 +643,7 @@ export default function OemAdminPage() {
               {action === "cross" && (
                 <>
                   <Select
-                    label="Производитель детали (необязательно для предыдущего OEM)"
+                    label="Производитель детали"
                     value={cross.partBrandId}
                     onChange={(value) =>
                       setCross({ ...cross, partBrandId: value })
@@ -648,6 +653,13 @@ export default function OemAdminPage() {
                       item.officialName,
                     ])}
                   />
+                  {options.partBrands.length === 0 && (
+                    <p className="rounded bg-amber-50 p-3 text-sm text-amber-800">
+                      Справочник производителей деталей пуст. Сначала
+                      администратор должен загрузить проверенный curated-список;
+                      без производителя внешний номер сохранить нельзя.
+                    </p>
+                  )}
                   <Input
                     label="Номер аналога"
                     value={cross.externalPartNumber}
@@ -684,10 +696,7 @@ export default function OemAdminPage() {
                   />
                   <button
                     disabled={
-                      (!cross.partBrandId &&
-                        ["AFTERMARKET_ANALOG", "OES_EQUIVALENT"].includes(
-                          cross.relationType,
-                        )) ||
+                      !cross.partBrandId ||
                       !cross.externalPartNumber.trim() ||
                       !cross.sourceId ||
                       busy
